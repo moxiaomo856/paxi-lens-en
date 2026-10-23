@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 620" font-family="'Segoe UI', 'Microsoft YaHei', sans-serif">
+  <rect x="0" y="0" width="800" height="620" fill="#ffffff"/>
+  <text x="400" y="34" text-anchor="middle" font-size="21" font-weight="700" fill="#1e293b">Paxi Lens · 系统架构 — 非托管工具集 + 只读数据层</text>
+  <text x="400" y="56" text-anchor="middle" font-size="12" fill="#64748b">实线箭头 = 用户签名/广播流；数据层独立只读抓取链上公开数据，不触碰私钥与资金</text>
+
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#475569"/>
+    </marker>
+  </defs>
+
+  <!-- Wallet layer -->
+  <rect x="250" y="72" width="300" height="64" rx="10" fill="#ecfdf5" stroke="#16a34a" stroke-width="2"/>
+  <text x="400" y="98" text-anchor="middle" font-size="15" font-weight="700" fill="#166534">用户钱包层 · PaxiHub（window.paxihub）</text>
+  <text x="400" y="118" text-anchor="middle" font-size="11.5" fill="#15803d">移动端 App · 注入式钱包 · 私钥与资金永不离开本地 · keplr 兜底(pump)</text>
+
+  <!-- App layer -->
+  <rect x="220" y="182" width="360" height="64" rx="10" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+  <text x="400" y="208" text-anchor="middle" font-size="15" font-weight="700" fill="#1d4ed8">Paxi Lens 前端（20 工具 · 纯静态 · 非托管）</text>
+  <text x="400" y="228" text-anchor="middle" font-size="11.5" fill="#1e40af">本地构造 SignDoc · 解码/发币/Swap/治理/质押/委托…</text>
+
+  <!-- Chain layer -->
+  <rect x="250" y="292" width="300" height="64" rx="10" fill="#fef3c7" stroke="#d97706" stroke-width="2"/>
+  <text x="400" y="318" text-anchor="middle" font-size="15" font-weight="700" fill="#b45309">Paxi 链 · LCD（REST）</text>
+  <text x="400" y="338" text-anchor="middle" font-size="11.5" fill="#92400e">钱包仅签名 · dApp 经 LCD 广播 · 只读查询</text>
+
+  <!-- Data layer label -->
+  <text x="400" y="398" text-anchor="middle" font-size="13" font-weight="700" fill="#7c3aed">数据层（本期新增 · 开源可接管 · 零 TKCC）</text>
+
+  <!-- Scanner -->
+  <rect x="40" y="412" width="210" height="80" rx="10" fill="#f5f3ff" stroke="#7c3aed" stroke-width="2"/>
+  <text x="145" y="440" text-anchor="middle" font-size="14" font-weight="700" fill="#6d28d9">区块扫描服务 (VPS)</text>
+  <text x="145" y="460" text-anchor="middle" font-size="11" fill="#7c3aed">只读 · pump-watch 同款架构</text>
+  <text x="145" y="478" text-anchor="middle" font-size="11" fill="#7c3aed">公开披露 · 不持私钥</text>
+
+  <!-- DB -->
+  <rect x="300" y="412" width="200" height="80" rx="10" fill="#f5f3ff" stroke="#7c3aed" stroke-width="2"/>
+  <text x="400" y="440" text-anchor="middle" font-size="14" font-weight="700" fill="#6d28d9">只读数据库 (SQLite)</text>
+  <text x="400" y="460" text-anchor="middle" font-size="11" fill="#7c3aed">事件索引 · 可重放</text>
+  <text x="400" y="478" text-anchor="middle" font-size="11" fill="#7c3aed">官方可一键接管</text>
+
+  <!-- Dashboards -->
+  <rect x="550" y="412" width="210" height="80" rx="10" fill="#f5f3ff" stroke="#7c3aed" stroke-width="2"/>
+  <text x="655" y="438" text-anchor="middle" font-size="14" font-weight="700" fill="#6d28d9">数据看板</text>
+  <text x="655" y="457" text-anchor="middle" font-size="10.5" fill="#7c3aed">大户追踪·大额流·合约雷达</text>
+  <text x="655" y="474" text-anchor="middle" font-size="10.5" fill="#7c3aed">治理看板·验证者透明</text>
+
+  <!-- Compliance strip -->
+  <rect x="40" y="540" width="720" height="56" rx="10" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"/>
+  <text x="400" y="565" text-anchor="middle" font-size="13.5" font-weight="700" fill="#166534">合规约束</text>
+  <text x="400" y="585" text-anchor="middle" font-size="11.5" fill="#15803d">单一透明收款地址 paxi1rd…g7xd · 无资金托管 · 合约不持用户资金 · 新玩法零 TKCC 触碰 · DAO 资助金同址按月披露</text>
+
+  <!-- Arrows -->
+  <line x1="400" y1="138" x2="400" y2="178" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="400" y1="248" x2="400" y2="288" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="400" y1="358" x2="160" y2="408" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="252" y1="452" x2="298" y2="452" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="502" y1="452" x2="548" y2="452" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+</svg>

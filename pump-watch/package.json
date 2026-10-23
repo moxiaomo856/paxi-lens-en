@@ -1,0 +1,12 @@
+{
+  "name": "paxi-pump-watch",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Paxi Pump token-launch cloud monitor (resident HTTP service, scans the chain and pushes to WeChat every 10 minutes)",
+  "scripts": {
+    "start": "node pump-watch-server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
