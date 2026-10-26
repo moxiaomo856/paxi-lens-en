@@ -111,11 +111,11 @@ const DENOM = 'upaxi';
 const GOV_AUTH = 'paxi10d07y265gmmuvt4z0w9aw880jnsr700je7h2vr';
 const WHITELIST = [
   'paxi1gzrza9s6frtwenz0p4dpjftjpvjaznn6f2lvh3',
-  'paxi1rdarmm997hqwfdgl9wvnpffe28zmex3kfyg7xd',
+  'paxi1ga6x5ljj547ax436sfc5kw6fn3vfdwqtn0kpwg',
   'paxi1qvrmsftn402cumn0axqjc4dgvmkge6lhp0y39j',
   'paxi1fl8j6gewhs2yz3tztr5dlvsmpp0d7gaxka73e5',
 ];
-const RECIPIENT = 'paxi1rdarmm997hqwfdgl9wvnpffe28zmex3kfyg7xd';
+const RECIPIENT = 'paxi1ga6x5ljj547ax436sfc5kw6fn3vfdwqtn0kpwg';
 const AMOUNT_PAXI = 300000;
 const AMOUNT_MICRO = String(AMOUNT_PAXI * 1e6);
 

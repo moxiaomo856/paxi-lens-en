@@ -17,7 +17,7 @@ const path = require('path');
 const LCD = 'https://mainnet-lcd.paxinet.io';
 // Collection address: unified with the dApp as the single platform collection address CONFIG.feeCollector
 const FEE_RECEIVERS = new Set([
-    "paxi1rdarmm997hqwfdgl9wvnpffe28zmex3kfyg7xd"
+    "paxi1ga6x5ljj547ax436sfc5kw6fn3vfdwqtn0kpwg"
 ]);
 const MAX_BLOCKS_PER_RUN = 3000;   // Max blocks scanned per run (skip the middle section when downtime is too long)
 const CONCURRENCY = 6;             // Concurrent blocks fetched (too high triggers node 503 rate limiting)

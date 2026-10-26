@@ -63,7 +63,7 @@ const SHARED_CONFIG = {
   gasPrice: '0.25upaxi',
   gasLimit: 600000,
   maxMessagesPerTx: 100,
-  feeCollector: 'paxi1rdarmm997hqwfdgl9wvnpffe28zmex3kfyg7xd',
+  feeCollector: 'paxi1ga6x5ljj547ax436sfc5kw6fn3vfdwqtn0kpwg',
   feeRate: 1.5,
   // Batch transfer charges per address (PAXI/address)
   batchTransfer: {
@@ -87,7 +87,7 @@ const SHARED_CONFIG = {
     // DAO proposal (community-pool grant / funding request) whitelist: only these wallet addresses see the feature once connected
     daoProposerWhitelist: [
       'paxi1gzrza9s6frtwenz0p4dpjftjpvjaznn6f2lvh3',
-      'paxi1rdarmm997hqwfdgl9wvnpffe28zmex3kfyg7xd',
+      'paxi1ga6x5ljj547ax436sfc5kw6fn3vfdwqtn0kpwg',
       'paxi1qvrmsftn402cumn0axqjc4dgvmkge6lhp0y39j',
       'paxi1fl8j6gewhs2yz3tztr5dlvsmpp0d7gaxka73e5',
     ],

@@ -646,7 +646,7 @@ async function _mintNft() {
   const count = parseInt(document.getElementById('mintCount').value) || 0;
   if (!contractAddr || count < 1) { showToast(_nftL('fillAll'), 'warning'); return; }
   if (count > 10) { showToast(_nftL('max10Hint'), 'warning'); return; }
-  if (!confirm(_nftL('mintConfirm') + (CONFIG.feeCollector || 'paxi1rdarmm997hqwfdgl9wvnpffe28zmex3kfyg7xd'))) return;
+  if (!confirm(_nftL('mintConfirm') + (CONFIG.feeCollector || 'paxi1ga6x5ljj547ax436sfc5kw6fn3vfdwqtn0kpwg'))) return;
 
   const btn = document.getElementById('btnBatchMint');
   const statusEl = document.getElementById('nftMintStatus');
@@ -684,7 +684,7 @@ async function _mintNft() {
     const feeAmount = paxiToUpaxi('5');
     const feeMsg = PaxiCosmJS.MsgSend.fromPartial({
       fromAddress: addr,
-      toAddress: (CONFIG.feeCollector || 'paxi1rdarmm997hqwfdgl9wvnpffe28zmex3kfyg7xd'),
+      toAddress: (CONFIG.feeCollector || 'paxi1ga6x5ljj547ax436sfc5kw6fn3vfdwqtn0kpwg'),
       amount: [PaxiCosmJS.coins(feeAmount, CONFIG.denom)[0]],
     });
     messages.push(PaxiCosmJS.Any.fromPartial({

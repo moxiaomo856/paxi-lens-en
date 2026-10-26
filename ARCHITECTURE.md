@@ -133,8 +133,7 @@ paxi-suite/                # existing: front-end (GitHub Pages)
 1. **Read-only**: the data service only calls LCD/RPC read-only endpoints, never touches signing / private keys / funds.
 2. **Take-overable**: fully open-source + replay scripts, the official team can take over and run with one click.
 3. **Non-custodial**: consistent with the toolkit's "no custody" promise, only adding one publicly disclosed scanning service (pump-watch precedent).
-4. **Zero TKCC**: all new features priced in PAXI/PRC-20, no TKCC touchpoints whatsoever.
-5. **Disclaimer**: the whale leaderboard / health check / yield simulator are all data presentation, with "not investment advice" attached.
+4. **Disclaimer**: the whale leaderboard / health check / yield simulator are all data presentation, with "not investment advice" attached.
 
 ## 6. Next-Step Development Recommendations (5 phases, ~16–18 weeks total)
 

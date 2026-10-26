@@ -64,7 +64,7 @@ sandbox.mapError = (e) => (e && e.message) || String(e);
 sandbox.paxiToUpaxi = (s) => String(Math.round(parseFloat(s || '0') * 1e6));
 sandbox.upaxiToPaxi = (s) => String(parseInt(s || '0', 10) / 1e6);
 sandbox.getLCD = () => 'https://example.invalid';
-sandbox.CONFIG = { lcd: 'https://example.invalid', denom: 'upaxi', feeCollector: 'paxi1rdarmm997hqwfdgl9wvnpffe28zmex3kfyg7xd' };
+sandbox.CONFIG = { lcd: 'https://example.invalid', denom: 'upaxi', feeCollector: 'paxi1ga6x5ljj547ax436sfc5kw6fn3vfdwqtn0kpwg' };
 sandbox.SHARED_CONFIG = null;            // overridden by shared.js
 sandbox.PaxiCosmJS = new Proxy({}, { get: () => undefined });
 sandbox.state = { connected: false, wallet: null, currentTool: 'proposal' };

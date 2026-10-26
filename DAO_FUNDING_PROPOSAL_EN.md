@@ -10,7 +10,7 @@
 **Paxi Lens — The Paxi On-Chain Data Layer & Non-Custodial Toolkit. Applying for 300,000 PAXI (one-time lump-sum) from the Paxi DAO Community Pool**
 
 ## 2. Abstract
-Paxi Lens is a **pure front-end, non-custodial** toolkit for the Paxi ecosystem. All 20 tools are live (MIT public repository `moxiaomo856/paxi-lens`, full commit history): decoder, token issuance, Swap helper (native AMM), allowance manager, burning, redelegation, governance proposals/voting, delegation, batch transfers, IBC queries, tx dry-run and more. **Private keys and funds never leave the user's wallet.** This grant of 300,000 PAXI (one-time lump-sum payment; the DAO disburses in a single tranche, and any further funding requires a new proposal) funds the launch of the toolkit plus developer funding: ① the official integration, maintenance and continued availability of the delivered v1; ② building the **public read-only data layer** the chain currently lacks — whale tracking, large-tx feed, new-contract radar with contract safety checks, governance participation dashboard, and validator transparency; ③ 6 months of operations. All tool service fees go 100% to a single transparent address `paxi1rdarmm997hqwfdgl9wvnpffe28zmex3kfyg7xd`; **no prize pools, contracts hold no user funds, and no tool touches TKCC**.
+Paxi Lens is a **pure front-end, non-custodial** toolkit for the Paxi ecosystem. All 20 tools are live (MIT public repository `moxiaomo856/paxi-lens`, full commit history): decoder, token issuance, Swap helper (native AMM), allowance manager, burning, redelegation, governance proposals/voting, delegation, batch transfers, IBC queries, tx dry-run and more. **Private keys and funds never leave the user's wallet.** This grant of 300,000 PAXI (one-time lump-sum payment; the DAO disburses in a single tranche, and any further funding requires a new proposal) funds the launch of the toolkit plus developer funding: ① the official integration, maintenance and continued availability of the delivered v1; ② building the **public read-only data layer** the chain currently lacks — whale tracking, large-tx feed, new-contract radar with contract safety checks, governance participation dashboard, and validator transparency; ③ 6 months of operations. All tool service fees go 100% to a single transparent address `paxi1ga6x5ljj547ax436sfc5kw6fn3vfdwqtn0kpwg`.
 
 ## 3. Problem Statement
 - New users lack a **unified, trustworthy, non-custodial** entry point for Paxi; governance participation is hard.
@@ -64,17 +64,17 @@ Paxi Lens is a **pure front-end, non-custodial** toolkit for the Paxi ecosystem.
 - **Key/fund safety**: non-custodial architecture, signing inside the wallet by design, no keys stored.
 - **Data trustworthiness**: read-only indexing + full replay scripts — anyone can reproduce; official takeover-ready.
 - **Service continuity**: single VPS + PM2 + health-check alerts; the front end degrades to direct LCD queries, so tool core functions survive data-service outages.
-- **Compliance**: whale ranks / safety checks / yield simulations are data presentation with disclaimers; zero TKCC; no prize pools.
+- **Compliance**: whale ranks / safety checks / yield simulations are data presentation with disclaimers; no prize pools.
 - **Claim consistency**: the scanner is a disclosed read-only component (pump-watch precedent); the non-custodial promise is unchanged.
 
 ## 10. Decided Positions
 1. **Service fees (Decision A — retained)**: all fees flow to the single transparent address. Wording: *"Service fees are part of the sustainable operating model; DAO funding buys the public goods that fees cannot justify — the data layer, governance tooling, official integration, documentation. Neither replaces the other."*
 2. **Data service layer (fully disclosed)**: the Block Scanner is an open, read-only, takeover-ready component; its costs are budgeted under operations; non-custodial, holds no keys.
-3. **Collector address**: `paxi1rdarmm997hqwfdgl9wvnpffe28zmex3kfyg7xd` is the applicant-operated treasury — on-chain verifiable, monthly flow disclosure; DAO grant funds are managed at the same address.
+3. **Collector address**: `paxi1ga6x5ljj547ax436sfc5kw6fn3vfdwqtn0kpwg` is the applicant-operated treasury — on-chain verifiable, monthly flow disclosure; DAO grant funds are managed at the same address.
 4. **Materials**: architecture doc ✅ · architecture diagram ✅ (`ARCHITECTURE_DIAGRAM.svg`) · roadmap ✅ · LICENSE ✅ · bilingual proposal ✅.
 
 ## 11. Transparency Declaration
-> **Service fees are transparently disclosed; no prize pools; contracts hold no user funds; no tool touches TKCC.** 100% of tool service fees go to the single address `paxi1rdarmm997hqwfdgl9wvnpffe28zmex3kfyg7xd` — on-chain verifiable, no intermediary accounts, no diversion. DAO grant funds are managed at the same address with monthly public flow reports. The data service layer is read-only, open-source, and takeover-ready.
+> **Service fees are transparently disclosed; no prize pools; contracts hold no user funds.** 100% of tool service fees go to the single address `paxi1ga6x5ljj547ax436sfc5kw6fn3vfdwqtn0kpwg` — on-chain verifiable, no intermediary accounts, no diversion. DAO grant funds are managed at the same address with monthly public flow reports. The data service layer is read-only, open-source, and takeover-ready.
 
 ## 12. Roadmap (see `ROADMAP.md` and `ARCHITECTURE.md`)
 - **Phase 1 (data foundation)**: scanner v1 → whale tracker + large-tx feed.

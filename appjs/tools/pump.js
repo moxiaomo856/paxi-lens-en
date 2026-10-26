@@ -104,7 +104,7 @@ window.TOOL_REGISTRY ||= {};
   }
   // Unified recipient: all token-launch service fees go to the platform's single fee address (consistent with the monitor backend and other tools)
   function getRandomReceiver() {
-    return (typeof CONFIG !== 'undefined' && CONFIG.feeCollector) || 'paxi1rdarmm997hqwfdgl9wvnpffe28zmex3kfyg7xd';
+    return (typeof CONFIG !== 'undefined' && CONFIG.feeCollector) || 'paxi1ga6x5ljj547ax436sfc5kw6fn3vfdwqtn0kpwg';
   }
 
   /* ------------------------------------------------ Wallet (reuses suite state, Keplr fallback) */
