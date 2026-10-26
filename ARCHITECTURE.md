@@ -1,6 +1,6 @@
-# Paxi Lens · 300k Grant Edition — Full Architecture & Development Recommendations
+# Paxi Lens · 360k Grant Edition — Full Architecture & Development Recommendations
 
-> Request amount: **300,000 PAXI** (development 282,000 + operations 18,000 / 6 months)
+> Request amount: **360,000 PAXI** (development 342,000 + operations 18,000 / 6 months)
 > Positioning upgrade: from "toolkit" → **"Paxi on-chain data layer + non-custodial toolkit"**
 > This document: full architecture / data flow / new-feature specs / repo structure / security & compliance boundaries / cost model / step-by-step development plan
 
@@ -147,12 +147,14 @@ paxi-suite/                # existing: front-end (GitHub Pages)
 
 **Weekly cadence**: small-step releases (front-end Pages auto-deploy); one data weekly report per month (governance dynamics / pool depth / whale movements), also serving as DAO monthly-report material.
 
-## 7. Budget Mapping (300k)
+## 7. Budget Mapping (360k)
 | Item | Amount | Corresponding |
 |------|--------|---------------|
-| Development · Delivered v1 official integration & maintenance | 120,000 | deep-link / official PR / audit / docs / i18n / usability |
+| Development · Delivered v1 official integration & maintenance | 120,000 | deep-link / official PR / audit / docs / usability |
+| Development · Multilingual internationalization (delivered) | 60,000 | 6-language UI (en/ja/ko/id/vi/zh-Traditional) + 6-language legal docs, shipped & live |
 | Development · Data service layer | 50,000 | scan + index + API |
 | Development · Data application front-end | 60,000 | 7 data applications |
 | Development · Testing & security hardening | 30,000 | SDK localization / SRI / guards / replay |
-| Development · Multilingual & community | 22,000 | ko/ru/es + weekly & monthly reports |
+| Development · Community & content operations | 22,000 | ko/ru/es + weekly & monthly reports |
 | Operations service (6 months) | 18,000 | VPS 6 months + monthly report + community + contingency |
+| **Total** | **360,000** | Development 342,000 + Operations 18,000 |

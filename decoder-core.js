@@ -41,6 +41,19 @@ const TIMEOUT = 20000;
  * and safest. */
 if (typeof window !== 'undefined') window.$ = (id) => document.getElementById(id);
 
+/* ============================================================ Engine-level i18n
+ * English is the built-in fallback. The UI layer injects a per-language override
+ * table via PaxiDecoder.setCoreStrings(dict) (keys below). Missing keys fall back
+ * to English, so partial translations are safe.
+ * ==========================================================================*/
+let CORE_OVERRIDE = null;
+function cT(key, fb, ...args) {
+  let s = (CORE_OVERRIDE && CORE_OVERRIDE[key] != null) ? CORE_OVERRIDE[key] : fb;
+  args.forEach((v, i) => { s = String(s).split('{' + i + '}').join(String(v == null ? '' : v)); });
+  return s;
+}
+
+
 function shortAddr(a) {
   if (!a) return '—';
   a = String(a);
@@ -101,11 +114,11 @@ function timeAgo(ts) {
   const t = Date.parse(ts);
   if (isNaN(t)) return '';
   const s = Math.max(0, Math.floor((Date.now() - t) / 1000));
-  if (s < 60) return s + 's ago';
-  if (s < 3600) return Math.floor(s / 60) + 'm ago';
-  if (s < 86400) return Math.floor(s / 3600) + 'h ago';
-  if (s < 86400 * 30) return Math.floor(s / 86400) + 'd ago';
-  return Math.floor(s / 86400 / 30) + 'mo ago';
+  if (s < 60) return cT('ago.s', '{0}s ago', s);
+  if (s < 3600) return cT('ago.m', '{0}m ago', Math.floor(s / 60));
+  if (s < 86400) return cT('ago.h', '{0}h ago', Math.floor(s / 3600));
+  if (s < 86400 * 30) return cT('ago.d', '{0}d ago', Math.floor(s / 86400));
+  return cT('ago.mo', '{0}mo ago', Math.floor(s / 86400 / 30));
 }
 
 async function getJSON(url, ms = TIMEOUT) {
@@ -360,9 +373,9 @@ const TYPE_LABEL = {
 };
 
 function labelOf(type) {
-  if (TYPE_LABEL[type]) return TYPE_LABEL[type];
+  if (TYPE_LABEL[type]) return cT('tl' + type, TYPE_LABEL[type]);
   const short = String(type).split('.').pop();
-  return short || 'Unknown action';
+  return short ? cT('tl.' + short, short) : cT('tl.unknown', 'Unknown action');
 }
 
 /** Vote option → label */
@@ -370,7 +383,7 @@ const VOTE_OPT = {
   VOTE_OPTION_YES: 'Yes', VOTE_OPTION_NO: 'No',
   VOTE_OPTION_ABSTAIN: 'Abstain', VOTE_OPTION_NO_WITH_VETO: 'No with veto',
 };
-function voteText(o) { return VOTE_OPT[o] || o; }
+function voteText(o) { return VOTE_OPT[o] ? cT('vote.' + o, VOTE_OPT[o]) : o; }
 
 /** base64 -> UTF-8 string (does not rely on atob, works in any runtime) */
 function b64ToUtf8(b64) {
@@ -434,7 +447,7 @@ const COVERED_ACTIONS = ['transfer', 'transfer_nft', 'send', 'mint', 'burn', 'se
 function tokenAmtStr(raw, contract, tokens) {
   const info = tokens && tokens[contract];
   if (info && info.symbol) return esc(formatToken(raw, info));
-  return `${esc(raw)} tokens (precision unknown)`;
+  return `${esc(raw)} ${cT('misc.tokensUnknownPrecision', 'tokens (precision unknown)')}`;
 }
 
 /**
@@ -451,137 +464,136 @@ function storyLineFor(m, flows, tokens) {
     const amts = Array.isArray(info.amount)
       ? info.amount.map(x => fmtCoin(x.amount, x.denom)).join('、')
       : fmtCoin(info.amount, 'upaxi');
-    lines.push(`💸 <b>${esc(nameOf(info.from))}</b> sent <b>${esc(amts)}</b> to <b>${esc(nameOf(info.to))}</b>`);
+    lines.push(cT('m.send', `💸 <b>{0}</b> sent <b>{1}</b> to <b>{2}</b>`, esc(nameOf(info.from)), esc(amts), esc(nameOf(info.to))));
 
   } else if (t === '/cosmos.bank.v1beta1.MsgMultiSend') {
     const fmtSide = (arr) => (arr || []).map(x =>
       `${esc(nameOf(x.address))} (${(x.coins || []).map(c => fmtCoin(c.amount, c.denom)).join(', ')}))`).join(' + ');
-    lines.push(`💸 Batch transfer: ${fmtSide(v.inputs)} → ${fmtSide(v.outputs)}`);
+    lines.push(cT('m.multiSend', `💸 Batch transfer: {0} → {1}`, fmtSide(v.inputs), fmtSide(v.outputs)));
 
   } else if (t.includes('ibc.applications.transfer') || t.endsWith('.MsgTransfer')) {
     const tok = v.token || {};
-    lines.push(`🌐 <b>${esc(nameOf(info.from))}</b> via channel <b>${esc(v.source_channel || '?')}</b> `
-      + `sent cross-chain <b>${esc(fmtCoin(tok.amount, tok.denom))}</b> to destination-chain address <b>${esc(shortAddr(v.receiver || ''))}</b> `
-      + `(cross-chain transfer needs confirmation from the other chain, a few seconds to a few minutes)`);
+    lines.push(cT('m.ibc', `🌐 <b>{0}</b> via channel <b>{1}</b> sent cross-chain <b>{2}</b> to destination-chain address <b>{3}</b> (cross-chain transfer needs confirmation from the other chain, a few seconds to a few minutes)`,
+      esc(nameOf(info.from)), esc(v.source_channel || '?'), esc(fmtCoin(tok.amount, tok.denom)), esc(shortAddr(v.receiver || ''))));
 
   } else if (t.endsWith('.MsgExecuteContract')) {
     const c = decodeContractMsg(m);
     const covered = COVERED_ACTIONS.includes(c.action) && flows.contract.length > 0;
     if (!covered) {
-      const act = EXEC_LABEL[c.action] || c.action || 'Unknown operation';
-      lines.push(`📜 <b>${esc(nameOf(c.sender || info.from))}</b> called contract `
-        + `<span class="lnk" data-addr="${esc(c.contract)}">${esc(nameOf(c.contract))}</span> `
-        + `to execute <b>${esc(act)}</b>`);
+      const act = (EXEC_LABEL[c.action] ? cT('exec.' + c.action, EXEC_LABEL[c.action]) : (c.action || cT('exec.unknown', 'Unknown operation')));
+      lines.push(cT('m.execContract', `📜 <b>{0}</b> called contract <span class="lnk" data-addr="{1}">{2}</span> to execute <b>{3}</b>`,
+        esc(nameOf(c.sender || info.from)), esc(c.contract), esc(nameOf(c.contract)), esc(act)));
     }
 
   } else if (t.endsWith('.MsgInstantiateContract')) {
     const c = v.contract || '';
     const lbl = v.label || '';
     const adm = v.admin || '';
-    lines.push(`🚀 <b>${esc(nameOf(info.from))}</b> created a new contract`
-      + (lbl ? ` (label: <b>${esc(lbl)}</b>)` : '')
-      + (c ? `: <span class="lnk" data-addr="${esc(c)}">${esc(shortAddr(c))}</span>` : '')
-      + (adm ? `, admin ${esc(shortAddr(adm))} (upgradeable)` : ', no admin set (non-upgradeable)'));
+    lines.push(cT('m.instantiate', `🚀 <b>{0}</b> created a new contract{1}{2}{3}`,
+      esc(nameOf(info.from)),
+      lbl ? cT('m.instLabel', ` (label: <b>{0}</b>)`, esc(lbl)) : '',
+      c ? cT('m.instAddr', `: <span class="lnk" data-addr="{0}">{1}</span>`, esc(c), esc(shortAddr(c))) : '',
+      adm ? cT('m.instAdminUp', `, admin {0} (upgradeable)`, esc(shortAddr(adm))) : cT('m.instAdminNo', ', no admin set (non-upgradeable)')));
 
   } else if (t.endsWith('.MsgStoreCode')) {
-    lines.push(`📦 <b>${esc(nameOf(info.from))}</b> uploaded a new contract code`);
+    lines.push(cT('m.storeCode', `📦 <b>{0}</b> uploaded a new contract code`, esc(nameOf(info.from))));
 
   } else if (t.endsWith('.MsgMigrateContract')) {
     const c = v.contract || '';
-    lines.push(`🔄 <b>${esc(nameOf(info.from))}</b> upgraded contract `
-      + `<span class="lnk" data-addr="${esc(c)}">${esc(nameOf(c))}</span> `
-      + `to a new version (Code ID ${esc(v.code_id || '?')})`);
+    lines.push(cT('m.migrate', `🔄 <b>{0}</b> upgraded contract <span class="lnk" data-addr="{1}">{2}</span> to a new version (Code ID {3})`,
+      esc(nameOf(info.from)), esc(c), esc(nameOf(c)), esc(v.code_id || '?')));
 
   } else if (t.endsWith('.MsgDelegate')) {
     const amt = v.amount ? fmtCoin(v.amount.amount, v.amount.denom) : '';
-    lines.push(`🏦 <b>${esc(nameOf(info.from))}</b> staked ${esc(amt)} to validator `
-      + `${esc(shortAddr(v.validator_addr || ''))}`
-      + ` (staking locks the funds; to withdraw you must first undelegate and wait for the unbonding period)`);
+    lines.push(cT('m.delegate', `🏦 <b>{0}</b> staked {1} to validator {2} (staking locks the funds; to withdraw you must first undelegate and wait for the unbonding period)`,
+      esc(nameOf(info.from)), esc(amt), esc(shortAddr(v.validator_addr || ''))));
 
   } else if (t.endsWith('.MsgUndelegate')) {
     const amt = v.amount ? fmtCoin(v.amount.amount, v.amount.denom) : '';
-    lines.push(`🏦 <b>${esc(nameOf(info.from))}</b> undelegated ${esc(amt)} from validator `
-      + `${esc(shortAddr(v.validator_addr || ''))}`
-      + ` — the funds arrive automatically after the unbonding period; during this time they cannot be traded or earn rewards`);
+    lines.push(cT('m.undelegate', `🏦 <b>{0}</b> undelegated {1} from validator {2} — the funds arrive automatically after the unbonding period; during this time they cannot be traded or earn rewards`,
+      esc(nameOf(info.from)), esc(amt), esc(shortAddr(v.validator_addr || ''))));
 
   } else if (t.endsWith('.MsgBeginRedelegate')) {
     const amt = v.amount ? fmtCoin(v.amount.amount, v.amount.denom) : '';
-    lines.push(`🏦 <b>${esc(nameOf(info.from))}</b> redelegated stake from validator `
-      + `${esc(shortAddr(v.validator_src_address || ''))} to `
-      + `${esc(shortAddr(v.validator_dst_address || ''))}, amount ${esc(amt)}`
-      + ` (principal unchanged, no unbonding wait)`);
+    lines.push(cT('m.redelegate', `🏦 <b>{0}</b> redelegated stake from validator {1} to {2}, amount {3} (principal unchanged, no unbonding wait)`,
+      esc(nameOf(info.from)), esc(shortAddr(v.validator_src_address || '')), esc(shortAddr(v.validator_dst_address || '')), esc(amt)));
 
   } else if (t.includes('WithdrawDelegatorReward')) {
-    lines.push(`💰 <b>${esc(nameOf(info.from))}</b> collected staking rewards from validator `
-      + `${esc(shortAddr(v.validator_addr || ''))}`);
+    lines.push(cT('m.claimReward', `💰 <b>{0}</b> collected staking rewards from validator {1}`,
+      esc(nameOf(info.from)), esc(shortAddr(v.validator_addr || ''))));
 
   } else if (t.includes('WithdrawValidatorCommission')) {
-    lines.push(`💰 Validator ${esc(shortAddr(v.validator_addr || ''))} withdrew its own commission`);
+    lines.push(cT('m.validatorCommission', `💰 Validator {0} withdrew its own commission`, esc(shortAddr(v.validator_addr || ''))));
 
   } else if (t.includes('SetWithdrawAddress')) {
-    lines.push(`💰 <b>${esc(nameOf(info.from))}</b> set the future reward receiving address to `
-      + `${esc(shortAddr(v.withdraw_address || ''))}`);
+    lines.push(cT('m.setWithdrawAddr', `💰 <b>{0}</b> set the future reward receiving address to {1}`,
+      esc(nameOf(info.from)), esc(shortAddr(v.withdraw_address || ''))));
 
   } else if (t.includes('FundCommunityPool')) {
     const amt = v.amount ? asArr(v.amount).map(x => fmtCoin(x.amount, x.denom)).join(', ') : '';
-    lines.push(`💜 <b>${esc(nameOf(info.from))}</b> donated ${esc(amt)} to the community pool`);
+    lines.push(cT('m.fundPool', `💜 <b>{0}</b> donated {1} to the community pool`, esc(nameOf(info.from)), esc(amt)));
 
   } else if (t.endsWith('.MsgUnjail')) {
-    lines.push(`🔓 Validator ${esc(shortAddr(v.validator_addr || ''))} applied to be unjailed and regain block-producing eligibility`);
+    lines.push(cT('m.unjail', `🔓 Validator {0} applied to be unjailed and regain block-producing eligibility`, esc(shortAddr(v.validator_addr || ''))));
 
   } else if (t.includes('gov.') && t.endsWith('.MsgVote')) {
-    const detail = v.proposal_id ? `Proposal #${esc(v.proposal_id)}` : '';
+    const detail = v.proposal_id ? cT('m.proposalNo', `Proposal #{0}`, esc(v.proposal_id)) : '';
     const opt = v.option ? voteText(v.option) : '';
-    lines.push(`🗳️ Governance vote${detail ? `: ${detail}` : ''}${opt ? `, voted <b>${esc(opt)}</b>` : ''}`
-      + (info.from ? ` (voter ${esc(nameOf(info.from))})` : ''));
+    lines.push(cT('m.vote', `🗳️ Governance vote{0}{1}{2}`,
+      detail ? cT('m.colonDetail', `: {0}`, detail) : '',
+      opt ? cT('m.votedOpt', `, voted <b>{0}</b>`, esc(opt)) : '',
+      info.from ? cT('m.voter', ` (voter {0})`, esc(nameOf(info.from))) : ''));
 
   } else if (t.includes('gov.') && t.endsWith('.MsgVoteWeighted')) {
-    const detail = v.proposal_id ? `Proposal #${esc(v.proposal_id)}` : '';
+    const detail = v.proposal_id ? cT('m.proposalNo', `Proposal #{0}`, esc(v.proposal_id)) : '';
     const opts = (v.options || []).map(o => `${voteText(o.option)}${o.weight ? '×' + o.weight : ''}`).join(', ');
-    lines.push(`🗳️ Governance weighted vote${detail ? `: ${detail}` : ''}${opts ? `, distribution <b>${esc(opts)}</b>` : ''}`
-      + (info.from ? ` (voter ${esc(nameOf(info.from))})` : ''));
+    lines.push(cT('m.voteWeighted', `🗳️ Governance weighted vote{0}{1}{2}`,
+      detail ? cT('m.colonDetail', `: {0}`, detail) : '',
+      opts ? cT('m.distribution', `, distribution <b>{0}</b>`, esc(opts)) : '',
+      info.from ? cT('m.voter', ` (voter {0})`, esc(nameOf(info.from))) : ''));
 
   } else if (t.includes('gov.') && t.endsWith('.MsgDeposit')) {
     const amt = v.amount ? asArr(v.amount).map(x => fmtCoin(x.amount, x.denom)).join(', ') : '';
-    lines.push(`🏦 Proposal deposit: ${esc(nameOf(info.from))} added ${esc(amt)} deposit to proposal #${esc(v.proposal_id || '?')}`
-      + ` (once the deposit threshold is met, the proposal enters the voting period)`);
+    lines.push(cT('m.deposit', `🏦 Proposal deposit: {0} added {1} deposit to proposal #{2} (once the deposit threshold is met, the proposal enters the voting period)`,
+      esc(nameOf(info.from)), esc(amt), esc(v.proposal_id || '?')));
 
   } else if (t.includes('gov.') && t.endsWith('.MsgSubmitProposal')) {
-    lines.push(`🗳️ ${esc(nameOf(info.from))} submitted a new proposal`
-      + (v.messages && v.messages.length ? ` (contains ${v.messages.length} execution actions)` : ''));
+    lines.push(cT('m.submitProposal', `🗳️ {0} submitted a new proposal{1}`,
+      esc(nameOf(info.from)),
+      (v.messages && v.messages.length) ? cT('m.containsActions', ` (contains {0} execution actions)`, v.messages.length) : ''));
 
   } else if (t.includes('gov.') && t.endsWith('.MsgCancelProposal')) {
-    lines.push(`🚫 ${esc(nameOf(info.from))} canceled proposal #${esc(v.proposal_id || '?')}`);
+    lines.push(cT('m.cancelProposal', `🚫 {0} canceled proposal #{1}`, esc(nameOf(info.from)), esc(v.proposal_id || '?')));
 
   } else if (t.includes('.MsgSwap') || t.includes('.MsgProvideLiquidity') || t.includes('.MsgWithdrawLiquidity')) {
     const label = labelOf(t);
     let extra = '';
     if (v.offer_coin) {
-      extra = `, swapping ${esc(fmtCoin(v.offer_coin.amount, v.offer_coin.denom))} for ${esc(String(v.ask_denom || '').toUpperCase())}`;
+      extra = cT('m.swapCoin', `, swapping {0} for {1}`, esc(fmtCoin(v.offer_coin.amount, v.offer_coin.denom)), esc(String(v.ask_denom || '').toUpperCase()));
     } else if (v.offerAmount) {
       /* Official MsgSwap flat fields: offerDenom/offerAmount/minReceive (DApp guide §3.8) */
       const od = String(v.offerDenom || '');
       const inShow = od === 'upaxi' ? fmtCoin(v.offerAmount, 'upaxi') : `${v.offerAmount} (PRC-20 minimal unit)`;
-      extra = `, using ${esc(inShow)} to swap for another coin`
-        + (v.minReceive ? `, with a protection line of "receive at least ${esc(String(v.minReceive))} minimal units"` : '');
+      extra = cT('m.swapFlat', `, using {0} to swap for another coin`, esc(inShow))
+        + (v.minReceive ? cT('m.swapMin', `, with a protection line of "receive at least {0} minimal units"`, esc(String(v.minReceive))) : '');
     }
-    lines.push(`🔁 ${esc(label)}: <b>${esc(nameOf(info.from))}</b> initiated${extra}`);
+    lines.push(cT('m.swapInit', `🔁 {0}: <b>{1}</b> initiated{2}`, esc(label), esc(nameOf(info.from)), extra));
 
   } else if (t.endsWith('.MsgExec')) {
     const subs = v.msgs || [];
-    lines.push(`👤 <b>${esc(nameOf(info.from))}</b> used permissions granted by someone else to execute ${subs.length} operations on their behalf:`);
+    lines.push(cT('m.execProxy', `👤 <b>{0}</b> used permissions granted by someone else to execute {1} operations on their behalf:`, esc(nameOf(info.from)), subs.length));
     for (const sm of subs) {
       for (const l of storyLineFor(sm, flows, tokens)) lines.push('　　· ' + l);
     }
 
   } else if (t.endsWith('.MsgGrant')) {
-    lines.push(`🔑 ${esc(nameOf(v.granter || info.from))} authorized ${esc(nameOf(v.grantee || ''))} to execute certain operations on their behalf`);
+    lines.push(cT('m.grant', `🔑 {0} authorized {1} to execute certain operations on their behalf`, esc(nameOf(v.granter || info.from)), esc(nameOf(v.grantee || ''))));
 
   } else if (t.endsWith('.MsgRevoke')) {
-    lines.push(`🔑 ${esc(nameOf(v.granter || info.from))} revoked the authorization granted to ${esc(nameOf(v.grantee || ''))}`);
+    lines.push(cT('m.revoke', `🔑 {0} revoked the authorization granted to {1}`, esc(nameOf(v.granter || info.from)), esc(nameOf(v.grantee || ''))));
 
   } else if (t.includes('feegrant') && t.endsWith('.MsgGrantAllowance')) {
-    lines.push(`⛽ ${esc(nameOf(v.granter || info.from))} agreed to pay gas fees on behalf of ${esc(nameOf(v.grantee || ''))} (gas subsidy)`);
+    lines.push(cT('m.feegrant', `⛽ {0} agreed to pay gas fees on behalf of {1} (gas subsidy)`, esc(nameOf(v.granter || info.from)), esc(nameOf(v.grantee || ''))));
 
   } else if (t.includes('feegrant') && t.endsWith('.MsgRevokeAllowance')) {
     lines.push(`⛽ ${esc(nameOf(v.granter || info.from))} revoked the gas fee subsidy for ${esc(nameOf(v.grantee || ''))}`);
@@ -622,17 +634,17 @@ function summarizeTx(msgs, flows) {
   const flags = [send, multi, game, swap, ibc, stake, gov, deploy, claim, other].filter(x => x > 0).length;
   const n = msgs.length;
 
-  if (flags > 1) return { head: `This is a composite operation with ${n} actions:`, plain: `This transaction did ${n} things at once, like running multiple errands in a single trip` };
-  if (send === 1 && n === 1) return { head: 'This is a normal transfer:', plain: 'Like sending a red packet — moving coins from one address into another address pocket' };
-  if (multi) return { head: 'This is a one-to-many batch transfer:', plain: 'One person sends coins to many addresses at once, like handing out candy to the whole class' };
-  if (game) return { head: 'This is a game action:', plain: 'An action in an on-chain mini-game (upgrade, battle, gacha draw, etc.)' };
-  if (swap) return { head: 'This is a token swap:', plain: 'Swapped one coin for another, like changing money at a currency exchange' };
-  if (ibc) return { head: 'This is a cross-chain transfer:', plain: 'Via the official "cross-chain bridge", sending coins from the Paxi chain to another blockchain' };
-  if (stake) return { head: 'This is a staking operation:', plain: 'Handing coins to a "bookkeeping node" (validator) to help secure the chain and earn rewards' };
-  if (gov) return { head: 'This is on-chain governance participation:', plain: 'Major chain decisions are voted on by everyone; this transaction is a vote or proposal submission' };
-  if (deploy) return { head: 'This is a contract deploy/upgrade:', plain: 'Installing an auto-running program onto the chain (or upgrading it)' };
-  if (claim) return { head: 'This is a reward claim:', plain: 'Taking interest/rewards earned earlier from the system back into your own pocket' };
-  if (other) return { head: 'This is a contract/system operation:', plain: 'Letting an on-chain auto-program (smart contract) do something on your behalf' };
+  if (flags > 1) return { head: cT('st.compositeHead', `This is a composite operation with {0} actions:`, n), plain: cT('st.compositePlain', `This transaction did {0} things at once, like running multiple errands in a single trip`, n) };
+  if (send === 1 && n === 1) return { head: cT('st.transferHead', 'This is a normal transfer:'), plain: cT('st.transferPlain', 'Like sending a red packet — moving coins from one address into another address pocket') };
+  if (multi) return { head: cT('st.batchHead', 'This is a one-to-many batch transfer:'), plain: cT('st.batchPlain', 'One person sends coins to many addresses at once, like handing out candy to the whole class') };
+  if (game) return { head: cT('st.gameHead', 'This is a game action:'), plain: cT('st.gamePlain', 'An action in an on-chain mini-game (upgrade, battle, gacha draw, etc.)') };
+  if (swap) return { head: cT('st.swapHead', 'This is a token swap:'), plain: cT('st.swapPlain', 'Swapped one coin for another, like changing money at a currency exchange') };
+  if (ibc) return { head: cT('st.ibcHead', 'This is a cross-chain transfer:'), plain: cT('st.ibcPlain', 'Via the official "cross-chain bridge", sending coins from the Paxi chain to another blockchain') };
+  if (stake) return { head: cT('st.stakeHead', 'This is a staking operation:'), plain: cT('st.stakePlain', 'Handing coins to a "bookkeeping node" (validator) to help secure the chain and earn rewards') };
+  if (gov) return { head: cT('st.govHead', 'This is on-chain governance participation:'), plain: cT('st.govPlain', 'Major chain decisions are voted on by everyone; this transaction is a vote or proposal submission') };
+  if (deploy) return { head: cT('st.deployHead', 'This is a contract deploy/upgrade:'), plain: cT('st.deployPlain', 'Installing an auto-running program onto the chain (or upgrading it)') };
+  if (claim) return { head: cT('st.claimHead', 'This is a reward claim:'), plain: cT('st.claimPlain', 'Taking interest/rewards earned earlier from the system back into your own pocket') };
+  if (other) return { head: cT('st.otherHead', 'This is a contract/system operation:'), plain: cT('st.otherPlain', 'Letting an on-chain auto-program (smart contract) do something on your behalf') };
   return '';
 }
 
@@ -645,8 +657,8 @@ function buildStory(txr, msgs, flows, tokens) {
   const ok = txr.code === 0 || txr.code === '0';
 
   if (!ok) {
-    lines.push(`💡 <b>In short</b>: this transaction <b>did not succeed</b> — your coins were not moved, usually only a small fee was lost. Below is what it "intended to do" (none of it <b>happened</b>).`);
-    lines.push(`❌ This transaction failed (error code ${esc(txr.code)}) — funds were not transferred, usually only a fee was charged. Below are the actions it <b>intended</b> to execute (none took effect):`);
+    lines.push(cT('story.failShort', `💡 <b>In short</b>: this transaction <b>did not succeed</b> — your coins were not moved, usually only a small fee was lost. Below is what it "intended to do" (none of it <b>happened</b>).`));
+    lines.push(cT('story.failDetail', `❌ This transaction failed (error code {0}) — funds were not transferred, usually only a fee was charged. Below are the actions it <b>intended</b> to execute (none took effect):`, esc(txr.code)));
   } else {
     const s = summarizeTx(msgs, flows);
     if (s) {
@@ -661,25 +673,21 @@ function buildStory(txr, msgs, flows, tokens) {
   // In-contract asset transfers (PRC-20/721); wasm events already gave details, here we show the result view
   for (const c of flows.contract) {
     if (c.kind === 'PRC-20') {
-      lines.push(`🪙 <b>${esc(nameOf(c.from))}</b> transferred ${tokenAmtStr(c.amount, c.contract, tokens)} to `
-        + `<b>${esc(nameOf(c.to))}</b> (token transfer, via contract `
-        + `<span class="lnk" data-addr="${esc(c.contract)}">${esc(shortAddr(c.contract))}</span>)`);
+      lines.push(cT('story.prc20', `🪙 <b>{0}</b> transferred {1} to <b>{2}</b> (token transfer, via contract <span class="lnk" data-addr="{3}">{4}</span>)`,
+        esc(nameOf(c.from)), tokenAmtStr(c.amount, c.contract, tokens), esc(nameOf(c.to)), esc(c.contract), esc(shortAddr(c.contract))));
     } else if (c.kind === 'PRC-721') {
-      lines.push(`🖼️ <b>${esc(nameOf(c.from))}</b> transferred NFT <b>#${esc(c.tokenId)}</b> to `
-        + `<b>${esc(nameOf(c.to))}</b> (via contract `
-        + `<span class="lnk" data-addr="${esc(c.contract)}">${esc(shortAddr(c.contract))}</span>)`);
+      lines.push(cT('story.prc721', `🖼️ <b>{0}</b> transferred NFT <b>#{1}</b> to <b>{2}</b> (via contract <span class="lnk" data-addr="{3}">{4}</span>)`,
+        esc(nameOf(c.from)), esc(c.tokenId), esc(nameOf(c.to)), esc(c.contract), esc(shortAddr(c.contract))));
     } else if (c.kind === 'Mint') {
-      lines.push(`✨ Contract minted asset <b>${esc(c.amount || '#' + c.tokenId)}</b> → ${esc(nameOf(c.to))}`);
+      lines.push(cT('story.mint', `✨ Contract minted asset <b>{0}</b> → {1}`, esc(c.amount || '#' + c.tokenId), esc(nameOf(c.to))));
     } else if (c.kind === 'Burn') {
-      lines.push(`🔥 Contract burned asset <b>${esc(c.amount || '#' + c.tokenId)}</b> (permanently reduced)`);
+      lines.push(cT('story.burn', `🔥 Contract burned asset <b>{0}</b> (permanently reduced)`, esc(c.amount || '#' + c.tokenId)));
     } else if (c.kind === 'Inter-contract transfer') {
-      lines.push(`🔗 Token contract transferred <b>${tokenAmtStr(c.amount, c.contract, tokens)}</b> into contract `
-        + `<b>${esc(nameOf(c.to))}</b> (triggers its internal logic, not a normal transfer)`);
+      lines.push(cT('story.interTransfer', `🔗 Token contract transferred <b>{0}</b> into contract <b>{1}</b> (triggers its internal logic, not a normal transfer)`,
+        tokenAmtStr(c.amount, c.contract, tokens), esc(nameOf(c.to))));
     } else if (c.amount) {
-      lines.push(`📦 In-contract asset change: ${esc(c.kind)}`
-        + (c.from ? ` ${esc(nameOf(c.from))}` : '')
-        + (c.to ? ` → ${esc(nameOf(c.to))}` : '')
-        + `, amount <b>${tokenAmtStr(c.amount, c.contract, tokens)}</b>`);
+      lines.push(cT('story.assetChange', `📦 In-contract asset change: {0}{1}{2}, amount <b>{3}</b>`,
+        esc(c.kind), c.from ? ` ${esc(nameOf(c.from))}` : '', c.to ? ` → ${esc(nameOf(c.to))}` : '', tokenAmtStr(c.amount, c.contract, tokens)));
     }
   }
 
@@ -687,18 +695,18 @@ function buildStory(txr, msgs, flows, tokens) {
   const tips = [];
   const cats = msgs.map(m => (m && m['@type']) || '').join(' ');
   if (cats.endsWith('.MsgSend') || cats.includes('.MsgSend') || flows.native.length) {
-    tips.push('Address = the "door number" of an on-chain account, starting with paxi1, unique worldwide; send to the wrong person and it is gone');
+    tips.push(cT('tip.addr', 'Address = the "door number" of an on-chain account, starting with paxi1, unique worldwide; send to the wrong person and it is gone'));
   }
-  if (cats.includes('staking.')) tips.push('Staking = entrusting coins to a "bookkeeping node" (validator) to earn rewards, like earning interest on a deposit');
-  if (cats.includes('gov.')) tips.push('Proposal/vote = major on-chain decisions are voted on by all coin holders together');
-  if (cats.includes('ibc') || cats.includes('MsgTransfer')) tips.push('Cross-chain = via the official "cross-chain bridge", sending coins to another blockchain');
+  if (cats.includes('staking.')) tips.push(cT('tip.staking', 'Staking = entrusting coins to a "bookkeeping node" (validator) to earn rewards, like earning interest on a deposit'));
+  if (cats.includes('gov.')) tips.push(cT('tip.gov', 'Proposal/vote = major on-chain decisions are voted on by all coin holders together'));
+  if (cats.includes('ibc') || cats.includes('MsgTransfer')) tips.push(cT('tip.ibc', 'Cross-chain = via the official "cross-chain bridge", sending coins to another blockchain'));
   if (cats.includes('Instantiate') || cats.includes('StoreCode') || cats.includes('Migrate')) {
-    tips.push('Contract = a program installed on-chain that runs automatically by its rules, like an unmanned vending machine');
+    tips.push(cT('tip.contract', 'Contract = a program installed on-chain that runs automatically by its rules, like an unmanned vending machine'));
   }
-  if (flows.contract.length) tips.push('Token/NFT = digital assets on-chain; once sent out they belong to the other party');
-  if (cats.includes('MsgSwap')) tips.push('Swap = inside the on-chain "auto-exchange", swapping for another coin at the pool price at that moment');
+  if (flows.contract.length) tips.push(cT('tip.token', 'Token/NFT = digital assets on-chain; once sent out they belong to the other party'));
+  if (cats.includes('MsgSwap')) tips.push(cT('tip.swap', 'Swap = inside the on-chain "auto-exchange", swapping for another coin at the pool price at that moment'));
   if (tips.length) {
-    lines.push(`📚 <b>Mini-glossary (this is all you need to understand the above)</b>: ${tips.map(t => esc(t)).join('; ')}.`);
+    lines.push(cT('story.glossary', `📚 <b>Mini-glossary (this is all you need to understand the above)</b>: {0}.`, tips.map(t => esc(t)).join('; ')));
   }
 
   return lines.join('\n');
@@ -770,22 +778,22 @@ function classify(contractInfo, schema) {
   const methods = (schema.methods || []).map(m => m.toLowerCase());
   const has = (k) => methods.includes(k);
 
-  if (has('nft_info') || has('all_nft_info') || has('owner_of')) return 'PRC-721 NFT';
-  if (has('token_info') && has('balance')) return 'PRC-20 token';
-  if (label.includes('nft')) return 'PRC-721 NFT';
-  if (label.includes('prc20') || label.includes('token')) return 'PRC-20 token';
+  if (has('nft_info') || has('all_nft_info') || has('owner_of')) return cT('cls.prc721', 'PRC-721 NFT');
+  if (has('token_info') && has('balance')) return cT('cls.prc20', 'PRC-20 token');
+  if (label.includes('nft')) return cT('cls.prc721', 'PRC-721 NFT');
+  if (label.includes('prc20') || label.includes('token')) return cT('cls.prc20', 'PRC-20 token');
 
   // Inferred from code id (only valid for Paxi genesis contracts, not new ones)
   const codeId = String(contractInfo.code_id || '');
-  if (codeId === '1') return 'PRC-20 token (by Code ID)';
-  if (codeId === '2') return 'PRC-721 NFT (by Code ID)';
-  return 'Custom contract';
+  if (codeId === '1') return cT('cls.prc20codeid', 'PRC-20 token (by Code ID)');
+  if (codeId === '2') return cT('cls.prc721codeid', 'PRC-721 NFT (by Code ID)');
+  return cT('cls.custom', 'Custom contract');
 }
 
 /** Generate a parameter template for a query method */
 function templateFor(method) {
   const m = method.toLowerCase();
-  if (m === 'balance') return { balance: { address: 'enter the address to query here' } };
+  if (m === 'balance') return { balance: { address: cT('misc.enterAddressHere', 'enter the address to query here') } };
   if (m === 'allowance') return { allowance: { owner: 'paxi1...', spender: 'paxi1...' } };
   if (m === 'owner_of') return { owner_of: { token_id: '1', include_expired: false } };
   if (m === 'nft_info') return { nft_info: { token_id: '1' } };
@@ -809,4 +817,10 @@ window.PaxiDecoder = {
   extractFlows, buildStory, readMsg, labelOf, decodeContractMsg,
   probeSchema, classify, templateFor, esc,
   groupEvents, asArr, toBig, b64ToUtf8, EXEC_LABEL, VOTE_OPT,
+  setCoreStrings,
 };
+
+/** Inject a per-language override table for engine story strings (missing keys fall back to English). Pass null/{} to reset. */
+function setCoreStrings(dict) {
+  CORE_OVERRIDE = (dict && typeof dict === 'object' && Object.keys(dict).length) ? dict : null;
+}

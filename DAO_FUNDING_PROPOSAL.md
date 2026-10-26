@@ -1,17 +1,17 @@
-# Paxi Lens · Official DAO Funding Proposal (300,000 PAXI Edition)
+# Paxi Lens · Official DAO Funding Proposal (360,000 PAXI Edition)
 
-> Purpose: To request **300,000 PAXI** from the Paxi DAO community pool for the launch of Paxi Lens — the "on-chain data layer + non-custodial toolkit" — and for developer funding (a one-time lump-sum payout).
-> Status: **Draft**. Amount structure: 282,000 PAXI for development (including delivered v1 integration & maintenance + new data-layer features + testing & security + multilingual & community) + 18,000 PAXI for operations (6 months).
+> Purpose: To request **360,000 PAXI** from the Paxi DAO community pool for the launch of Paxi Lens — the "on-chain data layer + non-custodial toolkit" — and for developer funding (a one-time lump-sum payout).
+> Status: **Draft**. Amount structure: 342,000 PAXI for development (including delivered v1 integration & maintenance + delivered 6-language internationalization + new data-layer features + testing & security + community & content) + 18,000 PAXI for operations (6 months).
 > Supporting materials: `ARCHITECTURE.md` (full architecture & development plan), `ARCHITECTURE_DIAGRAM.svg` (architecture diagram), `ROADMAP.md` (feature roadmap), `LICENSE` (MIT).
 > Recommendation: Attach an English version (`DAO_FUNDING_PROPOSAL_EN.md`) when formally submitting.
 
 ---
 
 ## 1. Title
-**Paxi Lens — Paxi On-Chain Data Layer and Non-Custodial Toolkit, requesting a 300,000 PAXI grant from the DAO community pool (one-time lump-sum payout)**
+**Paxi Lens — Paxi On-Chain Data Layer and Non-Custodial Toolkit, requesting a 360,000 PAXI grant from the DAO community pool (one-time lump-sum payout)**
 
 ## 2. Summary
-Paxi Lens is a **pure front-end, non-custodial** all-in-one toolkit for the Paxi ecosystem. All 20 tools are already live (MIT public repository `moxiaomo856/paxi-lens`, with full commit history, and having passed a security audit): decoder, token issuance, Swap assistant (native AMM), authorization management, burning, staking migration, governance proposal/voting, delegation, batch transfer, IBC query, transaction simulation, and more. **Private keys and funds never leave the user's wallet.** This project requests **300,000 PAXI from the Paxi DAO community pool (one-time lump-sum payout; the DAO disburses as a single payment, and any further funding requires a new proposal)**, of the nature "tool launch + developer funding": ① official integration, maintenance, and continued availability of the delivered v1; ② building a **public read-only data layer** that does not yet exist on-chain (whale tracking, large transaction feed, new contract radar & contract health check, governance participation dashboard, validator transparency); ③ 6 months of operations service. All tool service fees go 100% to a single transparent address `paxi1ga6x5ljj547ax436sfc5kw6fn3vfdwqtn0kpwg`.
+Paxi Lens is a **pure front-end, non-custodial** all-in-one toolkit for the Paxi ecosystem. All 20 tools are already live (MIT public repository `moxiaomo856/paxi-lens`, with full commit history, and having passed a security audit): decoder, token issuance, Swap assistant (native AMM), authorization management, burning, staking migration, governance proposal/voting, delegation, batch transfer, IBC query, transaction simulation, and more. **Private keys and funds never leave the user's wallet.** This project requests **360,000 PAXI from the Paxi DAO community pool (one-time lump-sum payout; the DAO disburses as a single payment, and any further funding requires a new proposal)**, of the nature "tool launch + developer funding": ① official integration, maintenance, and continued availability of the delivered v1; ② official adoption of the **delivered 6-language internationalization** (English / Japanese / Korean / Indonesian / Vietnamese / Traditional Chinese full UI, plus multilingual legal documents) to serve the ecosystem's international users; ③ building a **public read-only data layer** that does not yet exist on-chain (whale tracking, large transaction feed, new contract radar & contract health check, governance participation dashboard, validator transparency); ④ 6 months of operations service. All tool service fees go 100% to a single transparent address `paxi1ga6x5ljj547ax436sfc5kw6fn3vfdwqtn0kpwg`.
 
 ## 3. Problem Statement
 - New users lack a **unified, trustworthy, non-custodial** entry point for Paxi operations; governance participation has a high barrier to entry.
@@ -29,13 +29,13 @@ Paxi Lens is a **pure front-end, non-custodial** all-in-one toolkit for the Paxi
 > Compliance exclusions (proactively avoided): NFT marketplace (Authz risk), mini-games, wallet itself, prediction-market replica (boundary with official division of labor).
 
 ## 5. Deliverables
-1. Deployable pure front-end dApp (20 tools + 7 data applications, zh/en i18n).
+1. Deployable pure front-end dApp (20 tools + 7 data applications, 6-language i18n: en/ja/ko/id/vi/zh-Traditional, with multilingual legal documents).
 2. `paxi-data` open-source data service: scanner + index + public API + replay tests (reproducibility evidence).
 3. Single receiving address integration with a pre-sign fee/recipient disclosure mechanism.
 4. README + architecture diagram.
 5. Public GitHub repository (MIT, with commit history / Releases / OpenAPI docs).
 
-## 6. Milestones (300k · ~18 weeks total)
+## 6. Milestones (360k · ~18 weeks total)
 - **M1 (Weeks 1–2) · Data Service v1**: Block Scanner + SQLite + /healthz + replay tests; acceptance: catch-up rescan ≤5 min, replay consistent with on-chain sampling.
 - **M2 (Weeks 3–5) · Whale Tracker + Large Tx Feed**: acceptance: large tx latency <2 min, whale leaderboard Top100 queryable.
 - **M3 (Weeks 6–9) · New Contract Radar + Contract Health Check**: acceptance: new contract listed within 10 min, all 6 health-check metrics output.
@@ -43,23 +43,25 @@ Paxi Lens is a **pure front-end, non-custodial** all-in-one toolkit for the Paxi
 - **M5 (Weeks 14–18) · Public API documentation + weekly report automation + SDK localization + SRI**: acceptance: OpenAPI published, weekly report auto-generated.
 - Throughout: weekly releases, monthly fund-use report (on-chain verifiable).
 
-## 7. Budget Breakdown (finalized · 300,000 PAXI)
+## 7. Budget Breakdown (finalized · 360,000 PAXI)
 | Item | Amount (PAXI) | Share | Note |
 |------|---------------|-------|------|
-| Development · Delivered v1 official integration & maintenance | 120,000 | 40% | Deep-link integration / official PR collaboration / security audit / docs & i18n / ensuring long-term availability (no duplicate payment for already-built parts) |
-| Development · Data service layer | 50,000 | 16.7% | Block scanning + SQLite index + public read-only REST API (open-source, take-overable) |
-| Development · Data application front-end | 60,000 | 20% | Whale tracker / large tx feed / contract radar / contract health check / governance dashboard / validator transparency / overview, 7 in total |
-| Development · Testing & security hardening | 30,000 | 10% | SDK localization + SRI + declaration-conflict guard + replay tests (closing known risks) |
-| Development · Multilingual expansion & community | 22,000 | 7.3% | ko/ru/es expansion + weekly/monthly content operation material |
-| Operations · 6 months | 18,000 | 6% | Scanner VPS for 6 months + monthly fund-use report + community + contingency |
-| **Total** | **300,000** | 100% | |
+| Development · Delivered v1 official integration & maintenance | 120,000 | 33.3% | Deep-link integration / official PR collaboration / security audit / docs / ensuring long-term availability (no duplicate payment for already-built parts) |
+| Development · Multilingual internationalization (**delivered**) | 60,000 | 16.7% | 6-language UI (en/ja/ko/id/vi/zh-Traditional, ~845 keys × 5 packs) + 6-language legal documents, already shipped and live; grant covers official adoption & continued maintenance |
+| Development · Data service layer | 50,000 | 13.9% | Block scanning + SQLite index + public read-only REST API (open-source, take-overable) |
+| Development · Data application front-end | 60,000 | 16.7% | Whale tracker / large tx feed / contract radar / contract health check / governance dashboard / validator transparency / overview, 7 in total |
+| Development · Testing & security hardening | 30,000 | 8.3% | SDK localization + SRI + declaration-conflict guard + replay tests (closing known risks) |
+| Development · Community & content operations | 22,000 | 6.1% | ko/ru/es community expansion + weekly/monthly content operation material |
+| Operations · 6 months | 18,000 | 5.0% | Scanner VPS for 6 months + monthly fund-use report + community + contingency |
+| **Total** | **360,000** | 100% | Development 342,000 + Operations 18,000 |
 
 ## 8. KPIs (baseline targets)
 - Monthly active wallets ≥ **500**;
 - Monthly tool invocations ≥ **3,000**;
 - On-chain transactions initiated through this toolkit ≥ **1,500 tx/month**;
 - Governance proposal/voting participation up ≥ **20%** vs launch baseline;
-- Data layer: whale leaderboard / tx feed / governance dashboard monthly visits ≥ **2,000**; monthly fund-use reports **3+** (on-chain verifiable).
+- Data layer: whale leaderboard / tx feed / governance dashboard monthly visits ≥ **2,000**; monthly fund-use reports **3+** (on-chain verifiable);
+- Multilingual: 6-language UI fully delivered and live (en/ja/ko/id/vi/zh-Traditional); non-English interface usage share ≥ **30%** within 3 months of the data layer launch.
 
 ## 9. Risks & Mitigation
 - **Private-key/fund security**: Non-custodial architecture + in-wallet signing (audit confirms no private key written to disk).

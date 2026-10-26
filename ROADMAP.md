@@ -1,6 +1,6 @@
 # Paxi Lens · Later-Stage Feature Roadmap (DAO Grant Supplement)
 
-> Purpose: As an attachment to the 300,000 PAXI proposal, to answer the core reviewer doubt — "everything is already built, where does the grant money go?"
+> Purpose: As an attachment to the 360,000 PAXI proposal, to answer the core reviewer doubt — "everything is already built, where does the grant money go?"
 > Narrative thread: **v1 (20 tools already live) = a credibility asset of execution capability, not the reason for this application; this application buys "official integration + 6-month operations guarantee + a continuously evolving phase."**
 
 ---
@@ -52,7 +52,7 @@
 > Writing "not in this proposal" explicitly is actually a plus: feature priority should be decided by real data, not a one-time three-year commitment.
 
 ## 4. Growth Levers Top 5
-1. Mobile polish (469k accounts mostly on mobile, official is App-only) 2. Governance suite (voting hits two KPIs at once; only 16 validators → strong delegator-education story) 3. Portfolio dashboard (retention king) 4. LP management (highest tx-frequency cohort + monetization continuation) 5. ko/ru/es multilingual (zero competition opens three communities).
+1. Mobile polish (469k accounts mostly on mobile, official is App-only) 2. Governance suite (voting hits two KPIs at once; only 16 validators → strong delegator-education story) 3. Portfolio dashboard (retention king) 4. LP management (highest tx-frequency cohort + monetization continuation) 5. ru/es multilingual expansion (6-language UI en/ja/ko/id/vi/zh-Traditional already delivered and live; ru/es opens the remaining communities at near-zero marginal cost).
 
 **Community actions (grow without writing code)**: Weekly on-chain data report (governance/APR/pool depth), validator transparency profiles, new-contract hands-on series, newbie onboarding education, community feature voting (GitHub vote), good first issue.
 

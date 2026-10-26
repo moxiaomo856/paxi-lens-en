@@ -301,6 +301,11 @@ window.TOOL_REGISTRY ||= {};
     if (!ok && txr.raw_log) {
       for (const [re, txt] of DIAG) if (re.test(txr.raw_log)) { rootCause = txt; break; }
     }
+    /* engine-level story strings follow the current UI language */
+    if (D.setCoreStrings) {
+      const cl = (typeof currentLang !== 'undefined' && currentLang) || 'en';
+      D.setCoreStrings((window.PAXI_LANGS && PAXI_LANGS[cl] && PAXI_LANGS[cl].decoderCore) || {});
+    }
     const relTime = D.timeAgo(txr.timestamp);
     html += `<div class="banner ${ok ? 'ok' : 'err'}">
       ${ok ? dcPt('txOk') : dcPt('txFail') + (rootCause ? dcPt('txFailCause', esc(rootCause)) : ' · code ' + esc(txr.code))}
