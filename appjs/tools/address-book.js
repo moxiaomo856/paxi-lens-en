@@ -22,9 +22,13 @@ const AB_DICT = {
 };
 
 const abPt = (k, ...a) => {
-  const lang = (typeof currentLang !== 'undefined' && currentLang === 'en') ? 'en' : 'zh';
-  let v = AB_DICT[lang][k];
-  if (v === undefined) v = AB_DICT.en[k];
+  const lang = (typeof currentLang !== 'undefined' && currentLang) || 'en';
+  let v;
+  if (window.PAXI_LANGS && PAXI_LANGS[lang] && PAXI_LANGS[lang].addressBook && PAXI_LANGS[lang].addressBook[k] != null) {
+    v = PAXI_LANGS[lang].addressBook[k];
+  } else {
+    v = (AB_DICT[lang] && AB_DICT[lang][k] !== undefined) ? AB_DICT[lang][k] : AB_DICT.en[k];
+  }
   return typeof v === 'function' ? v(...a) : v;
 };
 

@@ -1,0 +1,274 @@
+// Paxi Lens — Korean (ko) language pack
+// Mirrors every key in core.js LANG.en (shared) plus the per-tool namespaces.
+window.PAXI_LANGS = window.PAXI_LANGS || {};
+window.PAXI_LANGS.ko = {
+  appTitle: 'Paxi Lens',
+  back: '← 뒤로',
+  tools: {
+    decoder: '온체인 디코더', batchTransfer: '일괄 전송', balanceCheck: '잔액 / 일괄 조회', pump: '커스텀 발행',
+    burn: '토큰 소각', nftMarket: 'NFT 마켓', txTracker: 'Tx 추적', nftLauncher: 'NFT 런처', myNfts: '내 NFT',
+    addressConvert: '주소 변환', redelegate: '재위임', gasCalc: '가스 계산', validatorCompare: '밸리데이터', proposal: '거버넌스 제안',
+    games: '게임 센터', monitor: '체인 모니터', later: '준비 중…', claimRewards: '보상 수령', govVote: '거버넌스 투표',
+    stakeManage: '위임 / 위임 해제', addressBook: '주소록', ibcQuery: 'IBC 조회', txDryRun: 'Tx 시뮬레이션', swap: '스왑 도우미', allowance: '허용량(Allowance)',
+    catStake: '스테이킹 & 거버넌스', catAssets: '자산 & 조회', catTrade: '거래 & 발행', catTools: '디코더 & 도구', searchPlaceholder: '도구 검색...'
+  },
+  batchTransfer: {
+    title: '📤 일괄 전송', desc: 'PAXI·PRC-20·NFT를 일괄 전송. CSV 가져오기와 균일 금액 지원.', modePack: '⚡ 패키지 모드: 모든 전송+수수료를 1tx·1서명으로 100% 성공.',
+    note: '💡 수신 지갑에 내역이 표시되지 않으면, "잔액 조회"의 "전송 내역"을 확인하세요.',
+    native: 'PAXI 네이티브', prc20: 'PRC-20 토큰', nft: 'NFT(PRC-721)',
+    csvMode: '📋 CSV 가져오기(금액 개별)', uniformMode: '🔄 균일 금액',
+    upload: '클릭하거나 CSV를 끌어다 놓기', format: '형식: address,amount(한 줄에 1건)',
+    pastePlaceholder: 'paxi1abc123...,100\npaxi1def456...,250', uniformPlaceholder: 'paxi1abc123...\npaxi1def456...',
+    parseBtn: '📋 분석 & 미리보기', sendBtn: '🚀 일괄 전송 실행', clearBtn: '지우기',
+    preview: '📋 전송 미리보기', history: '📜 최근 전송'
+  },
+  balanceCheck: {
+    title: '💰 잔액 / 일괄 조회', desc: '여러 Paxi 주소를 붙여넣어 PAXI 잔액과 PRC-20 보유량을 조회.',
+    placeholder: 'paxi1abc123...\npaxi1def456...', queryBtn: '🔍 잔액 조회', exportBtn: '📥 CSV 출력',
+    querying: '{count}개 주소 조회 중...', done: '✅ 완료: {count}건', noAddr: '유효한 Paxi 주소가 없습니다', records: '📜 전송 내역'
+  },
+  txTracker: {
+    title: '🔍 Tx 추적', desc: 'TxHash를 입력해 거래 상태와 상세를 확인.', placeholder: 'TxHash 입력...', queryBtn: '🔍 조회'
+  },
+  gasCalc: {
+    title: '⛽ 가스 계산', desc: '거래 유형별 가스 수수료를 추정.', type: 'Tx 유형', send: '전송(MsgSend)', prc20: 'PRC-20 전송', nft: 'NFT 전송',
+    swap: 'AMM 스왑', stake: '스테이크/위임', vote: '거버넌스 투표', price: '가스 가격(upaxi)', calcBtn: '🧮 계산'
+  },
+  addressConvert: {
+    title: '🔄 주소 변환', desc: 'Cosmos 체인 간 Bech32 프리픽스를 변환.', inputPlaceholder: 'paxi1... 또는 cosmos1... 또는 osmosis1...', target: '변환 대상 프리픽스', convertBtn: '🔄 변환'
+  },
+  validatorCompare: {
+    title: '🏦 밸리데이터 비교', desc: '모든 활성 밸리데이터의 APR·수수료·투표력·상태를 표시.', loadBtn: '🔄 밸리데이터 불러오기', loading: '불러오는 중...', done: '✅ 로드 완료: {count}건'
+  },
+  tokenInfo: {
+    title: '🪙 PRC-20 토큰 정보', desc: 'PRC-20 컨트랙트에서 토큰 이름·심볼·총공급량·소수점 자릿수를 조회.', placeholder: 'paxi1...', queryBtn: '🔍 조회'
+  },
+  nftMarket: {
+    title: '🏪 NFT 마켓', desc: 'Authz 아토믹 스왑 기반 분산형 NFT 거래.', tabs: ['참조', '판매', '주문 관리', '가져오기']
+  },
+  redelegate: {
+    title: '🔄 재위임', desc: '밸리데이터를 즉시 전환(7일 언본드 없음). 수수료: 0.15%(1.5‰).', hint: '현재 밸리데이터와 이동 대상 밸리데이터를 선택하고 이동 금액을 입력.',
+    from: '이동 출처(현재 밸리데이터)', to: '이동 대상(타깃 밸리데이터)', amount: '금액(PAXI)', max: '최대', fee: '수수료', feeRate: '비율',
+    execute: '🚀 재위임 실행', selectFrom: '선택...', selectTo: '선택...', success: '✅ 재위임 성공!', fail: '❌ 재위임 실패: ',
+    invalidInput: '두 밸리데이터와 금액을 모두 선택하세요', noDelegations: '위임을 찾을 수 없습니다'
+  },
+  proposal: {
+    title: '📦 거버넌스 제안', desc: 'Paxi 네트워크 거버넌스 제안을 제출. 디파짓+서비스 수수료 필요.',
+    submit: '📝 제안 제출', type: '제안 유형', typeText: '텍스트 제안', typeParam: '파라미터 변경 제안', typePool: '🏦 커뮤니티 풀 지출(DAO 자금 신청)',
+    poolBlockTitle: '🏦 커뮤니티 풀 지출(CommunityPoolSpendProposal)', poolDesc: '제안이 통과되면 커뮤니티 풀이 지정 금액의 PAXI를 수령 주소로 전송(DAO 자금 신청).',
+    poolTip: '💡 자금 신청 주의: 제목과 요약은 투표하는 모든 토큰 보유자에게 공개됩니다. 목적·예산 내역·마일스톤·납기를 설명란에 기재하고, 수령처는 프로젝트의 국고 주소를 사용하세요.',
+    poolRecipient: '수령 주소(recipient)', poolAmount: '지출액(PAXI)', poolBalance: '💰 온체인 커뮤니티 풀 잔액: ', poolBalanceLoading: '커뮤니티 풀 잔액 조회 중...',
+    poolBalanceEmpty: '커뮤니티 풀은 현재 비어 있음', poolBalanceFail: '커뮤니티 풀 잔액 조회 실패', poolNoRecipient: '수령 주소를 입력하세요', poolBadRecipient: '수령 주소 형식이 잘못됨(paxi1...)',
+    poolBadAmount: '지출액은 0보다 커야 합니다', poolExceed: '지출액이 온체인 커뮤니티 풀 잔액을 초과합니다',
+    badgePool: '🏦 풀 지출', badgeParam: '🔧 파라미터 변경', badgeText: '📝 텍스트', badgeUpgrade: '⬆️ 소프트웨어 업그레이드', badgeClient: '🔗 IBC 클라이언트 복구',
+    confirmSubmitPool: '커뮤니티 풀 지출 제안(DAO 자금 신청)을 제출할까요?\n\n금액: {amount} PAXI\n수령처: {rcv}\n\n통과 시 풀은 이 주소로 {amount} PAXI를 전송합니다.\n서비스 수수료 {fee} PAXI + 디파짓 {deposit} PAXI.',
+    daoTitle: '🏦 DAO 자금 신청', daoDesc: '커뮤니티 풀(CommunityPoolSpend)에서 자금을 신청. 제안 통과 시 풀이 수령 주소로 전송.',
+    daoInfo: '💡 제목과 요약은 투표하는 모든 토큰 보유자에게 공개됩니다. 목적·예산 내역·마일스톤·납기를 기재하고, 수령처는 프로젝트 국고 주소를 사용하세요.',
+    daoLabelTitle: '제안 제목', daoTitlePlaceholder: '예: Paxi Lens 출시 + 6개월 유지보수 자금(300,000 PAXI)', daoLabelSummary: '제안 요약(summary)', daoSummaryPlaceholder: '신청 내용과 금액을 한 문장으로...',
+    daoLabelDesc: '제안 설명(description)', daoDescPlaceholder: '목적·예산 내역·마일스톤·납기 기재...', daoSubmitBtn: 'DAO 자금 신청 제출', daoNotAllowed: '현재 지갑 주소는 DAO 자금 신청을 제출할 수 없습니다',
+    daoNoTitle: '제안 제목을 입력하세요', daoNoSummary: '제안 요약을 입력하세요', daoNoDesc: '제안 설명을 입력하세요', daoSuccess: '✅ DAO 자금 신청 제출! 제안 ID: ',
+    paramSubspace: 'Subspace(모듈)', paramKey: 'Key(파라미터명)', paramValue: 'Value(JSON 문자열)', paramValuePH: '예: "0.050000000000000000"',
+    addParam: '➕ 파라미터 추가', delParam: '삭제', paramHint: '일반적인 subspace: gov / bank / staking / mint / slashing / distribution. Value는 JSON 문자열.',
+    paramRefTitle: '📖 일반 프리셋 & 참조', invalidParam: '각 파라미터 행의 Subspace / Key / Value를 입력하세요', invalidParamRef: '파라미터 변경 제안에는 최소 1건의 파라미터가 필요',
+    paramBlockTitle: '🔧 파라미터 변경 설정(ParameterChangeProposal)', titleLabel: '제안 제목', titlePlaceholder: '예: 거래 수수료 인하', descLabel: '제안 설명', descPlaceholder: '제안을 자세히 서술...',
+    deposit: '디파짓(PAXI)', fee: '플랫폼 수수료(PAXI)', submitBtn: '🚀 제안 제출', submitting: '제출 중...', success: '✅ 제안 제출! 제안 ID: ', fail: '❌ 제출 실패: ',
+    list: '📋 제안 목록', listLoading: '불러오는 중...', listEmpty: '아직 제안이 없습니다', passed: '통과', rejected: '부결', voting: '투표 중', depositFailed: '디파짓 반환',
+    status: '상태', submitTime: '제출 시각', depositAmount: '디파짓', connectFirst: '먼저 지갑을 연결하세요', emptyFields: '제목과 설명을 입력하세요',
+    invalidDeposit: '디파짓은 0보다 커야 합니다', confirmSubmit: '서비스 수수료 {fee} PAXI + 디파짓 {deposit} PAXI 지불을 확정할까요? 통과 시 디파짓이 반환됩니다.',
+    cancel: '취소', cancelBtn: '🗑 제안 취소', cancelConfirm: '제안 #{id}를 취소할까요? 디파짓은 반환됩니다.', canceling: '취소 중...',
+    cancelSuccess: '✅ 제안 #{id} 취소. 디파짓 반환됩니다.', cancelFail: '❌ 취소 실패: ', onlyDepositCanCancel: '디파짓 기간 중인 제안만 취소 가능'
+  },
+  disclaimer: {
+    siteWide: '⚠️ 본 사이트(및 모든 하위 페이지)는 온체인 데이터 조회와 지갑 조작 지원만을 목적으로 합니다. 어떤 토큰 교환·거래 중개·가격 안내·정보 중개 서비스도 제공하지 않습니다. 모든 온체인 조작은 이용자의 독립적인 행위이며 본 사이트와 무관합니다. 거주 국가·지역의 법규를 준수하세요.',
+    balanceCheck: '본 도구는 온체인 공개 데이터만 표시하며 어떠한 거래 서비스도 포함하지 않습니다. 모든 데이터는 Paxi 네트워크 기원이며 참고용입니다.',
+    txTracker: '본 도구는 온체인 거래 상태만을 조회하며 거래 조언이나 투자 권유를 하지 않습니다.',
+    gasCalc: '본 추정은 참고용입니다. 실제 수수료는 온체인 실행에 따릅니다.',
+    validatorCompare: '밸리데이터 데이터는 온체인 공개 정보 기원이며 참고용으로, 투자 조언이 아닙니다.',
+    prc20Info: '본 도구는 토큰 기본 정보만 표시하며 가격이나 거래 서비스를 제공하지 않습니다.',
+    proposalSubmit: '본 도구는 제안 제출의 기술적 입구만 제공합니다. 제안 내용의 작성과 책임은 이용자에게 있습니다. 제안 내용이 관할 법규를 준수하는지 확인하세요.',
+    proposalList: '제안 목록은 온체인 공개 데이터이며, 내용의 책임은 제안자에게 있습니다.',
+    batchTransfer: '⚠️ 본 기능은 개인 지갑 자산 관리만을 목적으로 하며, 상업 결제·토큰 교환·그 어떤 가상자산 거래 서비스에도 사용되어서는 안 됩니다. 모든 전송은 이용자의 독립적인 조작이며 본 도구와 무관합니다.',
+    redelegate: '본 조작은 스테이킹 노드의 독립적 관리를 목적으로 하는 온체인 거버넌스 행위이며 투자 조언이 아닙니다.',
+    nftLauncher: '본 도구는 NFT 민팅의 기술적 서비스만 제공하며 거래 중개·가격 책정·교환 기능은 일절 제공하지 않습니다. NFT 보유·처분의 일체 결과는 이용자가 부담합니다.'
+  },
+  myNfts: {
+    title: '🖼️ 내 NFT', desc: '지갑 주소를 입력해 NFT(이미지·이름·속성)를 표시.', walletAddr: '지갑 주소', contract: 'NFT 컨트랙트', selectContract: '-- 배포된 컨트랙트 선택 --',
+    manualInput: '주소 직접 입력', query: '🔍 조회', queryHint: '위 주소+컨트랙트로 정밀 조회', querying: '온체인 데이터 조회 중...', loadingMeta: '메타데이터 로드 중',
+    noNft: '이 주소에는 NFT가 없습니다', noContract: '컨트랙트 주소를 선택하거나 입력하세요', loadMore: '더 보기', exportCsv: '📥 CSV 출력', tokenId: '토큰 ID', name: '이름',
+    attributes: '속성', image: '이미지', contractAddr: '컨트랙트 주소', tokenUri: '토큰 URI', description: '설명', total: '합계', nftUnit: 'NFT', queryFail: '조회 실패', cached: '(캐시)', exported: 'CSV 출력 완료',
+    disclaimer: '본 도구는 온체인 NFT 데이터만 조회하며 거래 서비스는 없습니다.',
+    transferTitle: '📤 NFT 전송', transferDesc: '이 컨트랙트의 NFT를 수신자에게 전송. 소유자 지갑 서명 필요, 가스만 있고 서비스 수수료 없음.',
+    transferContract: 'NFT 컨트랙트 *', transferTokenId: '토큰 ID *', transferRecv: '수신자 *', transferMemo: '메모(선택)', transferBtn: '📤 전송',
+    transferConfirm: '이 NFT를 다음 주소로 전송할까요?', transferSuccess: '✅ 전송 성공', transferAddrInvalid: '주소 무효(paxi1... 계정 43자 또는 컨트랙트 63자)', transferNeedWallet: '먼저 지갑을 연결하세요', transferring: '전송 중...',
+    modalSendTitle: '📤 이 NFT 전송', modalSendRecipientPH: '수신 주소 paxi1...', modalSendBtn: '📤 이 주소로 전송', modalSendHint: '가스만 있고 서비스 수수료 없음. NFT는 귀하의 주소에서 수신자로 이동.',
+    allChainBtn: '🌐 전체 체인 NFT 보기', allChainHint: '온체인의 모든 cw721 컨트랙트를 자동 스캔(컨트랙트 주소 불필요)', allChainLoading: '전체 체인의 cw721 컨트랙트 열거 및 보유 조회 중...',
+    allChainEmpty: '이 주소에는 NFT가 없음(전체 cw721 컨트랙트, code_id=2)', allChainCount: '{n}개 컨트랙트 대상·총 {m} NFT', allChainNeedWallet: '전체 체인 NFT를 보려면 먼저 지갑을 연결하세요'
+  },
+  games: { title: '🎮 게임 센터', desc: '툴박스에서 캐주얼 게임을 즐기세요!', comingSoon: '더 많은 게임을 곧 공개…' },
+  planeWar: {
+    title: '✈️ 플레인 워', hint: '화면을 터치/클릭해 기체 이동, 자동 사격', score: '점수', hp: 'HP', start: '준비 완료', touchToStart: '탭하여 시작', startBtn: '게임 시작',
+    controls: '👆 화면 터치로 이동 | ⌨️ 방향키/WASD', gameOver: '게임 오버', finalScore: '최종 점수', playAgain: '다시 하기', needWallet: '플레이하려면 지갑을 연결하세요',
+    payTitle: '🎮 게임 결제', payDesc: '5 PAXI를 결제해 플레인 워 10회 플레이', payBtn: '💳 5 PAXI 결제 후 시작', paying: '결제 중...', paySuccess: '결제 성공! 10회분 획득', payFailed: '결제 실패',
+    roundsLeft: '남은 횟수', noRounds: '횟수 없음. 계속하려면 결제하세요', buyRounds: '횟수 구매', connectFirst: '먼저 지갑을 연결하세요'
+  },
+  gamePay: {
+    needWallet: '플레이하려면 지갑을 연결하세요', payTitle: '🎮 게임 결제', payDesc: '5 PAXI를 결제해 10회 플레이', payBtn: '💳 5 PAXI 결제 후 시작', paying: '결제 중...',
+    paySuccess: '결제 성공! 10회분 획득', payFailed: '결제 실패', roundsLeft: '남은 횟수', noRounds: '횟수 없음. 계속하려면 결제하세요', buyRounds: '횟수 구매', connectFirst: '먼저 지갑을 연결하세요',
+    start: '준비 완료', touchToStart: '탭하여 시작', startBtn: '게임 시작', gameOver: '게임 오버', finalScore: '최종 점수', playAgain: '다시 하기'
+  },
+  g2048: { title: '🔢 2048', desc: '같은 숫자를 합쳐 2048을 만들어 보세요!', score: '점수', best: '최고', controls: '⌨️ 방향키/WASD로 이동 | 👆 스와이프' },
+  klotski: { title: '🧩 화용도', desc: '고전 슬라이드 퍼즐, 조조를 탈출시켜 보세요', moves: '단계', controls: '👆 블록 탭하여 선택, 스와이프로 이동 | ⌨️ 방향키/WASD', win: '승리' },
+  bubble: { title: '🫧 버블 슈팅', desc: '조준해 쏘고 같은 색 버블을 터뜨리세요', score: '점수', controls: '👆 마우스/터치로 조준, 클릭해 발사', win: '전체 제거' },
+  tetris: { title: '🟦 테트리스', desc: '고전 블록 쌓기 게임', score: '점수', lines: '라인', controls: '⌨️ ←→ 이동 | ↑ 회전 | ↓ 소프트 드롭 | 스페이스 하드 드롭 | 👆 스와이프' },
+  gomoku: { title: '⚫ 오목', desc: 'AI와 대전, 5개를 나란히 놓아 승리', turn: '턴', you: '당신(흑)', ai: 'AI(백)', youWin: '당신의 승리', aiWin: 'AI 승리', controls: '👆 판을 클릭/탭해 돌 놓기' },
+  common: {
+    connectFirst: '먼저 지갑을 연결하세요', sending: '전송 중...', loading: '불러오는 중...', connect: '지갑 연결', disconnect: '연결 해제',
+    mainnet: '메인넷', testnet: '테스트넷',     langSwitch: '언어',
+    footerNote: '투자 아님 · 비수탁형 · 본인 책임',
+    fullDisclaimer: '면책 조항 및 법적 고지 →'
+  },
+  decoder: {
+    title: '🔍 온체인 디코더', searchPh: 'Tx 해시 / 컨트랙트 주소 / 지갑 주소', decodeBtn: '디코드', clearTitle: '지우기', clear: '지우기',
+    tabDecode: '📖 Tx 디코드', tabSandbox: '🧪 샌드박스', tabBatch: '📋 일괄 디코드', tabDiagnose: '🩺 실패 진단',
+    jumpBalance: '💰 잔액', jumpRedelegate: '🔄 재위임', jumpValidator: '📊 밸리데이터', jumpProposal: '📦 제안',
+    sandboxHint: '노드에 직접 읽기 전용 쿼리를 보냅니다(서명·가스 불필요). 입력이 막막하면 먼저 디코드 탭에서 컨트랙트를 살피고 실제 지원되는 쿼리 메서드를 확인하세요.',
+    contractAddr: '컨트랙트 주소', queryJson: '쿼리 JSON', runQuery: '쿼리 실행',
+    batchHint: '한 줄에 64자 Tx 해시 1건(공백/쉼표도 가능), 최대 200건.', runBatchBtn: '일괄 디코드 시작', exportCsvBtn: '📥 CSV 출력',
+    diagHint: '실패한 Tx 해시를 입력해 실패 원인을 자동 분류하고 개선안을 제시.', failHashPh: '실패한 Tx 해시...', diagBtn: '진단',
+    footer: '⚠️ 본 도구는 공개 온체인 데이터를 읽고 알기 쉽게 설명할 뿐입니다. 투자 조언 없음. 완전 읽기 전용: 서명·자산 접근 없음.',
+    txOk: '✅ Tx 성공', txFail: '❌ Tx 실패', txFailCause: ': {0}', height: '높이 {0}', paren: '({0})',
+    storyTitle: '📖 이 Tx의 내용', memo: '📝 메모: {0}', feeTitle: '수수료', amount: '금액', feePayer: '수수료 납부자', txHash: 'Tx 해시', copy: '⧉ 복사', sharePage: '공유', copyLink: '🔗 디코드 링크 복사',
+    nativeDelta: '네이티브 잔액 변동(PAXI)', received: '📥 수신', sent: '📤 송신', contractFlows: '스마트 컨트랙트 자산 이동', from: '송신원 ', to: '수신처 ', qty: '금액: ',
+    msgsTitle: '메시지({0})', sender: '송신자: ', execMethod: '메서드: ', contractOf: ' · 컨트랙트 ', viewArgs: '인수 보기', rawMsg: '원시 메시지', failLog: '실패 로그',
+    queryingChain: '온체인 데이터 조회 중…', isContract: '🔗 이것은 스마트 컨트랙트입니다', profile: '컨트랙트 프로필', label: '라벨', kind: '분류', creator: '생성자',
+    admin: '관리자', upgradable: '(업그레이드 가능)', noAdmin: '업그레이드 불가(관리자 포기됨)', createdHeight: '생성 높이',
+    totalSupply: '총공급량', tokenInfo: '토큰 정보', name: '이름', symbol: '심볼', decimals: '소수점 자릿수',
+    srcEcho: '실제 컨트랙트 응답에서', srcProbe: '메서드 개별 probing에서', srcNoEcho: '응답 없음', srcErr: '응답 오류',
+    queryFeatures: '쿼리 가능 메서드(온체인 검증됨)', methodsFound: '온체인에서 실제 메서드 {0}건 발견. 클릭해 샌드박스에 로드.',
+    noMethods: '이 컨트랙트는 메서드 목록을 응답하지 않았습니다(독자 구현 또는 공개 쿼리 없음). 샌드박스에서 수동 입력도 가능.',
+    openSandbox: '🧪 이 컨트랙트의 샌드박스 열기',
+    nativeBalance: '네이티브 잔액', noBalance: '이 주소에 네이티브 잔액 없음', localNote: '로컬 메모(이 기기만)', noteName: '메모', notSet: '미설정', address: '주소',
+    editNote: '편집', addNote: '추가', notePrompt: '이 주소의 메모 설정(이 브라우저만 저장): ', unknownInput: '해시인지 주소인지 판별할 수 없습니다. 전체가 복사되었나요?',
+    inputHint: 'Paxi 주소는 <b>paxi1</b>로 시작, Tx 해시는 64자 영숫자입니다.', parsingTx: 'Tx {0} 분석 중…', netErr: '⚠️ 네트워크/노드 오류(Tx 실패 아님, 재시도하세요): {0}', nodeReturn: '노드 응답',
+    netErrHint: '일반적 원인: 해시 없음, 미인덱스, 노드 일시 무응답.', badAddr: '유효한 컨트랙트 주소를 입력하세요(완전한 paxi1...)', noJson: '쿼리 JSON을 입력하세요', jsonErr: 'JSON 구문 오류: {0}',
+    queryingNode: '노드 조회 중(읽기 전용)…', queryOk: '✅ 쿼리 성공', realMethods: '💡 이 컨트랙트가 지원하는 실제 쿼리 메서드: ', expandAll: '클릭해 전체 {0}건 펼치기',
+    notContract: '이 주소는 컨트랙트가 아니거나 이전/삭제되었습니다.', queryFail: '쿼리 실패: {0}', nodeRaw: '원시 노드 응답', realMethodsTitle: '실제 쿼리 메서드',
+    noValidHash: '유효한 해시가 없습니다(한 줄에 64자 16진 해시).', overLimit: '한도 초과 — 처음 {0}건만 처리.', parsing: '분석 {0}/{1}', stOk: '성공', stFail: '실패', stQueryFail: '쿼리 실패', done: '완료: {0}건',
+    needHash: '64자 Tx 해시를 입력하세요', diagnosing: '진단 중…', netErr2: '⚠️ 네트워크/노드 오류(Tx 실패 아님): {0}',
+    txOkNoDiag: '✅ 이 Tx는 정상 실행되었습니다 — 진단할 항목 없음.', noClassify: '• 자동 분류 실패. 아래 원시 로그를 확인하세요.',
+    txFailCode: '❌ Tx 실패(code {0})', diagTitle: '진단', gasSet: '가스 한도', gasUsed: '가스 사용량', codespace: 'Codespace', rawLogTitle: '원시 로그',
+    d1: '잔액 부족: 계정이 전송과 수수료를 모두 감당하지 못합니다.', d2: '가스 부족: 실행이 가스 한도를 초과 — 가스를 올리세요.',
+    d3: '컨트랙트 로직 오류: 컨트랙트가 직접 반환한 오류 — 가스와 무관.', d4: '권한 없음: 호출자가 컨트랙트 관리자/민터가 아님.',
+    d5: '이미 존재: 중복 라벨이나 token_id 등.', d6: '찾을 수 없음: 대상 ID·컨트랙트 주소·제안이 존재하지 않음.',
+    d7: '인수 무효: JSON이 컨트랙트가 기대하는 필드와 일치하지 않음.', d8: '시퀀스 충돌: 계정 nonce 불일치, 또는 Tx가 두 번 브로드캐스트됨.',
+    d9: '타임아웃: 목표 높이까지 포함되지 않음 — 재브로드캐스트 가능.', d10: '소수점 자릿수 오류: 토큰 소수점 설정이 잘못됨.',
+    welcome: '위에 아무 <b>Tx 해시</b>나 <b>주소</b>를 붙여넣으면 알기 쉬운 말로 무엇을 했는지 설명합니다.',
+    coreMissing: '핵심 엔진 decoder-core.js 로드에 실패했습니다.', copied: '✅ 복사됨', copyFail: '❌ 복사 실패', addrCopied: '✅ 주소 복사됨', truncated: '\n…(잘림, 전체 {0}자)'
+  },
+  burn: {
+    title: '🔥 토큰 소각', desc: 'PRC-20 컨트랙트의 burn 메서드를 호출해 토큰을 영구 소멸(총공급량 감소·취소 불가). 플랫폼 수수료 없음 — 온체인 가스만.',
+    contractLabel: '토큰 컨트랙트 주소(PRC-20 / CW20)', amountLabel: '소각량(표시 단위, 예: 100)', amountPlaceholder: '예: 100',
+    burnBtn: '🔥 지금 소각', connected: '✅ 연결됨: <span class="mono">{0}…</span>', notConnected: '미연결(우측 상단 지갑 먼저 연결)', disconnected: '미연결',
+    queryFailHttp: '컨트랙트 조회 실패(HTTP {0}). PRC-20 컨트랙트 주소인지 확인하세요', notToken: '이 컨트랙트는 token_info를 반환하지 않았습니다 — 표준 PRC-20이 아니어서 소각 불가',
+    signFail: 'PaxiHub 서명 실패', connectFirst: '먼저 지갑을 연결하세요', badContract: '유효한 PRC-20 컨트랙트 주소(완전한 paxi1...)를 입력하세요', badAmount: '유효한 소각량(양수)을 입력하세요',
+    querying: '⏳ 토큰 정보 조회 중...', tokenLabel: '토큰: ', decimalsInfo: ', 소수점 자릿수: {0}', zeroAmount: '변환된 소각량이 0입니다 — 소수점 자릿수를 확인하세요',
+    confirmTitle: '{0} {1} 소각을 확정할까요?', confirmConverted: '→ 실제 소각량: {0} {1}(기본 단위: {2})', confirmIrreversible: '→ 총공급량이 영구 감소합니다. 취소 불가!',
+    signing: '⏳ 소각에 서명 중...', preparing: '⏳ {0} {1} 소각 준비 중', noTxHash: '노드가 Tx 해시를 반환하지 않았습니다 — 결과 불명. 무작정 재시도 말고 먼저 온체인 디코더로 확인하세요',
+    successHtml: '🔥 소각 성공! 총공급량이 영구 감소했습니다.', successToast: '🔥 소각 성공! 총공급량이 영구 감소했습니다!', failPrefix: '❌ 실패: ',
+    warn: '⚠️ 소각은 취소 불가. 표준 burn 메서드를 구현한 PRC-20 컨트랙트만 지원. 소각 전 컨트랙트 주소와 양을 다시 확인하세요.', unitFull: '토큰', unit: '토큰'
+  },
+  allowance: {
+    title: '🔑 허용량(Allowance) 관리', desc: '다른 주소(예: Swap 모듈)에 부여한 토큰 허용량을 표시·관리. 허용량은 "자동 인출 한도"와 같음 — 클수록 위험, 끝나면 축소하세요. 무료 도구, 온체인 가스만.',
+    contractLabel: 'PRC-20 컨트랙트 주소', ownerLabel: '소유자(허용 대상)', spenderLabel: '사용자(사용 가능자)', spenderHint: '일반: Swap 모듈(공식 Swap 모듈 주소)', spenderCustom: '커스텀 주소',
+    queryBtn: '🔍 허용량 조회', amountLabel: '금액(표시 단위, 예: 100)', increaseBtn: '➕ 증액', decreaseBtn: '➖ 감액', revokeBtn: '🚫 전체 revoke',
+    querying: '조회 중...', noAllowance: '허용량 없음(현재 한도 0)', allowanceResult: '현재 허용량', balanceLabel: '소유자 잔액',
+    confirmIncrease: '증액을 확정할까요?\n\n· 컨트랙트: {0}\n· 사용자: {1}\n· 증액: {2}\n· 수수료: 없음(온체인 가스만)',
+    confirmDecrease: '감액을 확정할까요?\n\n· 컨트랙트: {0}\n· 사용자: {1}\n· 감액: {2}\n· 수수료: 없음(온체인 가스만)',
+    confirmRevoke: '전체 revoke를 확정할까요?\n\n· 컨트랙트: {0}\n· 사용자: {1}\n· revoke: {2}(0으로 설정 — 더 이상 토큰을 옮길 수 없음)\n· 수수료: 없음(온체인 가스만)',
+    success: '✅ 완료 — 허용량 갱신!', failPrefix: '❌ 실패: ', connectFirst: '먼저 지갑을 연결하세요(우측 상단)', badContract: '유효한 PRC-20 컨트랙트 주소(paxi1...)를 입력하세요',
+    badAddr: '무효한 주소(완전한 paxi1... 필요)', badAmount: '0보다 큰 금액을 입력하세요', noQueryYet: '먼저 현재 허용량을 조회하세요', queryingTx: '⏳ 서명 & 브로드캐스트 중...', done: '완료',
+    viewTx: '🧭 디코더에서 이 Tx 검사', tokenFail: '토큰 정보 로드 실패(PRC-20 컨트랙트인가요?)', unlimitedNote: '⚠️ 주의: revoke = 한 번에 0으로. 사용자는 재승인하지 않는 한 토큰에 손댈 수 없습니다.'
+  },
+  swap: {
+    title: '🔁 스왑 도우미(네이티브 모듈)', desc: 'Paxi 네이티브 스왑 모듈로 토큰 교환. 서명 전 보장 최소 수령액을 계산 — 공식 예시의 고정 50% 슬리피지 대체. 무료, 온체인 가스만.',
+    poolListTitle: '📈 전체 풀(클릭해 선택)', poolLoading: '풀 로드 중...', poolFail: '풀 로드 실패', poolEmpty: '풀 없음 — PRC-20 컨트랙트 주소를 직접 붙여넣기 가능',
+    price: '가격', reserve: '리저브', contractLabel: 'PRC-20 컨트랙트 주소(풀)', loadPoolBtn: '🔄 풀 로드',
+    direction: '방향', dirSellToken: 'PRC-20 매도 → PAXI', dirSellPaxi: 'PAXI 매도 → PRC-20', amountLabel: '매도량(표시 단위)', balanceLabel: '내 잔액',
+    slippageLabel: '슬리피지 보호(%)', quoteTitle: '견적 미리보기', qRatio: '예상 수령(풀 비율)', qCp: '상수곱 추정(임팩트 포함)', qImpact: '가격 임팩트',
+    qMin: '🛡️ 최소 수령액(이보다 작으면 Tx 자동 실패 — 귀하의 보호)', quoteHint: '서명 전 견적을 갱신. 수량/방향이 바뀌면 견적은 만료.', refreshQuote: '🔄 견적 갱신',
+    execBtn: '🔁 서명 & 스왑', confirm: '스왑을 확정할까요?\n\n· 방향: {0}\n· 매도: {1}\n· 🛡️ 최소 수령: {2}\n· 슬리피지: {3}%\n· 수수료: 없음(온체인 가스만)\n\nPRC-20 매도 시 허용량 증액은 동일 Tx에 원자적으로 포함됩니다.',
+    queryingTx: '⏳ 서명 & 브로드캐스트 중...', success: '✅ 스왑 Tx가 온체인 확정!', failPrefix: '❌ 실패: ', connectFirst: '먼저 지갑을 연결하세요(우측 상단)', badContract: '유효한 PRC-20 컨트랙트 주소(paxi1...)를 입력하세요',
+    badAmount: '0보다 큰 금액을 입력하세요', noPool: '이 주소에 풀 없음(먼저 토큰 생성 후 유동성 공급자가 풀 개설)', needQuote: '먼저 견적을 갱신하세요', minSlip: '슬리피지는 50을 초과할 수 없습니다',
+    typeUrlHint: '노드가 메시지 타입을 인식하지 못했습니다. 나중에 재시도하거나 보고하세요.', viewTx: '🧭 디코더에서 이 Tx 검사', allowanceAdded: '(허용량 증액 자동 포함: {0} — 이 스왑에 필요한 분만)'
+  },
+  govVote: {
+    title: '거버넌스 투표', desc: '온체인 거버넌스 제안을 열람하고, 투표 기간 중 제안에 투표. 본 도구는 플랫폼 수수료 없음.',
+    info: '💡 투표 가능한 것은 "투표 중" 제안만. 투표는 지갑 서명과 온체인 브로드캐스트가 필요, 체인 기록이 정확.',
+    voting: '투표 중', passed: '통과', rejected: '부결', deposit: '디파짓', connectFirst: '투표 전 지갑을 연결하세요', yes: '찬성', no: '반대', abstain: '기권', veto: '거부권 행사',
+    voted: '귀하의 투표: ', confirmMsg: (id, opt) => `제안 #${id}에 "${opt}"로 투표할까요?\n\n"OK"로 지갑 서명 & 브로드캐스트.`, success: '✅ 투표 제출', failPrefix: '투표 실패: ', sdkErr: 'SDK가 이 메시지 타입을 미지원', noProposals: '제안 없음', loading: '불러오는 중...', statusUnknown: '알 수 없음', voteFailed: '투표 실패'
+  },
+  claimRewards: {
+    title: '보상 수령', desc: 'PAXI 스테이킹 보상을 원클릭으로 확인·수령. 선택적으로 "복리"를 켜면 수령 후 동일 밸리데이터에 재위임.',
+    info: '본 도구는 수령/복리 Tx만 브로드캐스트하며 플랫폼 수수료 없음 — 온체인 가스만. 보상은 upaxi 단위(1 PAXI = 1,000,000 upaxi).',
+    compound: '수령 후 동일 밸리데이터에 복리', claimBtn: '전체 수령', connectFirst: '지갑을 연결하세요', noRewards: '수령 가능한 스테이킹 보상 없음',
+    colValidator: '밸리데이터', colAmount: '수령 가능(PAXI)', colAction: '작업', total: '수령 합계: ', loading: '⏳ 스테이킹 보상 로드 중...',
+    confirmMsg: (paxi, compound) => `스테이킹 보상 ${paxi} PAXI를 수령할까요?` + (compound ? '\n(복리 활성: 수령 후 동일 밸리데이터에 재위임)' : '') + '\n\nOK로 지갑 서명.',
+    success: '✅ 수령 성공', failPrefix: '수령 실패: ', sdkErr: 'SDK가 이 메시지 타입을 미지원', queryFail: '보상 조회 실패: '
+  },
+  ibcQuery: {
+    title: 'IBC 조회', desc: 'Paxi의 IBC 채널·클라이언트·크로스체인 denom 추적을 읽기 전용 조회.',
+    channelsBtn: '채널 조회', denomTracesBtn: 'denom 추적 조회', clientsBtn: '클라이언트 조회', resolveBtn: 'denom 해석', hashPh: 'ibc/... 해시 또는 날 해시 입력',
+    notEnabled: '이 IBC 엔드포인트는 오류를 반환했습니다. Paxi 메인넷은 IBC 미활성일 가능성(다른 기능 영향 없음).', loading: '조회 중...', noData: '데이터 없음', resolved: '해석됨', info: '본 도구는 읽기 전용으로 Tx를 보내지 않습니다. Paxi 메인넷이 IBC 미활성이면 엔드포인트는 오류를 반환합니다 — 이는 예상된 동작.'
+  },
+  addressBook: {
+    title: '주소록', desc: '자주 쓰는 Paxi 주소를 브라우저에 로컬 저장.', addBtn: '추가', exportBtn: '출력', importBtn: '입력', name: '이름', address: '주소', note: '메모', search: '이름 또는 주소로 검색...', empty: '저장된 주소 없음', invalidAddr: '주소 형식 무효', added: '추가됨', deleted: '삭제됨', exported: '출력됨', imported: '입력됨', confirmDel: '이 주소를 삭제할까요?'
+  },
+  pump: {
+    templateLabel: '템플릿 선택', feeLabel: '서비스 수수료', feeUnit: ' PAXI', deployBtn: '🚀 배포', deployingBtn: '배포 중...', revokingBtn: '권한 삭제 중...',
+    walletDisconnected: '미연결', walletConnectedPrefix: '✅', connectHint: '먼저 헤더에서 지갑 연결', templateLoadFail: '템플릿 로드 실패', alertConnectFirst: '먼저 지갑을 연결하세요', alertSelectTemplate: '먼저 템플릿을 선택하세요',
+    alertUploadFail: '이미지 업로드 실패: ', alertDeployFail: '배포 실패: ', alertImageType: '이미지 파일(JPG / PNG / GIF 등)을 선택하세요', alertImageSize: '이미지 크기는 32MB 이하', alertReadFileFail: '이미지 파일 읽기 실패', alertUploadGeneral: '이미지 업로드 실패',
+    fields: { name: '토큰 이름', symbol: '토큰 심볼', total_supply: '총공급량(단위)', project: '프로젝트 URL', description: '토큰 설명', logo_url: '로고 URL(필수)', minter: '민터 주소' },
+    placeholders: { name: '토큰 이름', symbol: '토큰 심볼(예: PAXI)', project: '프로젝트 URL https://…', description: '토큰 설명' },
+    templates: { prc20: 'PRC-20 대체 토큰', prc721: 'PRC-721 NFT 컬렉션' },
+    logoUrlPlaceholder: '또는 이미지 URL 붙여넣기(https://…)', uploadingBtn: '업로드 중...', resultSuccessTitle: '✅ 발행 성공!', resultContractAddr: '컨트랙트 주소: ', resultTxHash: 'Tx 해시: ',
+    resultTotalSupply: '총공급량: ', resultTotalSupplySuffix: '(전부 귀하의 지갑으로 민팅)', resultFee: '서비스 수수료: ', resultFeeSuffix: ' PAXI(자동 공제)', resultLogoUrl: '로고 URL: ', resultNoLogo: 'N/A',
+    resultMinter: '민터: ', resultMinterSuffix: '(이후 민트에 이 주소 사용 가능)', resultMinterRevokedSuffix: '(발행 후 민트 및 동결 권한 자동 포기)', resultRevokeLabel: '민트/동결 권한: ',
+    resultRevokeOk: '자동 포기됨(이후 민트 불가, 계정 동결 불가)', resultRevokeFail: '자동 포기 실패! 수동으로 update_minter(null) Tx를 컨트랙트로 보내세요.', resultNotReadyTitle: '⚠️ Tx 전송됨이나 컨트랙트 주소 미확정.',
+    resultNotReadyTip: '나중에 온체인 디코더로 확인하세요.', errNameRequired: '토큰 이름은 필수', errSymbolRequired: '토큰 심볼은 필수', errNftNameRequired: 'NFT 이름은 필수', errNftSymbolRequired: 'NFT 심볼은 필수',
+    errDecimalsRange: '소수점 자릿수는 0~36', errTotalSupplyPositive: '총공급량은 양의 정수', errTotalSupplyInteger: '총공급량은 음이 아닌 정수', errLogoRequired: '로고 URL은 필수! 이미지를 업로드하고 공개 링크를 붙여넣으세요.', errLogoScheme: '로고 URL은 http://, https://, ipfs://로 시작하세요',
+    errProjectUrl: '프로젝트 URL은 http:// 또는 https://로 시작하세요', errMinterInvalid: '무효한 민터 주소(paxi1로 시작)', errReceiverConfig: '수령 주소 설정 오류', errPubkeyMissing: '공개키 없음, 지갑 재연결하세요',
+    errUnknownTemplate: '알 수 없는 템플릿', errChainId: 'chainId 획득 실패', errAccount: '계정 정보 획득 실패', errSignPaxihub: 'PaxiHub 서명 실패', errBroadcast: '브로드캐스트 실패: ', errTxFail: (c, l) => `거래 실패(code=${c}): ${l || ''}`, errTxOnchain: '온체인에서 거래 실패: ', errUnknownWallet: '알 수 없는 지갑 종류'
+  },
+  stakeManage: {
+    title: '위임 / 위임 해제', desc: '밸리데이터에 PAXI를 위임해 스테이킹 보상을 얻거나, 필요 시 위임 해제(약 7일 언본드 기간). 본 도구는 플랫폼 수수료 없음.',
+    info: '💡 위임 후 블록마다 보상이 누적. 위임 해제 자금은 사용 가능해질 때까지 약 7일 잠김.', delegateSection: '위임(스테이크)', undelegateSection: '위임 해제(언스테이크)', unbondingSection: '언본드(카운트다운)',
+    delegateBtn: '위임', undelegateBtn: '위임 해제', connectFirst: '지갑을 연결하세요', confirmDelegate: (val, amt) => `위임을 확정할까요?\n\n대상 밸리데이터: ${val}\n금액: ${amt} PAXI\n\n"OK"로 지갑 서명.`, confirmUndelegate: (val, amt) => `위임 해제를 확정할까요?\n\n현재 위임: ${val}\n금액: ${amt} PAXI\n\n⚠️ 위임 해제 자금은 약 7일 언본드 기간에 들어가 이전·사용 불가. "OK"로 지갑 서명.`,
+    success: '✅ 성공', failPrefix: '실패: ', sdkErr: 'SDK가 이 메시지 타입을 미지원', noDelegations: '위임 없음', loading: '불러오는 중...', unbondPeriod: 'Paxi 언본드 기간 약 7일', selectValidator: '밸리데이터 선택', selectDelegation: '위임 선택',
+    invalidAmt: '유효한 금액을 입력하세요', selectSource: '위임 해제할 현재 위임을 선택하세요', amountLabel: '금액(PAXI)', unbondComplete: '✅ 언본드 완료', days: '일', hours: '시간', mins: '분', secs: '초'
+  },
+  txDryRun: {
+    title: 'Tx 시뮬레이션', desc: '온체인에서 Tx를 시뮬레이션해 가스를 추정하고 실패 여부를 판정.', info: '본 도구는 온체인을 시뮬레이션만 하며 브로드캐스트하지 않습니다. 가스를 추정하고 Tx 실패 여부 판정에 사용.',
+    modeA: '모드 A: 빠른 전송 시뮬레이션', modeB: '모드 B: tx_bytes 붙여넣기 시뮬레이션', from: '송신자(지갑 주소)', to: '수신 주소', amount: '금액(PAXI)', simTransferBtn: '전송 시뮬레이션', simBytesBtn: '붙여넣은 tx_bytes 시뮬레이션',
+    bytesPh: 'Base64 인코딩 tx_bytes 붙여넣기', connectFirst: '지갑을 연결하세요', invalidAddr: '무효한 수신 주소', invalidAmt: '유효한 금액을 입력하세요', gasUsed: '추정 가스 사용량', estFee: '추정 가스 수수료',
+    wouldFail: '시뮬레이션 메모: ', success: '시뮬레이션 성공', failPrefix: '시뮬레이션 실패: ', loading: '시뮬레이션 중...', gasWanted: 'Gas Wanted', paxiUnit: 'PAXI', notConnected: '지갑 미연결, 송신자 주소 비어 있음.'
+  },
+  nftLauncher: {
+    title: '🎨 NFT 런처', desc: 'PRC-721 NFT 컨트랙트를 Paxi 네트워크에 원클릭 배포. 배포 후 배치 민팅.',
+    step1: '컬렉션 정보', step2: '에셋 업로드', step3: '미리보기 & 배포', next: '다음: 업로드 →', prev: '← 뒤로', nextDeploy: '다음: 미리보기 & 배포 →', deploy: 'NFT 컨트랙트 배포',
+    collectionName: '컬렉션 이름', symbol: '심볼', description: '설명', maxSupply: '최대 공급량', royalty: '로열티(%)', mintPrice: '민팅 가격(PAXI)', maxPerWallet: '지갑당 최대 민팅',
+    deployBtn: '🚀 NFT 컨트랙트 배포', uploadCover: 'NFT 커버 이미지', uploadCoverHint: '클릭해 커버 이미지 업로드', uploadSupport: 'JPG/PNG/GIF/SVG 지원', imageUri: 'Image URI(IPFS off 시, 또는 덮어쓰기)', preview: '미리보기', previewPlaceholder: '🖼️',
+    batchMint: '배치 민팅 NFT', batchMintDesc: '배포된 PRC-721 컨트랙트에 배치 민팅. 1Tx 최대 10건. 각 NFT는 고유한 Token ID 획득.', contractAddr: 'NFT 컨트랙트 주소', contractAddrHint: '배포 후 자동 입력', mint: '민팅 수',
+    mintFeeTitle: '💰 견적 수수료', mintCountLabel: '민팅 수', estimatedFee: '견적 수수료', mintBtn: '🏭 배치 민팅 실행', mintTokenIds: '토큰 ID', blockHeight: '블록 높이',
+    metadataTitle: '📝 커스텀 메타데이터', metadataDesc: '민팅된 NFT에 커스텀 이름 & 이미지 추가. CW721 준수 메타데이터 JSON 생성.', tokenId: '토큰 ID', nftName: 'NFT 이름', imageUriLabel: 'Image URI', saveMetadataBtn: '📝 메타데이터 JSON 생성',
+    metadataExplain: 'PRC-721은 외부 JSON을 가리키는 token_uri로 메타데이터 관리. 아래 JSON을 서버/IPFS에 업로드하고, 민팅 시 token_uri로 그 URL 사용.', copyJson: '📋 JSON 복사', contractHistory: '배포된 컨트랙트', contractHistoryDesc: 'Paxi 체인에서 배포 성공한 NFT 컨트랙트.',
+    noHistory: '배포된 컨트랙트 없음', toContract: '→ 주소 입력', needWallet: '먼저 지갑을 연결하세요', fillAll: '필수 항목을 모두 입력하세요', deploying: '배포 Tx 구성 중...', waiting: '지갑 서명 대기...', broadcasting: 'Tx 브로드캐스트됨. 확인 대기...', confirmWait: '온체인 확인 대기...',
+    success: '✅ 성공', failed: '❌ 실패', deploySuccess: '✅ NFT 컨트랙트 배포!', nextStep: '👇 다음: 위 주소를 아래 배치 민팅란으로 복사', mintSuccess: '민팅 성공', nftMintCount: 'NFT',
+    connected: '연결됨', warning: '⚠️ 본 도구는 NFT 민팅의 기술적 서비스만 제공. 거래·가격 책정·교환 기능은 일절 없음. 일체 결과는 이용자가 부담.', warningEn: '⚠️ 본 도구는 NFT 민팅의 기술적 서비스만 제공. 거래·가격 책정·교환 기능은 일절 없음. 일체 결과는 이용자가 부담.',
+    max10Hint: '1트랜잭션 최대 10 NFT', mintConfirm: '배치 민팅을 확정할까요?\n\n· 서비스 수수료: 5 PAXI\n· 수신자: ', buildTx: '민팅 Tx 구성 중...',
+    ipfsHint: '💡 업로드 이미지는 IPFS에 저장되어 NFT의 영구 접근 보장.', ipfsToggle: 'IPFS 저장 사용(권장)', ipfsConfig: '⚙️ IPFS 설정(Pinata)', ipfsJwtLabel: 'Pinata JWT', ipfsJwtPlaceholder: 'Pinata JWT 붙여넣기...', ipfsSave: '💾 저장', ipfsConfigured: '✓ 설정됨', ipfsNotConfigured: '⚠ 미설정', ipfsGetKey: '🔗 Pinata JWT 받기',
+    ipfsUploading: '업로드 중', ipfsImageOk: '✅ 이미지를 IPFS에 업로드', ipfsMetaGen: '메타데이터 생성 & 업로드 중...', ipfsUploadFail: '❌ IPFS 업로드 실패', ipfsNoJwt: '먼저 IPFS 설정에서 Pinata JWT를 입력하세요', ipfsGateway: '게이트웨이', ipfsFallback: 'IPFS 사용 불가, 기본 모드로', ipfsNeedImage: '커버 이미지를 업로드하거나 Image URI를 입력하세요', ipfsLargeImg: '이미지가 100KB 초과, IPFS 활성화해 가스 절감',
+    updTitle: '🔄 온체인 메타데이터 갱신', updDescInfo: '민팅된 NFT의 온체인 메타데이터(이름/이미지/설명/속성)를 직접 덮어쓰기 — 재민팅 불필요. 민터 또는 토큰 소유자 지갑으로 서명, 가스만 있고 서비스 수수료 없음.',
+    updDescLabel: 'NFT 설명', updAttrsLabel: '속성 JSON(선택)', updAttrsPlaceholder: '[{"trait_type":"Series","value":"Genesis"}]', updBtn: '🔄 온체인 갱신 전송', updSuccess: '✅ 메타데이터 갱신', updAttrsInvalid: '속성 JSON 무효 — [{"trait_type":"...","value":"..."}] 형태의 배열 기대', updAddrInvalid: '컨트랙트 주소 형식 무효(paxi1... 계정 43자/컨트랙트 63자). 배포 이력을 모두 복사.',
+    updConfirm: '이 메타데이터를 온체인에 기록할까요? NFT의 이름/이미지/속성을 직접 변경. 가스만.\n\n', buildUpdTx: '갱신 Tx 구성 중...', updUriTooLarge: '메타데이터 token_uri가 64KB를 초과해 온체인 Tx가 실패할 수 있습니다. 갱신 전 IPFS 링크를 사용하거나 이미지를 압축.'
+  }
+};

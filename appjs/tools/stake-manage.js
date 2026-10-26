@@ -36,9 +36,13 @@ const SM_DICT = {
   }
 };
 const smPt = (k, ...a) => {
-  const lang = (typeof currentLang !== 'undefined' && currentLang === 'en') ? 'en' : 'zh';
-  let v = SM_DICT[lang][k];
-  if (v === undefined) v = SM_DICT.en[k];
+  const lang = (typeof currentLang !== 'undefined' && currentLang) || 'en';
+  let v;
+  if (window.PAXI_LANGS && PAXI_LANGS[lang] && PAXI_LANGS[lang].stakeManage && PAXI_LANGS[lang].stakeManage[k] != null) {
+    v = PAXI_LANGS[lang].stakeManage[k];
+  } else {
+    v = (SM_DICT[lang] && SM_DICT[lang][k] !== undefined) ? SM_DICT[lang][k] : SM_DICT.en[k];
+  }
   return typeof v === 'function' ? v(...a) : v;
 };
 

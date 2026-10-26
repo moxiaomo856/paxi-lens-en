@@ -18,7 +18,8 @@
     }
     .topbar { display: flex; align-items: center; gap: 10px; padding: 6px 0 16px; border-bottom: 1px solid var(--border); margin-bottom: 22px; position: sticky; top: 0; background: var(--bg); z-index: 10; }
     .logo { width: 32px; height: 32px; background: var(--primary); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 18px; }
-    .topbar h1 { font-size: 18px; font-weight: 700; }
+    .topbar h1 { font-size: 18px; font-weight: 700; flex: 1; min-width: 0; }
+    .topbar select { background: var(--bg-card); color: var(--text); border: 1px solid var(--border); border-radius: 8px; padding: 7px 10px; font-size: 13px; max-width: 46%; }
     h2 { font-size: 17px; margin: 30px 0 12px; padding-left: 10px; border-left: 3px solid var(--primary); }
     h3 { font-size: 15px; margin: 18px 0 6px; color: var(--text); }
     p, li { font-size: 14px; color: var(--text); }
@@ -40,56 +41,68 @@
 
   <div class="topbar">
     <div class="logo">P</div>
-    <h1>Paxi Lens · About &amp; Legal Disclaimer</h1>
+    <h1 id="pageTitle">Paxi Lens · About &amp; Legal Disclaimer</h1>
+    <select id="langSel" onchange="renderLegal(this.value)" title="Language"></select>
   </div>
 
-  <!-- ===== About ===== -->
+  <!-- ===== Multilingual legal body (rendered by script) ===== -->
+  <div id="legalBody"></div>
+
+  <a class="back" id="backLink" href="index.html">← Back to Paxi Lens</a>
+
+<script>
+const PAGE_TITLES = {
+  en: 'Paxi Lens · About & Legal Disclaimer',
+  ja: 'Paxi Lens · 概要と免責事項',
+  ko: 'Paxi Lens · 소개 및 법적 고지',
+  id: 'Paxi Lens · Tentang & Penafian Hukum',
+  vi: 'Paxi Lens · Giới thiệu & Miễn trừ pháp lý',
+  zh: 'Paxi Lens · 關於與法律免責聲明'
+};
+const BACK_TEXT = {
+  en: '← Back to Paxi Lens',
+  ja: '← Paxi Lens に戻る',
+  ko: '← Paxi Lens로 돌아가기',
+  id: '← Kembali ke Paxi Lens',
+  vi: '← Quay lại Paxi Lens',
+  zh: '← 返回 Paxi Lens'
+};
+const FEE_ADDR = 'paxi1rdarmm997hqwfdgl9wvnpffe28zmex3kfyg7xd';
+
+const LEGAL = {
+  en: `
   <div class="card">
     <strong>About Paxi Lens</strong>
     <p style="margin-top:8px">Paxi Lens is a <b>non-custodial toolkit</b> for the Paxi ecosystem: 20 on-chain tools (decoder, token launch, swap, governance, delegation, burn, and more) are <b>all integrated into this single page</b>. It is a pure front-end, and private keys never leave your wallet.</p>
     <p style="margin-top:8px">The built-in "On-Chain Decoder" is a lightweight decoding module that turns raw transaction, contract, and wallet data into plain language. It is read-only and requires no wallet connection.</p>
     <p style="margin-top:8px">Paxi Lens is <b>not an investment and not a custodian</b>. Service fees go 100% to a single transparent address, and you use it at your own risk.</p>
   </div>
-
   <div class="notice">This page is the complete description and legal disclaimer for Paxi Lens. Before using any tool, please read and fully understand the terms below.</div>
-
-  <!-- ===== Legal Disclaimer (English) ===== -->
   <h2>Legal Disclaimer &amp; Risk Disclosure</h2>
   <p class="muted">Last updated: 2026-10-23</p>
   <p>Paxi Lens ("the Service", "we", "us") is a <b>non-custodial, open-source toolkit</b> delivered as a pure front-end interface for the Paxi blockchain. By accessing this website, connecting a wallet, or using any tool, you acknowledge and agree to the following:</p>
-
   <h3>A. Nature of the Service</h3>
   <p>Paxi Lens is utility software. It is <b>not</b> a wallet, exchange, custodian, broker, bank, investment vehicle, or financial product. It does <b>not</b> hold user assets, does <b>not</b> custody private keys, and does <b>not</b> broadcast transactions on a user's behalf — every transaction is constructed locally and signed <b>exclusively inside the user's own wallet</b>. Paxi Lens does not issue, sell, or distribute any token or NFT as an investment.</p>
-
   <h3>B. No Investment Advice</h3>
   <p>Nothing on this website, in any documentation, or in any community channel constitutes investment, financial, legal, or tax advice, or a recommendation to buy, sell, stake, delegate, or hold any asset. You are solely responsible for your own decisions. Participate at your own risk.</p>
-
   <h3>C. Non-Custodial — You Control Your Assets</h3>
   <p>Private keys and funds <b>never leave your wallet</b>. Paxi Lens cannot move, freeze, seize, or access your assets. Loss of your private key or wallet credentials results in permanent loss of access that we cannot recover.</p>
-
   <h3>D. Service Fees Are Transparent and Pre-Disclosed</h3>
   <p>Certain tools charge a fixed service fee that is routed <b>100% to a single, publicly verifiable address</b>:</p>
-  <div class="addr">paxi1rdarmm997hqwfdgl9wvnpffe28zmex3kfyg7xd</div>
+  <div class="addr">${FEE_ADDR}</div>
   <p>The exact fee amount and recipient are <b>always displayed for your confirmation before you sign</b> any transaction. These fees are payment for software use, not a purchase of any asset, token, or equity.</p>
-
   <h3>E. No Buyback, Yield, Prize Pool, or Return Promise</h3>
   <p>We do <b>not</b> promise, guarantee, or imply any buyback, profit distribution, staking yield, or return of any kind. Paxi Lens contains <b>no prize pools, lotteries, or reward-for-deposit mechanisms</b>. Any secondary-market activity involving assets you create or trade is solely between you and other users.</p>
-
   <h3>F. No TKCC Involvement</h3>
   <p>Paxi Lens does <b>not</b> touch, hold, transfer, or facilitate any TKCC token, nor any token-claiming, airdrop, or promotional distribution. The Service operates strictly within the documented Paxi wallet injection APIs and performs no undisclosed on-chain interactions.</p>
-
   <h3>G. User-Initiated On-Chain Actions</h3>
   <p>Tools such as token issuance, swap, burning, delegation, redelegation, and governance are <b>user-initiated actions performed entirely on-chain at your direction</b>. Paxi Lens does not endorse, guarantee, or assume liability for the value, legality, or outcome of any token you create, swap, or interact with through the Service.</p>
-
   <h3>H. Geographic Restrictions</h3>
   <p>This Service is <b>not offered to residents of mainland China</b>. By accessing or using this Service, you represent and warrant that you are not located in, and are not a resident of, mainland China. We reserve the right to restrict access from any jurisdiction at our discretion. Users who circumvent technical access restrictions do so at their own risk and in violation of these terms.</p>
-
   <h3>I. Compliance with Local Laws</h3>
   <p>You are solely responsible for ensuring that your access to and use of this Service complies with the laws and regulations of your jurisdiction. We make no representation that the Service is appropriate or available in any particular location.</p>
-
   <h3>J. Limitation of Liability &amp; "As Is"</h3>
   <p>The Service is provided on an <b>"AS IS"</b> and <b>"AS AVAILABLE"</b> basis without warranties of any kind. To the maximum extent permitted by applicable law, the developers shall not be liable for any direct, indirect, incidental, or consequential damages arising from your use of the Service, including but not limited to loss of funds due to user error, wallet compromise, network failure, or smart-contract risk.</p>
-
   <h2>Pre-Use Acknowledgement (must be checked before first transaction)</h2>
   <p>By checking this box, I confirm that:</p>
   <ul>
@@ -101,11 +114,276 @@
     <li>I understand there is <b>no buyback, yield, prize pool, or promised return</b> of any kind.</li>
     <li>I am participating <b>at my own risk</b>.</li>
   </ul>
-
   <h2>Permanent Footer Statement</h2>
   <p><b>Paxi Lens — a non-custodial Paxi toolkit. Not an investment. No return promised. Not offered to mainland China residents. You control your keys. Participate at your own risk.</b></p>
+  `,
+  ja: `
+  <div class="card">
+    <strong>Paxi Lens について</strong>
+    <p style="margin-top:8px">Paxi Lens は Paxi エコシステム向けの<b>非管理型（ノンカストディアル）ツールキット</b>です。デコーダ・トークン発行・スワップ・ガバナンス・委任・焼却など 20 のオンチェーンツールが<b>すべてこの単一ページに統合</b>されています。純粋なフロントエンドであり、秘密鍵がウォレット外に出ることはありません。</p>
+    <p style="margin-top:8px">内蔵の「オンチェーンデコーダ」は、生の取引・コントラクト・ウォレットデータを平易な言葉に変換する軽量なデコードモジュールです。読取専用でウォレット接続は不要です。</p>
+    <p style="margin-top:8px">Paxi Lens は<b>投資でも custodian（資産管理業者）でもありません</b>。サービス手数料は 100% 単一の透明なアドレスに向かい、利用は自己責任です。</p>
+  </div>
+  <div class="notice">本ページは Paxi Lens の完全な説明および免責事項です。いかなるツールを利用する前にも、以下の条項を読み十分に理解してください。</div>
+  <h2>免責事項・リスク開示</h2>
+  <p class="muted">最終更新: 2026-10-23</p>
+  <p>Paxi Lens（「本サービス」「当方」）は、Paxi ブロックチェーン向けの純粋なフロントエンドとして提供される<b>非管理型・オープンソースのツールキット</b>です。本ウェブサイトへのアクセス、ウォレット接続、またはいかなるツールの利用により、あなたは以下に同意したものとみなします。</p>
+  <h3>A. サービスの性質</h3>
+  <p>Paxi Lens はユーティリティ・ソフトウェアです。それはウォレット・取引所・custodian・ブローカー・銀行・投資商品・金融商品の<b>いずれでもありません</b>。ユーザー資産を保有せず、秘密鍵を保管せず、ユーザーに代わって取引をブロードキャストすることも<b>ありません</b>。すべての取引はローカルで構築され、<b>専らユーザー自身のウォレット内でのみ署名</b>されます。Paxi Lens は投資としていかなるトークンや NFT を発行・販売・配布しません。</p>
+  <h3>B. 投資助言なし</h3>
+  <p>本ウェブサイト・いかなる文書・いかなるコミュニティチャネルにおいても、投資・金融・法律・税務の助言、あるいはいかなる資産の売買・ステーク・委任・保有の推奨を構成するものではありません。すべての決定はあなた自身の責任です。自己責任で参加してください。</p>
+  <h3>C. 非管理型 — 資産はあなたが管理</h3>
+  <p>秘密鍵と資金は<b>ウォレット外に出ることはありません</b>。Paxi Lens はあなたの資産を移動・凍結・没収・アクセスできません。秘密鍵やウォレット認証情報の紛失は、当方が復旧できない永久的なアクセス喪失を招きます。</p>
+  <h3>D. サービス手数料は透明かつ事前開示</h3>
+  <p>一部のツールは固定のサービス手数料を徴収し、それは<b>100% 単一の公開検証可能なアドレス</b>に向かいます。</p>
+  <div class="addr">${FEE_ADDR}</div>
+  <p>正確な手数料額と送金先は、あなたが署名する<b>前に必ず確認画面に表示</b>されます。これらの手数料はソフトウェア利用の対価であり、いかなる資産・トークン・持分の購入ではありません。</p>
+  <h3>E. 買戻・利回り・賞金プール・リターン保証なし</h3>
+  <p>当方はいかなる買戻・利益分配・ステーキング利回り・いかなる種類のリターンも約束・保証・示唆しません。Paxi Lens に<b>賞金プール・くじ・預金報酬メカニズムは存在しません</b>。あなたが作成・取引する資産に関わる二次流通は、すべてあなたと他のユーザー間のみに帰属します。</p>
+  <h3>F. TKCC 関与なし</h3>
+  <p>Paxi Lens はいかなる TKCC トークンも保持・移転・仲介せず、トークン請求・エアドロップ・プロモーション配布も行いません。本サービスは文書化された Paxi ウォレット注入 API の範囲内でのみ動作し、非開示のオンチェーン操作は行いません。</p>
+  <h3>G. ユーザー主導のオンチェーン操作</h3>
+  <p>トークン発行・スワップ・焼却・委任・再委任・ガバナンスなどのツールは、<b>あなたの指示による完全なオンチェーン上のユーザー主導操作</b>です。Paxi Lens は、あなたが作成・スワップ・相互作用するいかなるトークンの価値・合法性・結果を推奨・保証・責任を負いません。</p>
+  <h3>H. 地域制限</h3>
+  <p>本サービスは<b>中国本土の居住者には提供されません</b>。本サービスにアクセスまたは利用することで、あなたは中国本土に所在せず、かつ居住者でないことを表明・保証します。当方は独自の裁量でいかなる法域からのアクセスも制限する権利を留保します。技術的アクセス制限を回避する利用者は、自己責任かつ本規約違反として行います。</p>
+  <h3>I. 現地法の遵守</h3>
+  <p>本サービスへのアクセスおよび利用があなたの法域の法令を遵守することを確実にすることは、あなたのみの責任です。当方は本サービスがいかなる特定の場所で適切または利用可能であるとは表明しません。</p>
+  <h3>J. 責任の制限・「現状有姿」</h3>
+  <p>本サービスは<b>「現状有姿」</b>かつ<b>「利用可能な限り」</b>で、いかなる保証もなく提供されます。適用される法律で認められる最大限の範囲で、開発者は本サービスの利用から生じる直接的・間接的・偶発的・結果的な損害（ユーザー過失・ウォレット侵害・ネットワーク障害・スマートコントラクト・リスクによる資金損失を含むがこれらに限定されない）について責任を負いません。</p>
+  <h2>利用前の確認（初回取引前に要チェック）</h2>
+  <p>このボックスをチェックすることで、私は以下を確認します。</p>
+  <ul>
+    <li>私は<b>中国本土の居住者ではなく</b>、中国本土から本サービスにアクセスしていない。</li>
+    <li>私は<b>免責事項・リスク開示</b>を読み理解した。</li>
+    <li>Paxi Lens が<b>非管理型ユーティリティ・ツール</b>であり、投資・ウォレット・取引所・custodian ではないことを理解した。</li>
+    <li>私の<b>秘密鍵と資金がウォレット外に出ることはなく</b>、それらを管理するのは私のみであることを理解した。</li>
+    <li>サービス手数料が<b>透明であり、単一の公開アドレスに向かい、署名前に表示される</b>ことを理解した。</li>
+    <li><b>買戻・利回り・賞金プール・約束されたリターン</b>がいかなる形でも存在しないことを理解した。</li>
+    <li>私は<b>自己責任で</b>参加する。</li>
+  </ul>
+  <h2>恒久的フッター声明</h2>
+  <p><b>Paxi Lens — 非管理型 Paxi ツールキット。投資ではない。リターンの約束なし。中国本土居住者には提供せず。鍵はあなたが管理。自己責任で参加。</b></p>
+  `,
+  ko: `
+  <div class="card">
+    <strong>Paxi Lens 소개</strong>
+    <p style="margin-top:8px">Paxi Lens는 Paxi 생태계를 위한 <b>비수탁형(non-custodial) 툴킷</b>입니다. 디코더·토큰 발행·스왑·거버넌스·위임·소각 등 20개 온체인 도구가 <b>이 단일 페이지에 모두 통합</b>되어 있습니다. 순수 프론트엔드이며 개인키가 지갑 밖으로 나가지 않습니다.</p>
+    <p style="margin-top:8px">내장 "온체인 디코더"는 원시 거래·컨트랙트·지갑 데이터를 알기 쉬운 말로 변환하는 경량 디코드 모듈입니다. 읽기 전용이며 지갑 연결이 필요 없습니다.</p>
+    <p style="margin-top:8px">Paxi Lens는 <b>투자도 아니고 수탁업체도 아닙니다</b>. 서비스 수수료는 100% 단일 투명 주소로 가며, 이용은 본인 책임입니다.</p>
+  </div>
+  <div class="notice">이 페이지는 Paxi Lens의 완전한 설명 및 면책 조항입니다. 어떤 도구를 이용하기 전에도 아래 조항을 읽고 충분히 이해하세요.</div>
+  <h2>면책 조항 및 위험 고지</h2>
+  <p class="muted">최종 업데이트: 2026-10-23</p>
+  <p>Paxi Lens("본 서비스", "당사")는 Paxi 블록체인용 순수 프론트엔드로 제공되는 <b>비수탁형 오픈소스 툴킷</b>입니다. 본 웹사이트 접속, 지갑 연결, 또는 어떤 도구 이용 시 귀하는 다음에 동의한 것으로 간주합니다.</p>
+  <h3>A. 서비스의 성격</h3>
+  <p>Paxi Lens는 유틸리티 소프트웨어입니다. 그것은 지갑·거래소·수탁업체·브로커·은행·투자 상품·금융 상품 <b>어느 것도 아닙니다</b>. 사용자 자산을 보유하지 않고, 개인키를 맡기지 않으며, 사용자를 대신해 거래를 브로드캐스트하지도 <b>않습니다</b>. 모든 거래는 로컬에서 구성되고 <b>오직 사용자 본인 지갑 내에서만 서명</b>됩니다. Paxi Lens는 투자로서 어떤 토큰이나 NFT도 발행·판매·배포하지 않습니다.</p>
+  <h3>B. 투자 조언 없음</h3>
+  <p>본 웹사이트·어떤 문서·어떤 커뮤니티 채널에서도 투자·금융·법률·세무 조언이나 자산 매수·매도·스테이크·위임·보유 권고를 구성하지 않습니다. 모든 결정은 본인 책임입니다. 본인 책임으로 참여하세요.</p>
+  <h3>C. 비수탁형 — 자산은 본인이 통제</h3>
+  <p>개인키와 자금은 <b>지갑 밖으로 나가지 않습니다</b>. Paxi Lens는 귀하의 자산을 이동·동결·몰수·접근할 수 없습니다. 개인키나 지갑 자격 증명 분실은 당사가 복구할 수 없는 영구적 접근 상실을 초래합니다.</p>
+  <h3>D. 서비스 수수료는 투명하고 사전 공개</h3>
+  <p>일부 도구는 고정 서비스 수수료를 부과하며, <b>100% 단일 공개 검증 가능 주소</b>로 라우팅됩니다.</p>
+  <div class="addr">${FEE_ADDR}</div>
+  <p>정확한 수수료 금액과 수령처는 귀하가 서명하기 <b>전에 항상 확인 화면에 표시</b>됩니다. 이 수수료는 소프트웨어 이용 대가이며 어떤 자산·토큰·지분의 구매가 아닙니다.</p>
+  <h3>E. 재매입·수익·경품 풀·수익 약속 없음</h3>
+  <p>당사는 어떤 재매입·이익 분배·스테이킹 수익·어떤 종류의 수익도 약속·보장·시사하지 않습니다. Paxi Lens에는 <b>경품 풀·복권·예치 보상 메커니즘이 없습니다</b>. 귀하가 생성·거래하는 자산의 2차 시장 활동은 오직 귀하와 다른 사용자 간에 귀속됩니다.</p>
+  <h3>F. TKCC 관여 없음</h3>
+  <p>Paxi Lens는 어떤 TKCC 토큰도 보유·이전·중개하지 않으며 토큰 청구·에어드롭·프로모션 배포도 하지 않습니다. 본 서비스는 문서화된 Paxi 지갑 주입 API 범위 내에서만 동작하며 비공개 온체인 상호작용을 수행하지 않습니다.</p>
+  <h3>G. 사용자 주도 온체인 조치</h3>
+  <p>토큰 발행·스왑·소각·위임·재위임·거버넌스 등 도구는 <b>귀하의 지시에 따른 전적인 온체인상 사용자 주도 조치</b>입니다. Paxi Lens는 귀하가 생성·스왑·상호작용하는 어떤 토큰의 가치·적법성·결과를 권장·보장·책임지지 않습니다.</p>
+  <h3>H. 지역 제한</h3>
+  <p>본 서비스는 <b>중국 본토 거주자에게 제공되지 않습니다</b>. 본 서비스에 접속 또는 이용함으로써 귀하는 중국 본토에 소재하지 않으며 거주자도 아님을 진술·보증합니다. 당사는 재량으로 어떤 관할권의 접속도 제한할 권리를 보유합니다. 기술적 접속 제한을 우회하는 사용자는 본인 책임 및 본 약관 위반으로 행합니다.</p>
+  <h3>I. 현지 법규 준수</h3>
+  <p>본 서비스에 대한 접속 및 이용이 귀하 관할권의 법령을 준수함을 확실히 하는 것은 오직 귀하의 책임입니다. 당사는 본 서비스가 어떤 특정 장소에서 적절하거나 이용 가능함을 진술하지 않습니다.</p>
+  <h3>J. 책임 제한 및 "있는 그대로"</h3>
+  <p>본 서비스는 <b>"있는 그대로"</b> 및 <b>"이용 가능한 한"</b>에서 어떠한 보증도 없이 제공됩니다. 적용 법률이 허용하는 최대 한도까지 개발자는 본 서비스 이용에서 발생하는 직접·간접·부수·결과적 손해(사용자 과실·지갑 탈취·네트워크 장애·스마트 컨트랙트 위험으로 인한 자금 손실 포함하되 이에 한정되지 않음)에 대해 책임을 지지 않습니다.</p>
+  <h2>이용 전 확인(첫 거래 전 체크 필수)</h2>
+  <p>이 상자를 체크함으로써 나는 다음을 확인합니다.</p>
+  <ul>
+    <li>나는 <b>중국 본토 거주자가 아니며</b> 중국 본토에서 본 서비스에 접속하지 않는다.</li>
+    <li>나는 <b>면책 조항 및 위험 고지</b>를 읽고 이해했다.</li>
+    <li>Paxi Lens가 <b>비수탁형 유틸리티 도구</b>이며 투자·지갑·거래소·수탁업체가 아님을 이해했다.</li>
+    <li>나의 <b>개인키와 자금이 지갑 밖으로 나가지 않으며</b> 그것을 통제하는 것은 나뿐임을 이해했다.</li>
+    <li>서비스 수수료가 <b>투명하고 단일 공개 주소로 가며 서명 전에 표시됨</b>을 이해했다.</li>
+    <li><b>재매입·수익·경품 풀·약속된 수익</b>이 어떤 형태로도 없음을 이해했다.</li>
+    <li>나는 <b>본인 책임으로</b> 참여한다.</li>
+  </ul>
+  <h2>영구 하단 문구</h2>
+  <p><b>Paxi Lens — 비수탁형 Paxi 툴킷. 투자가 아님. 수익 약속 없음. 중국 본토 거주자에게 제공 안 함. 키는 본인이 통제. 본인 책임으로 참여.</b></p>
+  `,
+  id: `
+  <div class="card">
+    <strong>Tentang Paxi Lens</strong>
+    <p style="margin-top:8px">Paxi Lens adalah <b>toolkit non-kustodial</b> untuk ekosistem Paxi: 20 alat on-chain (dekoder, penerbitan token, swap, tata kelola, delegasi, bakar, dll) <b>semua terintegrasi dalam satu halaman ini</b>. Murni front-end, kunci privat tidak pernah keluar dari dompet Anda.</p>
+    <p style="margin-top:8px">"Dekoder On-Chain" bawaan adalah modul dekode ringan yang mengubah data transaksi, kontrak, dan dompet mentah menjadi bahasa sederhana. Hanya baca, tanpa perlu sambung dompet.</p>
+    <p style="margin-top:8px">Paxi Lens <b>bukan investasi dan bukan kustodian</b>. Biaya layanan 100% ke alamat transparan tunggal, digunakan dengan risiko Anda sendiri.</p>
+  </div>
+  <div class="notice">Halaman ini adalah penjelasan lengkap dan penafian hukum Paxi Lens. Sebelum menggunakan alat apa pun, baca dan pahami sepenuhnya syarat berikut.</div>
+  <h2>Penafian Hukum &amp; Pengungkapan Risiko</h2>
+  <p class="muted">Terakhir diperbarui: 2026-10-23</p>
+  <p>Paxi Lens ("Layanan", "kami", "kita") adalah <b>toolkit open-source non-kustodial</b> yang disajikan sebagai antarmuka murni front-end untuk blockchain Paxi. Dengan mengakses situs ini, menyambung dompet, atau menggunakan alat apa pun, Anda mengakui dan menyetujui hal berikut:</p>
+  <h3>A. Sifat Layanan</h3>
+  <p>Paxi Lens adalah perangkat lunak utilitas. Ini <b>bukan</b> dompet, bursa, kustodian, broker, bank, kendaraan investasi, atau produk keuangan. Ia <b>tidak</b> memegang aset pengguna, <b>tidak</b> menyimpan kunci privat, dan <b>tidak</b> menyiarkan transaksi atas nama pengguna — setiap transaksi dibangun secara lokal dan ditandatangani <b>hanya di dalam dompet pengguna sendiri</b>. Paxi Lens tidak menerbitkan, menjual, atau mendistribusikan token atau NFT apa pun sebagai investasi.</p>
+  <h3>B. Bukan Nasihat Investasi</h3>
+  <p>Tidak ada di situs ini, dokumentasi apa pun, atau saluran komunitas apa pun yang merupakan nasihat investasi, keuangan, hukum, atau pajak, atau rekomendasi untuk membeli, menjual, stake, delegasikan, atau memegang aset apa pun. Anda sepenuhnya bertanggung jawab atas keputusan sendiri. Ikutlah dengan risiko Anda sendiri.</p>
+  <h3>C. Non-Kustodial — Anda Kendalikan Aset Anda</h3>
+  <p>Kunci privat dan dana <b>tidak pernah keluar dari dompet Anda</b>. Paxi Lens tidak dapat memindah, membekukan, menyita, atau mengakses aset Anda. Hilangnya kunci privat atau kredensial dompet menyebabkan kehilangan akses permanen yang tidak dapat kami pulihkan.</p>
+  <h3>D. Biaya Layanan Transparan &amp; Diungkap Sebelumnya</h3>
+  <p>Beberapa alat membebankan biaya layanan tetap yang dialihkan <b>100% ke alamat tunggal yang dapat diverifikasi publik</b>:</p>
+  <div class="addr">${FEE_ADDR}</div>
+  <p>Jumlah dan penerima biaya <b>selalu ditampilkan untuk konfirmasi Anda sebelum menandatangani</b> transaksi apa pun. Biaya ini adalah pembayaran atas penggunaan perangkat lunak, bukan pembelian aset, token, atau ekuitas apa pun.</p>
+  <h3>E. Tanpa Buyback, Hasil, Prize Pool, atau Janji Imbalan</h3>
+  <p>Kami <b>tidak</b> menjanjikan, menjamin, atau menyiratkan buyback, distribusi keuntungan, hasil stake, atau imbalan apa pun. Paxi Lens tidak berisi <b>prize pool, lotere, atau mekanisme imbalan deposit</b>. Aktivitas pasar sekunder apa pun yang melibatkan aset yang Anda buat atau perdagangkan sepenuhnya antara Anda dan pengguna lain.</p>
+  <h3>F. Tidak Ada Keterlibatan TKCC</h3>
+  <p>Paxi Lens <b>tidak</b> menyentuh, memegang, mentransfer, atau memfasilitasi token TKCC apa pun, juga tidak ada klaim token, airdrop, atau distribusi promosi. Layanan beroperasi strictly dalam API injeksi dompet Paxi yang didokumentasikan dan tidak melakukan interaksi on-chain yang tidak diungkap.</p>
+  <h3>G. Tindakan On-Chain yang Diprakarsai Pengguna</h3>
+  <p>Alat seperti penerbitan token, swap, pembakaran, delegasi, redelegasi, dan tata kelola adalah <b>tindakan yang diprakarsai pengguna dilakukan sepenuhnya on-chain atas arahan Anda</b>. Paxi Lens tidak mendukung, menjamin, atau menanggung tanggung jawab atas nilai, legalitas, atau hasil token apa pun yang Anda buat, swap, atau berinteraksi melaluinya.</p>
+  <h3>H. Pembatasan Geografis</h3>
+  <p>Layanan ini <b>tidak ditawarkan kepada penduduk Tiongkok daratan</b>. Dengan mengakses atau menggunakan Layanan ini, Anda menyatakan dan menjamin bahwa Anda tidak berlokasi di, dan bukan penduduk, Tiongkok daratan. Kami berhak membatasi akses dari yurisdiksi apa pun atas kebijakan kami. Pengguna yang menghindari pembatasan akses teknis melakukannya dengan risiko sendiri dan melanggar syarat ini.</p>
+  <h3>I. Kepatuhan terhadap Hukum Setempat</h3>
+  <p>Anda sepenuhnya bertanggung jawab untuk memastikan bahwa akses dan penggunaan Layanan ini mematuhi hukum dan peraturan yurisdiksi Anda. Kami tidak menyatakan bahwa Layanan ini sesuai atau tersedia di lokasi tertentu mana pun.</p>
+  <h3>J. Pembatasan Tanggung Jawab &amp; "Sebagaimana Adanya"</h3>
+  <p>Layanan disediakan atas dasar <b>"SEBAGAIMANA ADANYA"</b> dan <b>"SEBAGAIMANA TERSEDIA"</b> tanpa jaminan apa pun. Dalam batas maksimum yang diizinkan hukum berlaku, pengembang tidak bertanggung jawab atas kerugian langsung, tidak langsung, insidental, atau konsekuensial yang timbul dari penggunaan Layanan Anda, termasuk namun tidak terbatas pada kehilangan dana akibat kesalahan pengguna, kompromi dompet, kegagalan jaringan, atau risiko smart-contract.</p>
+  <h2>Pernyataan Pengakuan Pra-Penggunaan (harus dicentang sebelum transaksi pertama)</h2>
+  <p>Dengan mencentang kotak ini, saya mengonfirmasi bahwa:</p>
+  <ul>
+    <li>Saya <b>bukan penduduk Tiongkok daratan</b> dan tidak mengakses Layanan ini dari Tiongkok daratan.</li>
+    <li>Saya telah membaca dan memahami <b>Penafian Hukum &amp; Pengungkapan Risiko</b>.</li>
+    <li>Saya memahami bahwa Paxi Lens adalah <b>alat utilitas non-kustodial</b>, bukan investasi, dompet, bursa, atau kustodian.</li>
+    <li>Saya memahami bahwa <b>kunci privat dan dana saya tidak pernah keluar dari dompet</b> dan hanya saya yang mengendalikannya.</li>
+    <li>Saya memahami bahwa biaya layanan <b>transparan, ke alamat publik tunggal, dan ditampilkan sebelum saya tanda tangan</b>.</li>
+    <li>Saya memahami bahwa <b>tidak ada buyback, hasil, prize pool, atau imbalan yang dijanjikan</b> apa pun.</li>
+    <li>Saya berpartisipasi <b>dengan risiko saya sendiri</b>.</li>
+  </ul>
+  <h2>Pernyataan Footer Permanen</h2>
+  <p><b>Paxi Lens — toolkit Paxi non-kustodial. Bukan investasi. Tidak ada imbalan yang dijanjikan. Tidak ditawarkan kepada penduduk Tiongkok daratan. Anda kendalikan kunci Anda. Ikut dengan risiko Anda sendiri.</b></p>
+  `,
+  vi: `
+  <div class="card">
+    <strong>Giới thiệu về Paxi Lens</strong>
+    <p style="margin-top:8px">Paxi Lens là <b>bộ công cụ phi lưu ký (non-custodial)</b> cho hệ sinh thái Paxi: 20 công cụ on-chain (giải mã, phát hành token, swap, quản trị, ủy quyền, đốt, v.v.) <b>đều được tích hợp trong trang này</b>. Thuần front-end, khóa riêng không bao giờ rời ví của bạn.</p>
+    <p style="margin-top:8px">"Bộ giải On-Chain" tích hợp là module giải mã nhẹ chuyển đổi dữ liệu thô của giao dịch, hợp đồng và ví thành ngôn ngữ bình thường. Chỉ đọc, không cần kết nối ví.</p>
+    <p style="margin-top:8px">Paxi Lens <b>không phải đầu tư và không phải bên lưu ký</b>. Phí dịch vụ 100% đến một địa chỉ minh bạch duy nhất, sử dụng tự chịu rủi ro.</p>
+  </div>
+  <div class="notice">Trang này là mô tả đầy đủ và tuyên bố miễn trừ trách nhiệm của Paxi Lens. Trước khi dùng bất kỳ công cụ nào, hãy đọc và hiểu hoàn toàn các điều khoản dưới.</div>
+  <h2>Tuyên bố miễn trừ trách nhiệm &amp; Công bố rủi ro</h2>
+  <p class="muted">Cập nhật lần cuối: 2026-10-23</p>
+  <p>Paxi Lens ("Dịch vụ", "chúng tôi") là <b>bộ công cụ mã nguồn mở phi lưu ký</b> được cung cấp dưới dạng giao diện thuần front-end cho blockchain Paxi. Bằng việc truy cập trang này, kết nối ví, hoặc dùng bất kỳ công cụ nào, bạn xác nhận và đồng ý với các điều sau:</p>
+  <h3>A. Bản chất Dịch vụ</h3>
+  <p>Paxi Lens là phần mềm tiện ích. Nó <b>không phải</b> ví, sàn giao dịch, bên lưu ký, môi giới, ngân hàng, phương tiện đầu tư, hay sản phẩm tài chính. Nó <b>không</b> nắm giữ tài sản người dùng, <b>không</b> giữ khóa riêng, và <b>không</b> phát giao dịch thay người dùng — mọi giao dịch được xây dựng cục bộ và ký <b>duy nhất trong ví của chính người dùng</b>. Paxi Lens không phát hành, bán, hay phân phối token hay NFT nào như một khoản đầu tư.</p>
+  <h3>B. Không có lời khuyên đầu tư</h3>
+  <p>Không có nội dung nào trên trang này, trong bất kỳ tài liệu nào, hay kênh cộng đồng nào cấu thành lời khuyên đầu tư, tài chính, pháp lý, hay thuế, hay khuyến nghị mua, bán, stake, ủy quyền, hay nắm giữ tài sản nào. Bạn hoàn toàn chịu trách nhiệm cho quyết định của mình. Tham gia tự chịu rủi ro.</p>
+  <h3>C. Phi lưu ký — Bạn kiểm soát tài sản</h3>
+  <p>Khóa riêng và tiền <b>không bao giờ rời ví của bạn</b>. Paxi Lens không thể di chuyển, đóng băng, tịch thu, hay truy cập tài sản bạn. Mất khóa riêng hoặc thông tin ví dẫn đến mất quyền truy cập vĩnh viễn mà chúng tôi không thể khôi phục.</p>
+  <h3>D. Phí dịch vụ minh bạch và công bố trước</h3>
+  <p>Một số công cụ thu phí dịch vụ cố định được chuyển <b>100% đến một địa chỉ duy nhất có thể xác minh công khai</b>:</p>
+  <div class="addr">${FEE_ADDR}</div>
+  <p>Số tiền và người nhận phí <b>luôn hiển thị để bạn xác nhận trước khi ký</b> bất kỳ giao dịch nào. Các phí này là thanh toán cho việc sử dụng phần mềm, không phải mua tài sản, token, hay cổ phần.</p>
+  <h3>E. Không mua lại, lợi nhuận, giải thưởng, hay hứa hẹn hoàn vốn</h3>
+  <p>Chúng tôi <b>không</b> hứa hẹn, bảo đảm, hay ngụ ý bất kỳ mua lại, chia sẻ lợi nhuận, lợi suất stake, hay khoản hoàn vốn nào. Paxi Lens không chứa <b>giải thưởng, xổ số, hay cơ chế thưởng gửi tiền</b>. Mọi hoạt động thị trường thứ cấp liên quan tài sản bạn tạo hoặc giao dịch chỉ thuộc giữa bạn và người dùng khác.</p>
+  <h3>F. Không liên quan TKCC</h3>
+  <p>Paxi Lens <b>không</b> chạm, giữ, chuyển, hay hỗ trợ bất kỳ token TKCC nào, cũng không có nhận token, airdrop, hay phân phối khuyến mãi. Dịch vụ chỉ hoạt động trong API tiêm ví Paxi đã tài liệu hóa và không thực hiện tương tác on-chain không công bố.</p>
+  <h3>G. Hành động on-chain do người dùng khởi tạo</h3>
+  <p>Các công cụ như phát hành token, swap, đốt, ủy quyền, ủy quyền lại, và quản trị là <b>hành động do người dùng khởi tạo, thực hiện hoàn toàn on-chain theo chỉ dẫn của bạn</b>. Paxi Lens không bảo trợ, bảo đảm, hay chịu trách nhiệm về giá trị, tính hợp pháp, hay kết quả của bất kỳ token nào bạn tạo, swap, hay tương tác qua Dịch vụ.</p>
+  <h3>H. Hạn chế địa lý</h3>
+  <p>Dịch vụ này <b>không cung cấp cho cư dân Trung Quốc đại lục</b>. Bằng việc truy cập hoặc sử dụng Dịch vụ, bạn cam đoan và bảo đảm rằng bạn không ở, và không phải cư dân, Trung Quốc đại lục. Chúng tôi bảo lưu quyền hạn chế truy cập từ bất kỳ phán quyền nào theo quyết định riêng. Người dùng lách hạn chế kỹ thuật truy cập tự chịu rủi ro và vi phạm các điều khoản này.</p>
+  <h3>I. Tuân thủ luật địa phương</h3>
+  <p>Bạn hoàn toàn chịu trách nhiệm đảm bảo việc truy cập và sử dụng Dịch vụ tuân thủ luật pháp tại phán quyền của bạn. Chúng tôi không tuyên bố Dịch vụ phù hợp hay khả dụng tại bất kỳ địa điểm cụ thể nào.</p>
+  <h3>J. Giới hạn trách nhiệm &amp; "Nguyên trạng"</h3>
+  <p>Dịch vụ được cung cấp trên cơ sở <b>"NGUYÊN TRẠNG"</b> và <b>"NHƯ SẴN CÓ"</b> không bảo đảm nào. Trong giới hạn tối đa luật áp dụng cho phép, nhà phát triển không chịu trách nhiệm cho bất kỳ thiệt hại trực tiếp, gián tiếp, ngẫu nhiên, hay hệ quả nào phát sinh từ việc bạn dùng Dịch vụ, bao gồm nhưng không giới hạn mất tiền do lỗi người dùng, xâm phạm ví, lỗi mạng, hay rủi ro hợp đồng thông minh.</p>
+  <h2>Xác nhận trước khi dùng (phải tích trước giao dịch đầu)</h2>
+  <p>Bằng cách tích ô này, tôi xác nhận rằng:</p>
+  <ul>
+    <li>Tôi <b>không phải cư dân Trung Quốc đại lục</b> và không truy cập Dịch vụ từ Trung Quốc đại lục.</li>
+    <li>Tôi đã đọc và hiểu <b>Tuyên bố miễn trừ trách nhiệm &amp; Công bố rủi ro</b>.</li>
+    <li>Tôi hiểu Paxi Lens là <b>công cụ tiện ích phi lưu ký</b>, không phải đầu tư, ví, sàn, hay bên lưu ký.</li>
+    <li>Tôi hiểu <b>khóa riêng và tiền không bao giờ rời ví</b> và chỉ tôi kiểm soát chúng.</li>
+    <li>Tôi hiểu phí dịch vụ <b>minh bạch, đến một địa chỉ công khai duy nhất, và hiển thị trước khi ký</b>.</li>
+    <li>Tôi hiểu <b>không có mua lại, lợi suất, giải thưởng, hay hoàn vốn hứa hẹn</b> nào.</li>
+    <li>Tôi tham gia <b>tự chịu rủi ro</b>.</li>
+  </ul>
+  <h2>Tuyên bố chân trang vĩnh viễn</h2>
+  <p><b>Paxi Lens — bộ công cụ Paxi phi lưu ký. Không phải đầu tư. Không hứa hoàn vốn. Không cung cấp cho cư dân Trung Quốc đại lục. Bạn kiểm soát khóa. Tham gia tự chịu rủi ro.</b></p>
+  `,
+  zh: `
+  <div class="card">
+    <strong>關於 Paxi Lens</strong>
+    <p style="margin-top:8px">Paxi Lens 是面向 Paxi 生態系的<b>非託管工具箱</b>：20 項鏈上工具（解碼器、代幣發行、Swap、治理、委託、銷毀等）<b>全部整合在此單一頁面</b>。純前端，私鑰永不出你的錢包。</p>
+    <p style="margin-top:8px">內建的「鏈上解碼器」是輕量解碼模組，將原始交易、合約與錢包資料轉為淺顯語言。唯讀，無需連接錢包。</p>
+    <p style="margin-top:8px">Paxi Lens <b>非投資、亦非託管方</b>。服務手續費 100% 流向單一透明地址，使用自負風險。</p>
+  </div>
+  <div class="notice">本頁為 Paxi Lens 的完整說明與法律免責聲明。使用任何工具前，請詳閱並充分理解下列條款。</div>
+  <h2>法律免責聲明與風險揭露</h2>
+  <p class="muted">最後更新：2026-10-23</p>
+  <p>Paxi Lens（「本服務」「我們」）是為 Paxi 區塊鏈提供的純前端<b>非託管開源工具箱</b>。存取本網站、連接錢包或使用任何工具，即表示你知悉並同意下列事項：</p>
+  <h3>A. 服務性質</h3>
+  <p>Paxi Lens 是工具型軟體。它<b>不是</b>錢包、交易所、託管方、經紀商、銀行、投資標的或金融商品。它<b>不</b>持有用戶資產、<b>不</b>保管私鑰、也<b>不</b>代用戶廣播交易——每筆交易皆於本地建構，並<b>僅在你的錢包內簽章</b>。Paxi Lens 不以投資名義發行、販售或分發任何代幣或 NFT。</p>
+  <h3>B. 不構成投資建議</h3>
+  <p>本網站、任何文件或任何社群頻道中的內容，均不構成投資、金融、法律或稅務建議，亦非買賣、質押、委託或持有任何資產的推薦。你須自行負責你的決定。參與即自負風險。</p>
+  <h3>C. 非託管 — 你掌控自己的資產</h3>
+  <p>私鑰與資金<b>永不出你的錢包</b>。Paxi Lens 無法移動、凍結、沒收或存取你的資產。遺失私鑰或錢包憑證將導致我們無法復原的永久性存取喪失。</p>
+  <h3>D. 服務手續費透明且事前揭露</h3>
+  <p>部分工具收取固定服務手續費，<b>100% 流向單一可公開驗證的地址</b>：</p>
+  <div class="addr">${FEE_ADDR}</div>
+  <p>確切的費用金額與收款方，<b>必在你簽章前顯示供確認</b>。此費用為軟體使用之對價，而非購買任何資產、代幣或股權。</p>
+  <h3>E. 無回購、收益、獎池或獲利承諾</h3>
+  <p>我們<b>不</b>承諾、保證或暗示任何回購、利潤分配、質押收益或任何形式之獲利。Paxi Lens <b>不含獎池、彩票或存款獎勵機制</b>。你建立或交易資產所涉及的任何二級市場活動，僅存在於你與其他用戶之間。</p>
+  <h3>F. 不涉及 TKCC</h3>
+  <p>Paxi Lens <b>不</b>觸碰、持有、轉移或協助任何 TKCC 代幣，亦無代幣領取、空投或促銷分發。本服務嚴格於已文件化的 Paxi 錢包注入 API 範圍內運作，不進行任何未揭露的鏈上互動。</p>
+  <h3>G. 用戶發起的鏈上行為</h3>
+  <p>代幣發行、Swap、銷毀、委託、重新委託與治理等工具，皆為<b>依你指示、完全在鏈上由用戶發起之行為</b>。Paxi Lens 不背書、保證或承擔你透過本服務建立、Swap 或互動之任何代幣的價值、合法性或結果責任。</p>
+  <h3>H. 地域限制</h3>
+  <p>本服務<b>不向中國大陸居民提供</b>。存取或使用本服務，即表示你聲明並保證你不在中國大陸境內，亦非其居民。我們保留自行裁量限制任何法域存取之權利。規避技術存取限制之使用者，須自負風險並違反本條款。</p>
+  <h3>I. 遵守當地法律</h3>
+  <p>確保你存取與使用本服務符合所屬法域之法律規範，完全由你負責。我們不表示本服務於任何特定地點適用或可用。</p>
+  <h3>J. 責任限制與「現狀」條款</h3>
+  <p>本服務依<b>「現狀」</b>與<b>「現有可用」</b>基礎提供，不附任何保證。在適用法律允許的最大範圍內，開發者不對因你使用本服務所生之任何直接、間接、偶發或衍生損害負責，包括但不限於因用戶過失、錢包遭入侵、網路故障或智能合約風險所致之資金損失。</p>
+  <h2>使用前確認（首次交易前須勾選）</h2>
+  <p>勾選此框，即確認：</p>
+  <ul>
+    <li>我<b>非中國大陸居民</b>，亦未自中國大陸存取本服務。</li>
+    <li>我已閱讀並理解<b>法律免責聲明與風險揭露</b>。</li>
+    <li>我理解 Paxi Lens 為<b>非託管工具型軟體</b>，非投資、錢包、交易所或託管方。</li>
+    <li>我理解<b>私鑰與資金永不出我的錢包</b>，且僅由我掌控。</li>
+    <li>我理解服務手續費<b>透明、流向單一公開地址，且於簽章前顯示</b>。</li>
+    <li>我理解<b>不存在任何回購、收益、獎池或獲利承諾</b>。</li>
+    <li>我<b>自負風險</b>參與。</li>
+  </ul>
+  <h2>永久頁腳聲明</h2>
+  <p><b>Paxi Lens — 非託管 Paxi 工具箱。非投資。不承諾獲利。不向中國大陸居民提供。你掌控自己的密鑰。參與自負風險。</b></p>
+  `
+};
 
-  <a class="back" href="index.html">← Back to Paxi Lens</a>
+const LANGS = [
+  { code: 'en', label: 'English' },
+  { code: 'ja', label: '日本語' },
+  { code: 'ko', label: '한국어' },
+  { code: 'id', label: 'Bahasa Indonesia' },
+  { code: 'vi', label: 'Tiếng Việt' },
+  { code: 'zh', label: '中文' }
+];
+
+(function init() {
+  const sel = document.getElementById('langSel');
+  sel.innerHTML = LANGS.map(l => `<option value="${l.code}">${l.label}</option>`).join('');
+  let lc = 'en';
+  try { lc = localStorage.getItem('paxi_lang') || 'en'; } catch (e) {}
+  if (!LEGAL[lc]) lc = 'en';
+  sel.value = lc;
+  renderLegal(lc);
+})();
+
+function renderLegal(lc) {
+  if (!LEGAL[lc]) lc = 'en';
+  try { localStorage.setItem('paxi_lang', lc); } catch (e) {}
+  document.documentElement.lang = lc;
+  document.getElementById('legalBody').innerHTML = LEGAL[lc];
+  document.getElementById('pageTitle').textContent = (PAGE_TITLES[lc] || PAGE_TITLES.en);
+  document.getElementById('backLink').textContent = (BACK_TEXT[lc] || BACK_TEXT.en);
+  const sel = document.getElementById('langSel');
+  if (sel) sel.value = lc;
+}
+</script>
 
 </body>
 </html>

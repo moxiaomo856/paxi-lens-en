@@ -59,8 +59,13 @@ window.TOOL_REGISTRY ||= {};
     }
   };
   const swPt = (k, ...a) => {
-    const lang = (typeof currentLang !== 'undefined' && currentLang) || 'zh';
-    let s = (SW_DICT[lang] && SW_DICT[lang][k]) || SW_DICT.en[k] || k;
+    const lang = (typeof currentLang !== 'undefined' && currentLang) || 'en';
+    let s;
+    if (window.PAXI_LANGS && PAXI_LANGS[lang] && PAXI_LANGS[lang].swap && PAXI_LANGS[lang].swap[k] != null) {
+      s = PAXI_LANGS[lang].swap[k];
+    } else {
+      s = (SW_DICT[lang] && SW_DICT[lang][k]) || SW_DICT.en[k] || k;
+    }
     a.forEach((v, i) => { s = s.split('{' + i + '}').join(String(v)); });
     return s;
   };

@@ -37,9 +37,13 @@ const CR_DICT = {
 };
 
 const crPt = (k, ...a) => {
-  const lang = (typeof currentLang !== 'undefined' && currentLang === 'en') ? 'en' : 'zh';
-  let v = CR_DICT[lang][k];
-  if (v === undefined) v = CR_DICT.en[k];
+  const lang = (typeof currentLang !== 'undefined' && currentLang) || 'en';
+  let v;
+  if (window.PAXI_LANGS && PAXI_LANGS[lang] && PAXI_LANGS[lang].claimRewards && PAXI_LANGS[lang].claimRewards[k] != null) {
+    v = PAXI_LANGS[lang].claimRewards[k];
+  } else {
+    v = (CR_DICT[lang] && CR_DICT[lang][k] !== undefined) ? CR_DICT[lang][k] : CR_DICT.en[k];
+  }
   return typeof v === 'function' ? v(...a) : v;
 };
 

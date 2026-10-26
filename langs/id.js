@@ -1,0 +1,274 @@
+// Paxi Lens — Indonesian (id) language pack
+// Mirrors every key in core.js LANG.en (shared) plus the per-tool namespaces.
+window.PAXI_LANGS = window.PAXI_LANGS || {};
+window.PAXI_LANGS.id = {
+  appTitle: 'Paxi Lens',
+  back: '← kembali',
+  tools: {
+    decoder: 'Dekoder On-Chain', batchTransfer: 'Kirim Massal', balanceCheck: 'Saldo / Cek Massal', pump: 'Penerbitan Kustom',
+    burn: 'Bakar Token', nftMarket: 'Pasar NFT', txTracker: 'Pelacak Tx', nftLauncher: 'Peluncur NFT', myNfts: 'NFT Saya',
+    addressConvert: 'Konversi Alamat', redelegate: 'Delegasikan Ulang', gasCalc: 'Hitung Gas', validatorCompare: 'Validator', proposal: 'Usulan Tata Kelola',
+    games: 'Pusat Game', monitor: 'Monitor Rantai', later: 'Segera hadir…', claimRewards: 'Klaim Hadiah', govVote: 'Voting Tata Kelola',
+    stakeManage: 'Staking / Unstaking', addressBook: 'Buku Alamat', ibcQuery: 'Query IBC', txDryRun: 'Simulasi Tx', swap: 'Pembantu Swap', allowance: 'Allowance (Izin)',
+    catStake: 'Staking & Tata Kelola', catAssets: 'Aset & Query', catTrade: 'Perdagangan & Terbit', catTools: 'Dekoder & Alat', searchPlaceholder: 'Cari alat...'
+  },
+  batchTransfer: {
+    title: '📤 Kirim Massal', desc: 'Kirim PAXI·PRC-20·NFT secara massal. Mendukung impor CSV dan jumlah seragam.', modePack: '⚡ Mode paket: semua pengiriman+biaya dalam 1tx·1tanda tangan, 100% sukses.',
+    note: '💡 Jika riwayat tidak muncul di dompet penerima, lihat "Riwayat Kirim" di "Cek Saldo".',
+    native: 'PAXI Asli', prc20: 'Token PRC-20', nft: 'NFT (PRC-721)',
+    csvMode: '📋 Impor CSV (jumlah per baris)', uniformMode: '🔄 Jumlah Seragam',
+    upload: 'Klik atau seret CSV', format: 'Format: address,jumlah (1 baris 1 entri)',
+    pastePlaceholder: 'paxi1abc123...,100\npaxi1def456...,250', uniformPlaceholder: 'paxi1abc123...\npaxi1def456...',
+    parseBtn: '📋 Parsing & Pratinjau', sendBtn: '🚀 Eksekusi Kirim Massal', clearBtn: 'Bersihkan',
+    preview: '📋 Pratinjau Kirim', history: '📜 Kirim Terbaru'
+  },
+  balanceCheck: {
+    title: '💰 Saldo / Cek Massal', desc: 'Tempel beberapa alamat Paxi untuk mengecek saldo PAXI dan kepemilikan PRC-20.',
+    placeholder: 'paxi1abc123...\npaxi1def456...', queryBtn: '🔍 Cek Saldo', exportBtn: '📥 Ekspor CSV',
+    querying: 'Mengecek {count} alamat...', done: '✅ Selesai: {count}', noAddr: 'Tidak ada alamat Paxi valid', records: '📜 Riwayat Kirim'
+  },
+  txTracker: {
+    title: '🔍 Pelacak Tx', desc: 'Masukkan TxHash untuk melihat status dan detail transaksi.', placeholder: 'Masukkan TxHash...', queryBtn: '🔍 Cek'
+  },
+  gasCalc: {
+    title: '⛽ Hitung Gas', desc: 'Perkirakan biaya gas berdasarkan jenis transaksi.', type: 'Jenis Tx', send: 'Kirim (MsgSend)', prc20: 'Kirim PRC-20', nft: 'Kirim NFT',
+    swap: 'Swap AMM', stake: 'Stake/Delegasi', vote: 'Voting Tata Kelola', price: 'Harga gas (upaxi)', calcBtn: '🧮 Hitung'
+  },
+  addressConvert: {
+    title: '🔄 Konversi Alamat', desc: 'Ubah prefix Bech32 antar rantai Cosmos.', inputPlaceholder: 'paxi1... atau cosmos1... atau osmosis1...', target: 'Prefix tujuan', convertBtn: '🔄 Konversi'
+  },
+  validatorCompare: {
+    title: '🏦 Bandingkan Validator', desc: 'Tampilkan APR·biaya·kekuatan vote·status semua validator aktif.', loadBtn: '🔄 Muat Validator', loading: 'Memuat...', done: '✅ Selesai muat: {count}'
+  },
+  tokenInfo: {
+    title: '🪙 Info Token PRC-20', desc: 'Query nama token·simbol·total suplai·desimal dari kontrak PRC-20.', placeholder: 'paxi1...', queryBtn: '🔍 Cek'
+  },
+  nftMarket: {
+    title: '🏪 Pasar NFT', desc: 'Perdagangan NFT terdesentralisasi via Atomic Swap Authz.', tabs: ['Jelajah', 'Jual', 'Kelola Pesanan', 'Impor']
+  },
+  redelegate: {
+    title: '🔄 Delegasikan Ulang', desc: 'Pindah validator instan (tanpa unbond 7 hari). Biaya: 0,15% (1,5‰).', hint: 'Pilih validator saat ini dan tujuan, lalu masukkan jumlah.',
+    from: 'Dari (validator saat ini)', to: 'Ke (validator target)', amount: 'Jumlah (PAXI)', max: 'Maks', fee: 'Biaya', feeRate: 'Rate',
+    execute: '🚀 Eksekusi Redelegasi', selectFrom: 'Pilih...', selectTo: 'Pilih...', success: '✅ Redelegasi berhasil!', fail: '❌ Redelegasi gagal: ',
+    invalidInput: 'Pilih kedua validator dan jumlah', noDelegations: 'Tidak ada delegasi ditemukan'
+  },
+  proposal: {
+    title: '📦 Usulan Tata Kelola', desc: 'Ajukan usulan tata kelola Paxi Network. Butuh deposit+biaya layanan.',
+    submit: '📝 Ajukan Usulan', type: 'Jenis Usulan', typeText: 'Usulan Teks', typeParam: 'Usulan Ubah Parameter', typePool: '🏦 Pengeluaran Community Pool (Ajukan Dana DAO)',
+    poolBlockTitle: '🏦 Pengeluaran Community Pool (CommunityPoolSpendProposal)', poolDesc: 'Jika disetujui, community pool mengirim PAXI ke alamat penerima (ajukan dana DAO).',
+    poolTip: '💡 Catatan ajukan dana: judul dan ringkasan terbuka untuk semua pemegang token yang vote. Jelaskan tujuan·rincian anggaran·milestone·tenggat di kolom deskripsi, dan gunakan alamat treasury proyek sebagai penerima.',
+    poolRecipient: 'Alamat penerima (recipient)', poolAmount: 'Jumlah pengeluaran (PAXI)', poolBalance: '💰 Saldo community pool on-chain: ', poolBalanceLoading: 'Mengecek saldo community pool...',
+    poolBalanceEmpty: 'Community pool saat ini kosong', poolBalanceFail: 'Gagal mengecek saldo community pool', poolNoRecipient: 'Masukkan alamat penerima', poolBadRecipient: 'Format alamat penerima salah (paxi1...)',
+    poolBadAmount: 'Jumlah pengeluaran harus > 0', poolExceed: 'Jumlah pengeluaran melebihi saldo community pool on-chain',
+    badgePool: '🏦 Pengeluaran Pool', badgeParam: '🔧 Ubah Parameter', badgeText: '📝 Teks', badgeUpgrade: '⬆️ Upgrade Perangkat Lunak', badgeClient: '🔗 Pemulihan Klien IBC',
+    confirmSubmitPool: 'Ajukan usulan pengeluaran community pool (dana DAO)?\n\nJumlah: {amount} PAXI\nPenerima: {rcv}\n\nJika disetujui, pool mengirim {amount} PAXI ke alamat ini.\nBiaya layanan {fee} PAXI + deposit {deposit} PAXI.',
+    daoTitle: '🏦 Ajukan Dana DAO', daoDesc: 'Ajukan dana dari Community Pool (CommunityPoolSpend). Jika disetujui, pool mengirim ke alamat penerima.',
+    daoInfo: '💡 Judul dan ringkasan terbuka untuk semua pemegang token yang vote. Jelaskan tujuan·rincian anggaran·milestone·tenggat, gunakan alamat treasury proyek sebagai penerima.',
+    daoLabelTitle: 'Judul Usulan', daoTitlePlaceholder: 'Contoh: Peluncuran Paxi Lens + dana pemeliharaan 6 bulan (300.000 PAXI)', daoLabelSummary: 'Ringkasan usulan (summary)', daoSummaryPlaceholder: 'Tulis isi dan jumlah dalam satu kalimat...',
+    daoLabelDesc: 'Deskripsi usulan (description)', daoDescPlaceholder: 'Tulis tujuan·rincian anggaran·milestone·tenggat...', daoSubmitBtn: 'Ajukan Dana DAO', daoNotAllowed: 'Alamat dompet saat ini tidak dapat mengajukan dana DAO',
+    daoNoTitle: 'Masukkan judul usulan', daoNoSummary: 'Masukkan ringkasan usulan', daoNoDesc: 'Masukkan deskripsi usulan', daoSuccess: '✅ Dana DAO diajukan! ID usulan: ',
+    paramSubspace: 'Subspace (modul)', paramKey: 'Key (nama parameter)', paramValue: 'Value (string JSON)', paramValuePH: 'Contoh: "0.050000000000000000"',
+    addParam: '➕ Tambah Parameter', delParam: 'Hapus', paramHint: 'Subspace umum: gov / bank / staking / mint / slashing / distribution. Value adalah string JSON.',
+    paramRefTitle: '📖 Preset & Referensi Umum', invalidParam: 'Isi Subspace / Key / Value untuk tiap baris parameter', invalidParamRef: 'Usulan ubah parameter butuh minimal 1 parameter',
+    paramBlockTitle: '🔧 Pengaturan Ubah Parameter (ParameterChangeProposal)', titleLabel: 'Judul Usulan', titlePlaceholder: 'Contoh: Turunkan biaya transaksi', descLabel: 'Deskripsi Usulan', descPlaceholder: 'Jelaskan usulan secara rinci...',
+    deposit: 'Deposit (PAXI)', fee: 'Biaya platform (PAXI)', submitBtn: '🚀 Ajukan Usulan', submitting: 'Mengajukan...', success: '✅ Usulan diajukan! ID: ', fail: '❌ Gagal mengajukan: ',
+    list: '📋 Daftar Usulan', listLoading: 'Memuat...', listEmpty: 'Belum ada usulan', passed: 'Disetujui', rejected: 'Ditolak', voting: 'Voting', depositFailed: 'Deposit Dikembalikan',
+    status: 'Status', submitTime: 'Waktu Ajukan', depositAmount: 'Deposit', connectFirst: 'Hubungkan dompet dulu', emptyFields: 'Isi judul dan deskripsi',
+    invalidDeposit: 'Deposit harus > 0', confirmSubmit: 'Konfirmasi bayar biaya layanan {fee} PAXI + deposit {deposit} PAXI? Deposit dikembalikan jika disetujui.',
+    cancel: 'Batal', cancelBtn: '🗑 Batalkan Usulan', cancelConfirm: 'Batalkan usulan #{id}? Deposit dikembalikan.', canceling: 'Membatalkan...',
+    cancelSuccess: '✅ Usulan #{id} dibatalkan. Deposit dikembalikan.', cancelFail: '❌ Gagal batalkan: ', onlyDepositCanCancel: 'Hanya usulan masa deposit yang bisa dibatalkan'
+  },
+  disclaimer: {
+    siteWide: '⚠️ Situs ini (dan semua sub-halaman) hanya untuk query data on-chain dan bantuan operasi dompet. Tidak menyediakan layanan penukaran token, perantara perdagangan, panduan harga, atau perantara informasi apa pun. Semua operasi on-chain adalah tindakan independen pengguna dan tidak terkait situs ini. Patuhi hukum di negara/wilayah Anda.',
+    balanceCheck: 'Alat ini hanya menampilkan data publik on-chain, tidak menyertakan layanan perdagangan apa pun. Semua data berasal dari jaringan Paxi, hanya untuk referensi.',
+    txTracker: 'Alat ini hanya mengecek status transaksi on-chain, tidak memberi nasihat perdagangan atau rekomendasi investasi.',
+    gasCalc: 'Perkiraan ini hanya untuk referensi. Biaya aktual mengikuti eksekusi on-chain.',
+    validatorCompare: 'Data validator berasal dari info publik on-chain, hanya referensi, bukan nasihat investasi.',
+    prc20Info: 'Alat ini hanya menampilkan info dasar token, tidak menyediakan harga atau layanan perdagangan.',
+    proposalSubmit: 'Alat ini hanya memberikan pintu teknis pengajuan. Penyusunan dan tanggung jawab isi usulan ada pada pengguna. Pastikan isi usulan patuh hukum yang berlaku.',
+    proposalList: 'Daftar usulan adalah data publik on-chain, tanggung jawab isi ada pada pengusul.',
+    batchTransfer: '⚠️ Fitur ini hanya untuk manajemen aset dompet pribadi, tidak boleh digunakan untuk pembayaran komersial, penukaran token, atau layanan perdagangan aset kripto apa pun. Semua pengiriman adalah operasi independen pengguna dan tidak terkait alat ini.',
+    redelegate: 'Operasi ini adalah tindakan tata kelola on-chain murni untuk manajemen node staking independen, bukan nasihat investasi.',
+    nftLauncher: 'Alat ini hanya memberikan layanan teknis minting NFT, tidak menyediakan perantara perdagangan, penentuan harga, atau fungsi penukaran. Segala hasil kepemilikan/pembuangan NFT ditanggung pengguna sepenuhnya.'
+  },
+  myNfts: {
+    title: '🖼️ NFT Saya', desc: 'Masukkan alamat dompet untuk menampilkan NFT (gambar·nama·atribut).', walletAddr: 'Alamat Dompet', contract: 'Kontrak NFT', selectContract: '-- pilih kontrak terdeploy --',
+    manualInput: 'Input alamat manual', query: '🔍 Cek', queryHint: 'Query presisi dengan alamat+kontrak di atas', querying: 'Mengecek data on-chain...', loadingMeta: 'Memuat metadata',
+    noNft: 'Tidak ada NFT di alamat ini', noContract: 'Pilih atau masukkan alamat kontrak', loadMore: 'Muat Lagi', exportCsv: '📥 Ekspor CSV', tokenId: 'Token ID', name: 'Nama',
+    attributes: 'Atribut', image: 'Gambar', contractAddr: 'Alamat Kontrak', tokenUri: 'Token URI', description: 'Deskripsi', total: 'Total', nftUnit: 'NFT', queryFail: 'Cek gagal', cached: '(cache)', exported: 'Ekspor CSV selesai',
+    disclaimer: 'Alat ini hanya mengecek data NFT on-chain, tidak ada layanan perdagangan.',
+    transferTitle: '📤 Kirim NFT', transferDesc: 'Kirim NFT kontrak ini ke penerima. Butuh tanda tangan dompet pemilik, hanya gas tanpa biaya layanan.',
+    transferContract: 'Kontrak NFT *', transferTokenId: 'Token ID *', transferRecv: 'Penerima *', transferMemo: 'Memo (opsional)', transferBtn: '📤 Kirim',
+    transferConfirm: 'Kirim NFT ini ke alamat berikut?', transferSuccess: '✅ Kirim berhasil', transferAddrInvalid: 'Alamat tidak valid (paxi1... akun 43 atau kontrak 63 karakter)', transferNeedWallet: 'Hubungkan dompet dulu', transferring: 'Mengirim...',
+    modalSendTitle: '📤 Kirim NFT ini', modalSendRecipientPH: 'Alamat penerima paxi1...', modalSendBtn: '📤 Kirim ke alamat ini', modalSendHint: 'Hanya gas tanpa biaya layanan. NFT pindah dari alamat Anda ke penerima.',
+    allChainBtn: '🌐 Tampilkan NFT semua rantai', allChainHint: 'Pindai otomatis semua kontrak cw721 on-chain (tidak perlu alamat kontrak)', allChainLoading: 'Menghitung kontrak cw721 semua rantai & mengecek kepemilikan...',
+    allChainEmpty: 'Tidak ada NFT di alamat ini (semua kontrak cw721, code_id=2)', allChainCount: '{n} kontrak dicek·total {m} NFT', allChainNeedWallet: 'Hubungkan dompet dulu untuk melihat NFT semua rantai'
+  },
+  games: { title: '🎮 Pusat Game', desc: 'Nikmati game kasual di dalam toolbox!', comingSoon: 'Lebih banyak game segera hadir…' },
+  planeWar: {
+    title: '✈️ Plane War', hint: 'Sentuh/klik layar untuk gerakkan pesawat, tembak otomatis', score: 'Skor', hp: 'HP', start: 'Siap', touchToStart: 'Ketuk untuk mulai', startBtn: 'Mulai Game',
+    controls: '👆 Sentuh layar untuk gerak | ⌨️ Panah/WASD', gameOver: 'Game Over', finalScore: 'Skor Akhir', playAgain: 'Main Lagi', needWallet: 'Hubungkan dompet untuk bermain',
+    payTitle: '🎮 Bayar Game', payDesc: 'Bayar 5 PAXI untuk main Plane War 10 kali', payBtn: '💳 Bayar 5 PAXI & Mulai', paying: 'Membayar...', paySuccess: 'Berhasil! Dapat 10 kali', payFailed: 'Gagal bayar',
+    roundsLeft: 'Sisa putaran', noRounds: 'Habis. Bayar untuk lanjut', buyRounds: 'Beli Putaran', connectFirst: 'Hubungkan dompet dulu'
+  },
+  gamePay: {
+    needWallet: 'Hubungkan dompet untuk bermain', payTitle: '🎮 Bayar Game', payDesc: 'Bayar 5 PAXI untuk main 10 kali', payBtn: '💳 Bayar 5 PAXI & Mulai', paying: 'Membayar...',
+    paySuccess: 'Berhasil! Dapat 10 kali', payFailed: 'Gagal bayar', roundsLeft: 'Sisa putaran', noRounds: 'Habis. Bayar untuk lanjut', buyRounds: 'Beli Putaran', connectFirst: 'Hubungkan dompet dulu',
+    start: 'Siap', touchToStart: 'Ketuk untuk mulai', startBtn: 'Mulai Game', gameOver: 'Game Over', finalScore: 'Skor Akhir', playAgain: 'Main Lagi'
+  },
+  g2048: { title: '🔢 2048', desc: 'Gabungkan angka sama untuk capai 2048!', score: 'Skor', best: 'Terbaik', controls: '⌨️ Panah/WASD untuk gerak | 👆 Swipe' },
+  klotski: { title: '🧩 Klotski', desc: 'Puzzle geser klasik, bebaskan Cao Cao', moves: 'Langkah', controls: '👆 Ketuk blok untuk pilih, swipe untuk gerak | ⌨️ Panah/WASD', win: 'Menang' },
+  bubble: { title: '🫧 Bubble Shooting', desc: 'Aim dan tembak, pecahkan gelembung sewarna', score: 'Skor', controls: '👆 Mouse/sentuh untuk aim, klik untuk tembak', win: 'Hapus Semua' },
+  tetris: { title: '🟦 Tetris', desc: 'Game susun balok klasik', score: 'Skor', lines: 'Baris', controls: '⌨️ ←→ gerak | ↑ rotasi | ↓ soft drop | spasi hard drop | 👆 swipe' },
+  gomoku: { title: '⚫ Gomoku', desc: 'Lawan AI, susun 5 berurutan untuk menang', turn: 'Giliran', you: 'Anda (hitam)', ai: 'AI (putih)', youWin: 'Anda Menang', aiWin: 'AI Menang', controls: '👆 Klik/ketuk papan untuk taruh batu' },
+  common: {
+    connectFirst: 'Hubungkan dompet dulu', sending: 'Mengirim...', loading: 'Memuat...', connect: 'Hubungkan Dompet', disconnect: 'Putus',
+    mainnet: 'Mainnet', testnet: 'Testnet',     langSwitch: 'Bahasa',
+    footerNote: 'Bukan investasi · Non-kustodial · Resiko Anda',
+    fullDisclaimer: 'Penafian & pemberitahuan hukum lengkap →'
+  },
+  decoder: {
+    title: '🔍 Dekoder On-Chain', searchPh: 'Tx Hash / Alamat Kontrak / Alamat Dompet', decodeBtn: 'Dekode', clearTitle: 'Bersihkan', clear: 'Bersihkan',
+    tabDecode: '📖 Dekode Tx', tabSandbox: '🧪 Sandbox', tabBatch: '📋 Dekode Massal', tabDiagnose: '🩺 Diagnosa Gagal',
+    jumpBalance: '💰 Saldo', jumpRedelegate: '🔄 Redelegasi', jumpValidator: '📊 Validator', jumpProposal: '📦 Usulan',
+    sandboxHint: 'Kirim query read-only langsung ke node (tanpa tanda tangan·gas). Jika bingung input, periksa kontrak di tab dekode dulu dan lihat metode query yang benar-benar didukung.',
+    contractAddr: 'Alamat Kontrak', queryJson: 'Query JSON', runQuery: 'Jalankan Query',
+    batchHint: '1 baris 1 Tx hash 64 karakter (spasi/koma juga bisa), maks 200.', runBatchBtn: 'Mulai Dekode Massal', exportCsvBtn: '📥 Ekspor CSV',
+    diagHint: 'Masukkan Tx hash gagal untuk klasifikasi otomatis penyebab & saran perbaikan.', failHashPh: 'Hash Tx gagal...', diagBtn: 'Diagnosa',
+    footer: '⚠️ Alat ini hanya membaca data publik on-chain & menjelaskannya sederhana. Tanpa nasihat investasi. Sepenuhnya read-only: tanpa tanda tangan·akses aset.',
+    txOk: '✅ Tx Sukses', txFail: '❌ Tx Gagal', txFailCause: ': {0}', height: 'Tinggi {0}', paren: '({0})',
+    storyTitle: '📖 Isi Tx ini', memo: '📝 Memo: {0}', feeTitle: 'Biaya', amount: 'Jumlah', feePayer: 'Pembayar Biaya', txHash: 'Tx Hash', copy: '⧉ Salin', sharePage: 'Bagikan', copyLink: '🔗 Salin Tautan Dekode',
+    nativeDelta: 'Perubahan Saldo Asli (PAXI)', received: '📥 Terima', sent: '📤 Kirim', contractFlows: 'Perpindahan Aset Kontrak Pintar', from: 'Dari ', to: 'Ke ', qty: 'Jumlah: ',
+    msgsTitle: 'Pesan ({0})', sender: 'Pengirim: ', execMethod: 'Metode: ', contractOf: ' · Kontrak ', viewArgs: 'Lihat Argumen', rawMsg: 'Pesan Mentah', failLog: 'Log Gagal',
+    queryingChain: 'Mengecek data on-chain…', isContract: '🔗 Ini adalah kontrak pintar', profile: 'Profil Kontrak', label: 'Label', kind: 'Kategori', creator: 'Pembuat',
+    admin: 'Admin', upgradable: '(bisa upgrade)', noAdmin: 'Tidak bisa upgrade (admin dibuang)', createdHeight: 'Tinggi Pembuatan',
+    totalSupply: 'Total Suplai', tokenInfo: 'Info Token', name: 'Nama', symbol: 'Simbol', decimals: 'Desimal',
+    srcEcho: 'dari respons kontrak asli', srcProbe: 'dari probing metode individual', srcNoEcho: 'tidak ada respons', srcErr: 'respons error',
+    queryFeatures: 'Metode yang bisa di-query (terverifikasi on-chain)', methodsFound: 'Ditemukan {0} metode asli on-chain. Klik untuk muat ke sandbox.',
+    noMethods: 'Kontrak ini tidak merespons daftar metode (implementasi sendiri atau tanpa query publik). Bisa input manual di sandbox.',
+    openSandbox: '🧪 Buka sandbox kontrak ini',
+    nativeBalance: 'Saldo Asli', noBalance: 'Alamat ini tidak punya saldo asli', localNote: 'Catatan lokal (hanya perangkat ini)', noteName: 'Catatan', notSet: 'Belum diatur', address: 'Alamat',
+    editNote: 'Edit', addNote: 'Tambah', notePrompt: 'Atur catatan untuk alamat ini (hanya disimpan di browser ini): ', unknownInput: 'Tidak bisa tentukan hash atau alamat. Sudah disalin seluruhnya?',
+    inputHint: 'Alamat Paxi diawali <b>paxi1</b>, Tx hash 64 karakter alfanumerik.', parsingTx: 'Memparsing Tx {0}…', netErr: '⚠️ Error jaringan/node (bukan kegagalan Tx, coba lagi): {0}', nodeReturn: 'Respons Node',
+    netErrHint: 'Penyebab umum: hash tidak ditemukan, belum diindeks, node tidak respons sementara.', badAddr: 'Masukkan alamat kontrak valid (paxi1... lengkap)', noJson: 'Masukkan query JSON', jsonErr: 'Error sintaks JSON: {0}',
+    queryingNode: 'Mengecek node (read-only)…', queryOk: '✅ Query sukses', realMethods: '💡 Metode query asli yang didukung kontrak ini: ', expandAll: 'Klik untuk bentangkan {0} item',
+    notContract: 'Alamat ini bukan kontrak atau sudah dipindah/dihapus.', queryFail: 'Query gagal: {0}', nodeRaw: 'Respons Node Mentah', realMethodsTitle: 'Metode Query Asli',
+    noValidHash: 'Tidak ada hash valid (1 baris 1 hash heksa 64 karakter).', overLimit: 'Lewat batas — hanya proses {0} item pertama.', parsing: 'Parsing {0}/{1}', stOk: 'Sukses', stFail: 'Gagal', stQueryFail: 'Query gagal', done: 'Selesai: {0}',
+    needHash: 'Masukkan Tx hash 64 karakter', diagnosing: 'Mendiagnosa…', netErr2: '⚠️ Error jaringan/node (bukan kegagalan Tx): {0}',
+    txOkNoDiag: '✅ Tx ini dieksekusi normal — tidak ada yang didiagnosa.', noClassify: '• Tidak bisa klasifikasi otomatis. Lihat log mentah di bawah.',
+    txFailCode: '❌ Tx Gagal (code {0})', diagTitle: 'Diagnosa', gasSet: 'Gas Limit', gasUsed: 'Gas Terpakai', codespace: 'Codespace', rawLogTitle: 'Log Mentah',
+    d1: 'Saldo tidak cukup: akun tidak cukup untuk kirim + biaya.', d2: 'Gas tidak cukup: eksekusi melebihi gas limit — naikkan gas.',
+    d3: 'Error logika kontrak: kontrak mengembalikan error sendiri — tidak terkait gas.', d4: 'Tidak berwenang: pemanggil bukan admin/minter kontrak.',
+    d5: 'Sudah ada: label atau token_id duplikat, dll.', d6: 'Tidak ditemukan: ID target·alamat kontrak·usulan tidak ada.',
+    d7: 'Argumen tidak valid: JSON tidak cocok dengan field yang diharap kontrak.', d8: 'Benturan urutan: nonce akun tidak cocok, atau Tx disiarkan dua kali.',
+    d9: 'Timeout: tidak masuk dalam target tinggi — bisa siarkan ulang.', d10: 'Error desimal: pengaturan desimal token salah.',
+    welcome: 'Tempel <b>Tx Hash</b> atau <b>Alamat</b> di atas, lalu kami jelaskan apa yang terjadi dengan bahasa sederhana.',
+    coreMissing: 'Gagal memuat engine inti decoder-core.js.', copied: '✅ Tersalin', copyFail: '❌ Gagal salin', addrCopied: '✅ Alamat disalin', truncated: '\n…(terpotong, total {0} karakter)'
+  },
+  burn: {
+    title: '🔥 Bakar Token', desc: 'Panggil metode burn kontrak PRC-20 untuk musnahkan token permanen (suplai turun·tidak bisa batal). Tanpa biaya platform — hanya gas on-chain.',
+    contractLabel: 'Alamat kontrak token (PRC-20 / CW20)', amountLabel: 'Jumlah bakar (satuan tampilan, mis: 100)', amountPlaceholder: 'Mis: 100',
+    burnBtn: '🔥 Bakar Sekarang', connected: '✅ Terhubung: <span class="mono">{0}…</span>', notConnected: 'Tidak terhubung (hubungkan dompet kanan atas dulu)', disconnected: 'Tidak terhubung',
+    queryFailHttp: 'Gagal query kontrak (HTTP {0}). Pastikan alamat kontrak PRC-20', notToken: 'Kontrak ini tidak mengembalikan token_info — bukan PRC-20 standar, tidak bisa bakar',
+    signFail: 'Gagal tanda tangan PaxiHub', connectFirst: 'Hubungkan dompet dulu', badContract: 'Masukkan alamat kontrak PRC-20 valid (paxi1... lengkap)', badAmount: 'Masukkan jumlah bakar valid (positif)',
+    querying: '⏳ Mengecek info token...', tokenLabel: 'Token: ', decimalsInfo: ', desimal: {0}', zeroAmount: 'Jumlah bakar hasil konversi = 0 — periksa desimal',
+    confirmTitle: 'Konfirmasi bakar {0} {1}?', confirmConverted: '→ Jumlah bakar aktual: {0} {1} (satuan dasar: {2})', confirmIrreversible: '→ Total suplai akan turun permanen. Tidak bisa batal!',
+    signing: '⏳ Menanda tangani bakar...', preparing: '⏳ Mempersiapkan bakar {0} {1}', noTxHash: 'Node tidak mengembalikan Tx hash — hasil tidak jelas. Jangan coba ulang sembarangan, cek dekoder on-chain dulu',
+    successHtml: '🔥 Bakar berhasil! Total suplai turun permanen.', successToast: '🔥 Bakar berhasil! Total suplai turun permanen!', failPrefix: '❌ Gagal: ',
+    warn: '⚠️ Bakar tidak bisa batal. Hanya kontrak PRC-20 dengan metode burn standar. Periksa alamat kontrak & jumlah sebelum bakar.', unitFull: 'Token', unit: 'Token'
+  },
+  allowance: {
+    title: '🔑 Kelola Allowance (Izin)', desc: 'Tampilkan & kelola izin token yang diberikan ke alamat lain (mis: modul Swap). Izin seperti "limit penarikan otomatis" — makin besar makin berisiko, kecilkan setelah selesai. Alat gratis, hanya gas on-chain.',
+    contractLabel: 'Alamat kontrak PRC-20', ownerLabel: 'Pemilik (target izin)', spenderLabel: 'Spender (yang boleh pakai)', spenderHint: 'Umum: modul Swap (alamat modul Swap resmi)', spenderCustom: 'Alamat kustom',
+    queryBtn: '🔍 Cek Allowance', amountLabel: 'Jumlah (satuan tampilan, mis: 100)', increaseBtn: '➕ Tambah', decreaseBtn: '➖ Kurangi', revokeBtn: '🚫 Revoke semua',
+    querying: 'Mengecek...', noAllowance: 'Tidak ada izin (limit saat ini 0)', allowanceResult: 'Allowance saat ini', balanceLabel: 'Saldo pemilik',
+    confirmIncrease: 'Konfirmasi tambah?\n\n· Kontrak: {0}\n· Spender: {1}\n· Tambah: {2}\n· Biaya: tidak ada (hanya gas on-chain)',
+    confirmDecrease: 'Konfirmasi kurangi?\n\n· Kontrak: {0}\n· Spender: {1}\n· Kurangi: {2}\n· Biaya: tidak ada (hanya gas on-chain)',
+    confirmRevoke: 'Konfirmasi revoke semua?\n\n· Kontrak: {0}\n· Spender: {1}\n· Revoke: {2} (set ke nol — tidak bisa lagi gerakkan token)\n· Biaya: tidak ada (hanya gas on-chain)',
+    success: '✅ Selesai — allowance diperbarui!', failPrefix: '❌ Gagal: ', connectFirst: 'Hubungkan dompet dulu (kanan atas)', badContract: 'Masukkan alamat kontrak PRC-20 valid (paxi1...)',
+    badAddr: 'Alamat tidak valid (perlu paxi1... lengkap)', badAmount: 'Masukkan jumlah > 0', noQueryYet: 'Cek allowance saat ini dulu', queryingTx: '⏳ Menanda tangani & siarkan...', done: 'Selesai',
+    viewTx: '🧭 Periksa Tx ini di dekoder', tokenFail: 'Gagal muat info token (kontrak PRC-20?)', unlimitedNote: '⚠️ Perhatian: revoke = nol sekaligus. Spender tidak bisa sentuh token kecuali disetujui ulang.'
+  },
+  swap: {
+    title: '🔁 Pembantu Swap (Modul Asli)', desc: 'Tukar token via modul swap asli Paxi. Hitung min received terjamin sebelum tanda tangan — mengganti slippage 50% tetap dari contoh resmi. Gratis, hanya gas on-chain.',
+    poolListTitle: '📈 Semua Pool (klik untuk pilih)', poolLoading: 'Memuat pool...', poolFail: 'Gagal muat pool', poolEmpty: 'Tidak ada pool — bisa tempel alamat kontrak PRC-20 langsung',
+    price: 'Harga', reserve: 'Reserve', contractLabel: 'Alamat kontrak PRC-20 (pool)', loadPoolBtn: '🔄 Muat Pool',
+    direction: 'Arah', dirSellToken: 'Jual PRC-20 → PAXI', dirSellPaxi: 'Jual PAXI → PRC-20', amountLabel: 'Jumlah jual (satuan tampilan)', balanceLabel: 'Saldo Saya',
+    slippageLabel: 'Proteksi Slippage (%)', quoteTitle: 'Pratinjau Perkiraan', qRatio: 'Perkiraan terima (rasio pool)', qCp: 'Perkiraan konstan-kali (dgn impact)', qImpact: 'Dampak Harga',
+    qMin: '🛡️ Min Received (jika di bawah ini Tx otomatis gagal — perlindungan Anda)', quoteHint: 'Perbarui perkiraan sebelum tanda tangan. Jika jumlah/arah berubah, perkiraan kadaluarsa.', refreshQuote: '🔄 Perbarui Perkiraan',
+    execBtn: '🔁 Tanda Tangani & Swap', confirm: 'Konfirmasi swap?\n\n· Arah: {0}\n· Jual: {1}\n· 🛡️ Min Received: {2}\n· Slippage: {3}%\n· Biaya: tidak ada (hanya gas on-chain)\n\nSaat jual PRC-20, penambahan allowance disertakan atomik di Tx yang sama.',
+    queryingTx: '⏳ Menanda tangani & siarkan...', success: '✅ Tx swap final on-chain!', failPrefix: '❌ Gagal: ', connectFirst: 'Hubungkan dompet dulu (kanan atas)', badContract: 'Masukkan alamat kontrak PRC-20 valid (paxi1...)',
+    badAmount: 'Masukkan jumlah > 0', noPool: 'Tidak ada pool di alamat ini (buat token dulu, penyedia likuiditas buka pool)', needQuote: 'Perbarui perkiraan dulu', minSlip: 'Slippage tidak boleh > 50',
+    typeUrlHint: 'Node tidak kenali tipe pesan. Coba lagi nanti atau laporkan.', viewTx: '🧭 Periksa Tx ini di dekoder', allowanceAdded: '(Penambahan allowance otomatis disertakan: {0} — hanya yang dibutuhkan swap ini)'
+  },
+  govVote: {
+    title: 'Voting Tata Kelola', desc: 'Lihat usulan tata kelola on-chain, dan vote usulan yang sedang masa voting. Alat ini tanpa biaya platform.',
+    info: '💡 Hanya usulan "voting" yang bisa divote. Vote butuh tanda tangan dompet & siaran on-chain, catatan rantai akurat.',
+    voting: 'Voting', passed: 'Disetujui', rejected: 'Ditolak', deposit: 'Deposit', connectFirst: 'Hubungkan dompet sebelum vote', yes: 'Ya', no: 'Tidak', abstain: 'Abstain', veto: 'Veto',
+    voted: 'Vote Anda: ', confirmMsg: (id, opt) => `Vote usulan #${id} dengan "${opt}"?\n\n"OK" untuk tanda tangan & siarkan dompet.`, success: '✅ Vote diajukan', failPrefix: 'Gagal vote: ', sdkErr: 'SDK tidak dukung tipe pesan ini', noProposals: 'Tidak ada usulan', loading: 'Memuat...', statusUnknown: 'Tidak diketahui', voteFailed: 'Gagal vote'
+  },
+  claimRewards: {
+    title: 'Klaim Hadiah', desc: 'Cek & klaim hadiah staking PAXI dengan satu klik. Opsional aktifkan "compound" untuk redelegasi ke validator sama setelah klaim.',
+    info: 'Alat ini hanya siarkan Tx klaim/compound, tanpa biaya platform — hanya gas on-chain. Hadiah dalam satuan upaxi (1 PAXI = 1.000.000 upaxi).',
+    compound: 'Compound ke validator sama setelah klaim', claimBtn: 'Klaim Semua', connectFirst: 'Hubungkan dompet', noRewards: 'Tidak ada hadiah staking untuk diklaim',
+    colValidator: 'Validator', colAmount: 'Bisa Diklaim (PAXI)', colAction: 'Aksi', total: 'Total klaim: ', loading: '⏳ Memuat hadiah staking...',
+    confirmMsg: (paxi, compound) => `Klaim hadiah staking ${paxi} PAXI?\n` + (compound ? '(Compound aktif: redelegasi ke validator sama setelah klaim)' : '') + '\n\nOK untuk tanda tangan dompet.',
+    success: '✅ Klaim berhasil', failPrefix: 'Gagal klaim: ', sdkErr: 'SDK tidak dukung tipe pesan ini', queryFail: 'Gagal cek hadiah: '
+  },
+  ibcQuery: {
+    title: 'Query IBC', desc: 'Query read-only saluran IBC·klien·trace denom lintas rantai Paxi.',
+    channelsBtn: 'Query Saluran', denomTracesBtn: 'Query Trace Denom', clientsBtn: 'Query Klien', resolveBtn: 'Resolver Denom', hashPh: 'Masukkan hash ibc/... atau hash mentah',
+    notEnabled: 'Endpoint IBC ini mengembalikan error. Paxi mainnet mungkin belum aktifkan IBC (fitur lain tidak terpengaruh).', loading: 'Mengeksekusi...', noData: 'Tidak ada data', resolved: 'Terresolve', info: 'Alat ini read-only, tidak mengirim Tx. Jika Paxi mainnet nonaktif IBC, endpoint mengembalikan error — ini wajar.'
+  },
+  addressBook: {
+    title: 'Buku Alamat', desc: 'Simpan alamat Paxi yang sering dipakai secara lokal di browser.', addBtn: 'Tambah', exportBtn: 'Ekspor', importBtn: 'Impor', name: 'Nama', address: 'Alamat', note: 'Catatan', search: 'Cari nama atau alamat...', empty: 'Tidak ada alamat tersimpan', invalidAddr: 'Format alamat tidak valid', added: 'Ditambah', deleted: 'Dihapus', exported: 'Diekspor', imported: 'Diimpor', confirmDel: 'Hapus alamat ini?'
+  },
+  pump: {
+    templateLabel: 'Pilih Template', feeLabel: 'Biaya Layanan', feeUnit: ' PAXI', deployBtn: '🚀 Deploy', deployingBtn: 'Mendeploy...', revokingBtn: 'Menghapus izin...',
+    walletDisconnected: 'Terputus', walletConnectedPrefix: '✅', connectHint: 'Hubungkan dompet di header dulu', templateLoadFail: 'Gagal muat template', alertConnectFirst: 'Hubungkan dompet dulu', alertSelectTemplate: 'Pilih template dulu',
+    alertUploadFail: 'Gagal upload gambar: ', alertDeployFail: 'Gagal deploy: ', alertImageType: 'Pilih file gambar (JPG / PNG / GIF dll)', alertImageSize: 'Ukuran gambar maks 32MB', alertReadFileFail: 'Gagal baca file gambar', alertUploadGeneral: 'Gagal upload gambar',
+    fields: { name: 'Nama Token', symbol: 'Simbol Token', total_supply: 'Total Suplai (satuan)', project: 'URL Proyek', description: 'Deskripsi Token', logo_url: 'URL Logo (wajib)', minter: 'Alamat Minter' },
+    placeholders: { name: 'Nama Token', symbol: 'Simbol Token (mis: PAXI)', project: 'URL Proyek https://…', description: 'Deskripsi Token' },
+    templates: { prc20: 'Token Pengganti PRC-20', prc721: 'Koleksi NFT PRC-721' },
+    logoUrlPlaceholder: 'Atau tempel URL gambar (https://…)', uploadingBtn: 'Mengupload...', resultSuccessTitle: '✅ Terbit berhasil!', resultContractAddr: 'Alamat kontrak: ', resultTxHash: 'Tx Hash: ',
+    resultTotalSupply: 'Total suplai: ', resultTotalSupplySuffix: '(semua di-mint ke dompet Anda)', resultFee: 'Biaya layanan: ', resultFeeSuffix: ' PAXI (dipotong otomatis)', resultLogoUrl: 'URL Logo: ', resultNoLogo: 'N/A',
+    resultMinter: 'Minter: ', resultMinterSuffix: '(alamat ini bisa dipakai mint berikutnya)', resultMinterRevokedSuffix: '(setelah terbit, izin mint & freeze otomatis dibuang)', resultRevokeLabel: 'Izin mint/freeze: ',
+    resultRevokeOk: 'Otomatis dibuang (tidak bisa mint lagi, tidak bisa freeze akun)', resultRevokeFail: 'Gagal buang otomatis! Kirim Tx update_minter(null) manual ke kontrak.', resultNotReadyTitle: '⚠️ Tx terkirim tapi alamat kontrak belum pasti.',
+    resultNotReadyTip: 'Cek di dekoder on-chain nanti.', errNameRequired: 'Nama token wajib', errSymbolRequired: 'Simbol token wajib', errNftNameRequired: 'Nama NFT wajib', errNftSymbolRequired: 'Simbol NFT wajib',
+    errDecimalsRange: 'Desimal 0~36', errTotalSupplyPositive: 'Total suplai harus bilangan bulat positif', errTotalSupplyInteger: 'Total suplai harus bilangan bulat non-negatif', errLogoRequired: 'URL logo wajib! Upload gambar & tempel link publik.', errLogoScheme: 'URL logo harus diawali http://, https://, ipfs://',
+    errProjectUrl: 'URL proyek harus diawali http:// atau https://', errMinterInvalid: 'Alamat minter tidak valid (diawali paxi1)', errReceiverConfig: 'Error pengaturan alamat penerima', errPubkeyMissing: 'Tidak ada public key, hubungkan ulang dompet',
+    errUnknownTemplate: 'Template tidak dikenal', errChainId: 'Gagal dapat chainId', errAccount: 'Gagal dapat info akun', errSignPaxihub: 'Gagal tanda tangan PaxiHub', errBroadcast: 'Gagal siarkan: ', errTxFail: (c, l) => `Transaksi gagal (code=${c}): ${l || ''}`, errTxOnchain: 'Transaksi gagal on-chain: ', errUnknownWallet: 'Jenis dompet tidak dikenal'
+  },
+  stakeManage: {
+    title: 'Staking / Unstaking', desc: 'Delegasikan PAXI ke validator untuk dapat hadiah staking, atau undelegate saat perlu (unbond ~7 hari). Alat ini tanpa biaya platform.',
+    info: '💡 Setelah delegasi, hadiah akumulasi per blok. Dana undelegate terkunci ~7 hari sampai tersedia.', delegateSection: 'Delegasi (Stake)', undelegateSection: 'Undelegasi (Unstake)', unbondingSection: 'Unbond (Hitung Mundur)',
+    delegateBtn: 'Delegasi', undelegateBtn: 'Undelegasi', connectFirst: 'Hubungkan dompet', confirmDelegate: (val, amt) => `Konfirmasi delegasi?\n\nValidator target: ${val}\nJumlah: ${amt} PAXI\n\n"OK" untuk tanda tangan dompet.`, confirmUndelegate: (val, amt) => `Konfirmasi undelegasi?\n\nDelegasi saat ini: ${val}\nJumlah: ${amt} PAXI\n\n⚠️ Dana undelegate masuk masa unbond ~7 hari, tidak bisa pindah/pakai. "OK" untuk tanda tangan dompet.`,
+    success: '✅ Berhasil', failPrefix: 'Gagal: ', sdkErr: 'SDK tidak dukung tipe pesan ini', noDelegations: 'Tidak ada delegasi', loading: 'Memuat...', unbondPeriod: 'Masa unbond Paxi ~7 hari', selectValidator: 'Pilih Validator', selectDelegation: 'Pilih Delegasi',
+    invalidAmt: 'Masukkan jumlah valid', selectSource: 'Pilih delegasi saat ini untuk undelegate', amountLabel: 'Jumlah (PAXI)', unbondComplete: '✅ Unbond selesai', days: 'hari', hours: 'jam', mins: 'mnt', secs: 'dtk'
+  },
+  txDryRun: {
+    title: 'Simulasi Tx', desc: 'Simulasikan Tx on-chain untuk perkirakan gas & tentukan apakah gagal.', info: 'Alat ini hanya simulasikan on-chain, tidak menyiarkan. Untuk perkirakan gas & tentukan kegagalan Tx.',
+    modeA: 'Mode A: Simulasi kirim cepat', modeB: 'Mode B: Simulasi tempel tx_bytes', from: 'Pengirim (alamat dompet)', to: 'Alamat penerima', amount: 'Jumlah (PAXI)', simTransferBtn: 'Simulasi Kirim', simBytesBtn: 'Simulasikan tx_bytes tempelan',
+    bytesPh: 'Tempel tx_bytes Base64', connectFirst: 'Hubungkan dompet', invalidAddr: 'Alamat penerima tidak valid', invalidAmt: 'Masukkan jumlah valid', gasUsed: 'Perkiraan Gas Terpakai', estFee: 'Perkiraan Biaya Gas',
+    wouldFail: 'Catatan simulasi: ', success: 'Simulasi sukses', failPrefix: 'Simulasi gagal: ', loading: 'Mensimulasikan...', gasWanted: 'Gas Wanted', paxiUnit: 'PAXI', notConnected: 'Dompet terputus, alamat pengirim kosong.'
+  },
+  nftLauncher: {
+    title: '🎨 Peluncur NFT', desc: 'Deploy kontrak NFT PRC-721 ke jaringan Paxi dengan satu klik. Setelah deploy, batch mint.',
+    step1: 'Info Koleksi', step2: 'Upload Aset', step3: 'Pratinjau & Deploy', next: 'Lanjut: Upload →', prev: '← Kembali', nextDeploy: 'Lanjut: Pratinjau & Deploy →', deploy: 'Deploy Kontrak NFT',
+    collectionName: 'Nama Koleksi', symbol: 'Simbol', description: 'Deskripsi', maxSupply: 'Suplai Maks', royalty: 'Royalti (%)', mintPrice: 'Harga Mint (PAXI)', maxPerWallet: 'Maks Mint per Dompet',
+    deployBtn: '🚀 Deploy Kontrak NFT', uploadCover: 'Gambar Sampul NFT', uploadCoverHint: 'Klik untuk upload sampul', uploadSupport: 'Mendukung JPG/PNG/GIF/SVG', imageUri: 'Image URI (jika IPFS off, atau timpa)', preview: 'Pratinjau', previewPlaceholder: '🖼️',
+    batchMint: 'Batch Mint NFT', batchMintDesc: 'Batch mint ke kontrak PRC-721 terdeploy. Maks 10 per Tx. Tiap NFT dapat Token ID unik.', contractAddr: 'Alamat Kontrak NFT', contractAddrHint: 'Terisi otomatis setelah deploy', mint: 'Jumlah Mint',
+    mintFeeTitle: '💰 Perkiraan Biaya', mintCountLabel: 'Jumlah Mint', estimatedFee: 'Perkiraan Biaya', mintBtn: '🏭 Eksekusi Batch Mint', mintTokenIds: 'Token ID', blockHeight: 'Tinggi Blok',
+    metadataTitle: '📝 Metadata Kustom', metadataDesc: 'Tambah nama & gambar kustom ke NFT ter-mint. Generate JSON metadata patuh CW721.', tokenId: 'Token ID', nftName: 'Nama NFT', imageUriLabel: 'Image URI', saveMetadataBtn: '📝 Generate JSON Metadata',
+    metadataExplain: 'PRC-721 kelola metadata via token_uri ke JSON eksternal. Upload JSON di bawah ke server/IPFS, pakai URL itu sebagai token_uri saat mint.', copyJson: '📋 Salin JSON', contractHistory: 'Kontrak Terdeploy', contractHistoryDesc: 'Kontrak NFT yang berhasil deploy di rantai Paxi.',
+    noHistory: 'Tidak ada kontrak terdeploy', toContract: '→ Input alamat', needWallet: 'Hubungkan dompet dulu', fillAll: 'Isi semua field wajib', deploying: 'Menyusun Tx deploy...', waiting: 'Menunggu tanda tangan dompet...', broadcasting: 'Tx disiarkan. Menunggu konfirmasi...', confirmWait: 'Menunggu konfirmasi on-chain...',
+    success: '✅ Berhasil', failed: '❌ Gagal', deploySuccess: '✅ Kontrak NFT terdeploy!', nextStep: '👇 Lanjut: salin alamat di atas ke kolom batch mint bawah', mintSuccess: 'Mint berhasil', nftMintCount: 'NFT',
+    connected: 'Terhubung', warning: '⚠️ Alat ini hanya layanan teknis minting NFT. Tanpa perantara perdagangan, penentuan harga, atau penukaran. Segala hasil ditanggung pengguna.', warningEn: '⚠️ Alat ini hanya layanan teknis minting NFT. Tanpa perantara perdagangan, penentuan harga, atau penukaran. Segala hasil ditanggung pengguna.',
+    max10Hint: 'Maks 10 NFT per transaksi', mintConfirm: 'Konfirmasi batch mint?\n\n· Biaya layanan: 5 PAXI\n· Penerima: ', buildTx: 'Menyusun Tx mint...',
+    ipfsHint: '💡 Gambar upload disimpan di IPFS, jamin akses permanen NFT.', ipfsToggle: 'Gunakan penyimpanan IPFS (disarankan)', ipfsConfig: '⚙️ Pengaturan IPFS (Pinata)', ipfsJwtLabel: 'Pinata JWT', ipfsJwtPlaceholder: 'Tempel Pinata JWT...', ipfsSave: '💾 Simpan', ipfsConfigured: '✓ Teratur', ipfsNotConfigured: '⚠ Belum diatur', ipfsGetKey: '🔗 Dapat Pinata JWT',
+    ipfsUploading: 'Mengupload', ipfsImageOk: '✅ Gambar diupload ke IPFS', ipfsMetaGen: 'Generate & upload metadata...', ipfsUploadFail: '❌ Gagal upload IPFS', ipfsNoJwt: 'Masukkan Pinata JWT di pengaturan IPFS dulu', ipfsGateway: 'Gateway', ipfsFallback: 'IPFS tidak tersedia, mode dasar', ipfsNeedImage: 'Upload sampul atau input Image URI', ipfsLargeImg: 'Gambar >100KB, aktifkan IPFS untuk kurangi gas',
+    updTitle: '🔄 Update Metadata On-Chain', updDescInfo: 'Timpa metadata on-chain NFT ter-mint (nama/gambar/deskripsi/atribut) langsung — tanpa remint. Tanda tangan dompet minter/pemilik, hanya gas tanpa biaya layanan.',
+    updDescLabel: 'Deskripsi NFT', updAttrsLabel: 'Atribut JSON (opsional)', updAttrsPlaceholder: '[{"trait_type":"Series","value":"Genesis"}]', updBtn: '🔄 Kirim Update On-Chain', updSuccess: '✅ Metadata diperbarui', updAttrsInvalid: 'Atribut JSON tidak valid — harap array seperti [{"trait_type":"...","value":"..."}]', updAddrInvalid: 'Format alamat kontrak tidak valid (paxi1... akun 43/kontrak 63 karakter). Salin semua dari riwayat deploy.',
+    updConfirm: 'Tulis metadata ini ke on-chain? Nama/gambar/atribut NFT diubah langsung. Hanya gas.\n\n', buildUpdTx: 'Menyusun Tx update...', updUriTooLarge: 'token_uri metadata >64KB bisa gagal Tx on-chain. Pakai link IPFS atau kompres gambar sebelum update.'
+  }
+};

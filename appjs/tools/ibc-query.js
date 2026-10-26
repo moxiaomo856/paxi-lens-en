@@ -18,9 +18,13 @@ const IQ_DICT = {
 };
 
 const iqPt = (k, ...a) => {
-  const lang = (typeof currentLang !== 'undefined' && currentLang === 'en') ? 'en' : 'zh';
-  let v = IQ_DICT[lang][k];
-  if (v === undefined) v = IQ_DICT.en[k];
+  const lang = (typeof currentLang !== 'undefined' && currentLang) || 'en';
+  let v;
+  if (window.PAXI_LANGS && PAXI_LANGS[lang] && PAXI_LANGS[lang].ibcQuery && PAXI_LANGS[lang].ibcQuery[k] != null) {
+    v = PAXI_LANGS[lang].ibcQuery[k];
+  } else {
+    v = (IQ_DICT[lang] && IQ_DICT[lang][k] !== undefined) ? IQ_DICT[lang][k] : IQ_DICT.en[k];
+  }
   return typeof v === 'function' ? v(...a) : v;
 };
 

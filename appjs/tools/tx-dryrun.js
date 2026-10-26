@@ -30,9 +30,13 @@ const DR_DICT = {
 };
 
 const drPt = (k, ...a) => {
-  const lang = (typeof currentLang !== 'undefined' && currentLang === 'en') ? 'en' : 'zh';
-  let v = DR_DICT[lang][k];
-  if (v === undefined) v = DR_DICT.en[k];
+  const lang = (typeof currentLang !== 'undefined' && currentLang) || 'en';
+  let v;
+  if (window.PAXI_LANGS && PAXI_LANGS[lang] && PAXI_LANGS[lang].txDryRun && PAXI_LANGS[lang].txDryRun[k] != null) {
+    v = PAXI_LANGS[lang].txDryRun[k];
+  } else {
+    v = (DR_DICT[lang] && DR_DICT[lang][k] !== undefined) ? DR_DICT[lang][k] : DR_DICT.en[k];
+  }
   return typeof v === 'function' ? v(...a) : v;
 };
 

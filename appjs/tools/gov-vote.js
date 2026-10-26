@@ -38,9 +38,13 @@ window.TOOL_REGISTRY ||= {};
     }
   };
   const pt = (key, ...args) => {
-    const lang = (typeof currentLang !== 'undefined' && currentLang === 'en') ? 'en' : 'zh';
-    let v = PT_DICT[lang][key];
-    if (v === undefined) v = PT_DICT.en[key];
+    const lang = (typeof currentLang !== 'undefined' && currentLang) || 'en';
+    let v;
+    if (window.PAXI_LANGS && PAXI_LANGS[lang] && PAXI_LANGS[lang].govVote && PAXI_LANGS[lang].govVote[key] != null) {
+      v = PAXI_LANGS[lang].govVote[key];
+    } else {
+      v = (PT_DICT[lang] && PT_DICT[lang][key] !== undefined) ? PT_DICT[lang][key] : PT_DICT.en[key];
+    }
     return typeof v === 'function' ? v(...args) : v;
   };
 

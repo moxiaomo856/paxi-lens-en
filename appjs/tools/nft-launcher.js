@@ -107,7 +107,10 @@ const _NFT_LANG = {
 };
 
 function _nftL(k) {
-  const lang = 'en'; // English-only build
+  const lang = (typeof currentLang !== 'undefined' && currentLang) || 'en';
+  if (window.PAXI_LANGS && PAXI_LANGS[lang] && PAXI_LANGS[lang].nftLauncher && PAXI_LANGS[lang].nftLauncher[k] != null) {
+    return PAXI_LANGS[lang].nftLauncher[k];
+  }
   return (_NFT_LANG[lang] && _NFT_LANG[lang][k]) || (_NFT_LANG.en[k] || k);
 }
 

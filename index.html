@@ -555,6 +555,7 @@
     <span class="wallet-balance" id="walletBalance" style="display:none"></span>
     <span class="wallet-address" id="walletAddress" style="display:none"></span>
     <span id="networkSelector"></span>
+    <select id="langSelect" onchange="setLanguage(this.value)" title="Language"></select>
     <button class="btn btn-primary btn-sm" id="btnConnect" onclick="connectWallet()">Connect Wallet</button>
     <button class="btn btn-outline btn-sm" id="btnDisconnect" style="display:none" onclick="disconnectWallet()">Disconnect</button>
   </div>
@@ -569,6 +570,12 @@
 <script src="https://mainnet-api.paxinet.io/resources/js/paxi-cosmjs.umd.js"></script>
 <script src="shared.js"></script>
 <script src="compat.js"></script>
+<!-- Multi-language packs (must load before core.js merges them) -->
+<script src="langs/ja.js"></script>
+<script src="langs/ko.js"></script>
+<script src="langs/id.js"></script>
+<script src="langs/vi.js"></script>
+<script src="langs/zh.js"></script>
 <!-- Core modules (language/state/wallet/home) -->
 <script src="appjs/core.js"></script>
 <!-- Tool modules (loaded in order, mutually independent) -->
@@ -611,7 +618,7 @@
   // Home footer: short compliance notice + link to the full disclaimer page
   (function () {
     try {
-      const textEN = '⚠️ Not an investment · Non-custodial · At your own risk　|　<a href="about.html" style="color:var(--primary);text-decoration:none">Full disclaimer &amp; legal notice →</a>';
+      const textEN = '⚠️ ' + (typeof t === 'function' ? t('common.footerNote') : 'Not an investment · Non-custodial · At your own risk') + '　|　<a href="about.html" style="color:var(--primary);text-decoration:none">' + (typeof t === 'function' ? t('common.fullDisclaimer') : 'Full disclaimer &amp; legal notice →') + '</a>';
       let el = document.getElementById('siteFooter');
       if (!el) {
         el = document.createElement('div');

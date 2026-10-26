@@ -382,20 +382,89 @@ const LANG = {
   }
 };
 
-let currentLang = 'en'; // English-only build: no language switcher
+// ============================================================
+// Multi-language support
+// Languages shown in the UI dropdown. Default = English.
+// External packs live in langs/{ja,ko,id,vi,zh}.js (window.PAXI_LANGS) and are deep-merged
+// over a clone of LANG.en, so every key always resolves (English is the fallback).
+// ============================================================
+const LANG_NAMES = [
+  { code: 'en', label: 'English' },
+  { code: 'ja', label: '日本語' },
+  { code: 'ko', label: '한국어' },
+  { code: 'id', label: 'Bahasa Indonesia' },
+  { code: 'vi', label: 'Tiếng Việt' },
+  { code: 'zh', label: '中文' },
+];
+
+// Deep-merge an override object over a (shallow/deep) clone of base.
+function _deepMerge(base, over) {
+  const out = Array.isArray(base) ? base.slice() : Object.assign({}, base);
+  if (!over || typeof over !== 'object') return out;
+  for (const k of Object.keys(over)) {
+    const bv = base ? base[k] : undefined;
+    if (over[k] && typeof over[k] === 'object' && !Array.isArray(over[k]) &&
+        bv && typeof bv === 'object' && !Array.isArray(bv)) {
+      out[k] = _deepMerge(bv, over[k]);
+    } else {
+      out[k] = over[k];
+    }
+  }
+  return out;
+}
+
+// Merge external language packs into LANG (English remains the fallback).
+if (typeof window.PAXI_LANGS !== 'undefined') {
+  for (const lc of ['ja', 'ko', 'id', 'vi', 'zh']) {
+    if (window.PAXI_LANGS[lc]) {
+      LANG[lc] = _deepMerge(LANG.en, window.PAXI_LANGS[lc]);
+    }
+  }
+}
+
+// Footer / disclaimer helper strings (also translated in langs/*.js).
+if (LANG.en.common) {
+  LANG.en.common.footerNote = 'Not an investment · Non-custodial · At your own risk';
+  LANG.en.common.fullDisclaimer = 'Full disclaimer & legal notice →';
+}
+
+// Current language: persisted in localStorage, default English.
+let currentLang = (typeof localStorage !== 'undefined' && localStorage.getItem('paxi_lang')) || 'en';
+if (!LANG[currentLang]) currentLang = 'en';
 let navStack = [];
 
 function t(key) {
   const keys = key.split('.');
-  let obj = LANG[currentLang];
+  // 1) current language
+  let cur = LANG[currentLang] || LANG.en;
+  let found = true;
   for (const k of keys) {
-    if (obj && obj[k] !== undefined) obj = obj[k];
+    if (cur && cur[k] !== undefined) cur = cur[k];
+    else { found = false; break; }
+  }
+  if (found && cur !== undefined) return cur;
+  // 2) fallback to English
+  let en = LANG.en;
+  for (const k of keys) {
+    if (en && en[k] !== undefined) en = en[k];
     else return key;
   }
-  return obj || key;
+  return en || key;
 }
 
-// Language is fixed to English in this build (no language switcher).
+// Switch language: persist + re-render the current view.
+function setLanguage(code) {
+  if (!LANG[code]) return;
+  currentLang = code;
+  try { localStorage.setItem('paxi_lang', code); } catch (e) {}
+  updateHeaderUI();
+  if (typeof state !== 'undefined' && state.currentView === 'tool' && state.currentTool &&
+      window.TOOL_REGISTRY && window.TOOL_REGISTRY[state.currentTool]) {
+    renderTool(state.currentTool, state.currentTool);
+  } else if (typeof renderHome === 'function') {
+    renderHome();
+  }
+}
 
 function updateHeaderUI() {
   const appTitle = document.getElementById('appTitle');
@@ -405,6 +474,15 @@ function updateHeaderUI() {
   const btnDisconnect = document.getElementById('btnDisconnect');
   if (btnDisconnect) btnDisconnect.textContent = t('common.disconnect');
   if (typeof renderNetworkSelector === 'function') renderNetworkSelector('networkSelector');
+  // Populate the language dropdown (built once, then kept in sync).
+  const sel = document.getElementById('langSelect');
+  if (sel) {
+    if (!sel.dataset.built) {
+      sel.innerHTML = LANG_NAMES.map((l) => `<option value="${l.code}">${l.label}</option>`).join('');
+      sel.dataset.built = '1';
+    }
+    sel.value = currentLang;
+  }
 }
 
 // ============================================================
@@ -770,10 +848,11 @@ async function refreshBalance() {
 window.APP = {};
 window.APP.LANG = LANG;
 window.APP.currentLang = currentLang;
+window.APP.getLang = () => currentLang;
+window.APP.setLanguage = setLanguage;
 window.APP.state = state;
 window.APP.CONFIG = CONFIG;
 window.APP.t = t;
-// (language switcher removed — fixed to English)
 window.APP.updateHeaderUI = updateHeaderUI;
 window.APP.navigateHome = navigateHome;
 window.APP.navigateBack = navigateBack;
