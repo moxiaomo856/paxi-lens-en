@@ -165,7 +165,7 @@ const LANG = {
       daoDesc: 'Apply for funding from the community pool (CommunityPoolSpend). If the proposal passes, the pool transfers the amount to the recipient address.',
       daoInfo: '💡 Title and summary are public to all token holders voting. State the purpose, budget breakdown, milestones and delivery timeline; use your project treasury address as recipient.',
       daoLabelTitle: 'Proposal Title',
-      daoTitlePlaceholder: 'e.g. Paxi Lens launch + 6-month maintenance funding (300,000 PAXI)',
+      daoTitlePlaceholder: 'e.g. Paxi Lens launch + 6-month maintenance funding (360,000 PAXI)',
       daoLabelSummary: 'Proposal Summary (summary)',
       daoSummaryPlaceholder: 'One sentence describing the request and amount…',
       daoLabelDesc: 'Proposal Description (description)',
@@ -424,7 +424,7 @@ if (typeof window.PAXI_LANGS !== 'undefined') {
 
 // Footer / disclaimer helper strings (also translated in langs/*.js).
 if (LANG.en.common) {
-  LANG.en.common.footerNote = 'Not an investment · Non-custodial · At your own risk';
+  LANG.en.common.footerNote = 'Not an investment · Non-custodial · Not offered to mainland China · At your own risk';
   LANG.en.common.fullDisclaimer = 'Full disclaimer & legal notice →';
 }
 

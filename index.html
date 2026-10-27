@@ -618,7 +618,7 @@
   // Home footer: short compliance notice + link to the full disclaimer page
   (function () {
     try {
-      const textEN = '⚠️ ' + (typeof t === 'function' ? t('common.footerNote') : 'Not an investment · Non-custodial · At your own risk') + '　|　<a href="about.html" style="color:var(--primary);text-decoration:none">' + (typeof t === 'function' ? t('common.fullDisclaimer') : 'Full disclaimer &amp; legal notice →') + '</a>';
+      const textEN = '⚠️ ' + (typeof t === 'function' ? t('common.footerNote') : 'Not an investment · Non-custodial · Not offered to mainland China · At your own risk') + '　|　<a href="about.html" style="color:var(--primary);text-decoration:none">' + (typeof t === 'function' ? t('common.fullDisclaimer') : 'Full disclaimer &amp; legal notice →') + '</a>';
       let el = document.getElementById('siteFooter');
       if (!el) {
         el = document.createElement('div');

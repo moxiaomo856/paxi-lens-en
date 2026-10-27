@@ -9,7 +9,7 @@
  * Also verifies:
  *   - bech32 checksum of the 4 whitelist addresses
  *   - on-chain gov module account matches the hardcoded value in code
- *   - on-chain community pool balance is readable and 300,000 PAXI is within the balance
+ *   - on-chain community pool balance is readable and 360,000 PAXI is within the balance
  *
  * Run: node test/verify-dao-submit.js
  */
@@ -135,8 +135,8 @@ function buildDaoProposalAny({ amountMicro = AMOUNT_MICRO, recipient = RECIPIENT
       initial_deposit: [{ denom: DENOM, amount: depositMicro }],
       proposer,
       metadata: '',
-      title: 'Paxi Lens launch and six-month operations funding (300,000 PAXI)',
-      summary: 'Requesting 300,000 PAXI for Paxi Lens launch and six-month operations.',
+      title: 'Paxi Lens launch and six-month operations funding (360,000 PAXI)',
+      summary: 'Requesting 360,000 PAXI for Paxi Lens launch and six-month operations.',
       expedited: false,
     }),
   };
@@ -190,7 +190,7 @@ function buildDaoProposalAny({ amountMicro = AMOUNT_MICRO, recipient = RECIPIENT
   }
 
   console.log('\n== Build DAO funding request and simulate ==');
-  const good = await simulate('DAO funding request (300,000 PAXI, v1 method)', [buildDaoProposalAny()]);
+  const good = await simulate('DAO funding request (360,000 PAXI, v1 method)', [buildDaoProposalAny()]);
   check(good.gas > 5000 && good.signCheck && !good.unresolved, 'v1 encoding correctly parsed on-chain (reached signature check)');
 
   // Negative control: wrong MsgCommunityPoolSpend typeUrl

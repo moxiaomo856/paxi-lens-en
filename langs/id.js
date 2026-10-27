@@ -282,7 +282,7 @@ window.PAXI_LANGS.id = {
   common: {
     connectFirst: 'Hubungkan dompet dulu', sending: 'Mengirim...', loading: 'Memuat...', connect: 'Hubungkan Dompet', disconnect: 'Putus',
     mainnet: 'Mainnet', testnet: 'Testnet',     langSwitch: 'Bahasa',
-    footerNote: 'Bukan investasi · Non-kustodial · Resiko Anda',
+    footerNote: 'Bukan investasi · Non-kustodial · Tidak untuk Tiongkok Daratan · Resiko Anda',
     fullDisclaimer: 'Penafian & pemberitahuan hukum lengkap →'
   },
   decoder: {

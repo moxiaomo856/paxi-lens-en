@@ -282,7 +282,7 @@ window.PAXI_LANGS.vi = {
   common: {
     connectFirst: 'Kết nối ví trước', sending: 'Đang gửi...', loading: 'Đang tải...', connect: 'Kết nối ví', disconnect: 'Ngắt',
     mainnet: 'Mainnet', testnet: 'Testnet',     langSwitch: 'Ngôn ngữ',
-    footerNote: 'Không phải đầu tư · Phi lưu ký · Tự chịu rủi ro',
+    footerNote: 'Không phải đầu tư · Phi lưu ký · Không phục vụ Trung Quốc đại lục · Tự chịu rủi ro',
     fullDisclaimer: 'Miễn trừ trách nhiệm & thông báo pháp lý →'
   },
   decoder: {

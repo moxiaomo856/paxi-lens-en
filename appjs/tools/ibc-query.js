@@ -9,11 +9,11 @@ const IQ_DICT = {
     clientsBtn: 'Query Clients',
     resolveBtn: 'Resolve Denom',
     hashPh: 'Enter ibc/... hash or bare hash',
-    notEnabled: 'This IBC endpoint returned an error; Paxi mainnet may not have IBC enabled (other features unaffected).',
+    notEnabled: '⚠️ Some Paxi IBC endpoints are not implemented; cross-chain availability should be verified by an actual transfer.',
     loading: 'Querying...',
     noData: 'No data',
     resolved: 'Resolved',
-    info: 'This tool is read-only and submits no transactions. If Paxi mainnet has IBC disabled, the endpoints return errors — this is expected.'
+    info: 'This tool is read-only and submits no transactions. Some Paxi IBC endpoints are not yet implemented (e.g. denom traces); endpoint errors are expected. Whether cross-chain transfers actually work should be verified by a real transfer.'
   }
 };
 
