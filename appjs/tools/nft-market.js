@@ -23,7 +23,7 @@ if (!window.TOOL_REGISTRY) window.TOOL_REGISTRY = {};
 const _NFTM_CODE_ID = 2;          // every cw721 on Paxi instantiates from code_id 2
 const _NFTM_COLL_PER_PAGE = 60;   // collections shown per page
 const _NFTM_TOKEN_PAGE = 100;      // tokens fetched per page inside a collection
-const _NFTM_CONCURRENCY = 8;
+const _NFTM_CONCURRENCY = 10;
 const _NFTM_INTENT_KEY = 'paxi_nft_intents';   // local sale intents (this device)
 const _NFTM_IMPORT_KEY = 'paxi_nft_imported';  // imported intent cards (this device)
 const _NFTM_TOKEN_CAP = 500;       // hard cap on tokens rendered per collection
@@ -335,6 +335,7 @@ async function _nftmOpenCollection(contract) {
   _nftmState.tokenCursor = null;
   const body = document.getElementById('nftmBody');
   if (body) body.innerHTML = _nftmRenderTokensView();
+  _nftmBindBody();        // re-bind back button / token grid / load-more after swapping to tokens view
   await _nftmLoadMoreTokens();
 }
 
@@ -358,30 +359,33 @@ async function _nftmLoadMoreTokens() {
       if (wrap) wrap.style.display = 'none';
       return;
     }
+    // register token ids + a placeholder display, then render placeholder cards IMMEDIATELY
+    // so the grid appears at once instead of blocking on every metadata request
+    const frag = document.createDocumentFragment();
+    tokens.forEach(tid => {
+      _nftmState.openTokens.push(tid);
+      _nftmState.openDisplays[tid] = _nftmState.openDisplays[tid] || { name: '', image: '', desc: '', attrs: [], tokenUri: '' };
+      const holder = document.createElement('div');
+      holder.innerHTML = _nftmRenderTokenCard(tid, contract);
+      frag.appendChild(holder.firstElementChild);
+    });
+    if (grid) grid.appendChild(frag);
     if (status) status.style.display = 'none';
-    const infos = await _queryBatch((tid) => _queryNftInfo(contract, tid).catch(() => ({})), tokens, _NFTM_CONCURRENCY);
-    const items = tokens.map((tid, i) => ({ tid, info: infos[i] || {} }));
-    items.forEach(it => { _nftmState.openTokens.push(it.tid); _nftmState.openDisplays[it.tid] = _resolveDisplay(it.info, null); });
-    const needMeta = items.filter(it => { const ext = it.info.extension || {}; return (!ext.image && !ext.name && it.info.token_uri); });
-    if (needMeta.length) {
-      const metas = await _queryBatch((it) => fetchTokenUriMetadata(it.info.token_uri, 5000).catch(() => null), needMeta, _NFTM_CONCURRENCY);
-      needMeta.forEach((it, i) => { _nftmState.openDisplays[it.tid] = _resolveDisplay(it.info, metas[i]); });
-    }
     _nftmState.tokenCursor = tokens[tokens.length - 1];
-    if (grid) grid.innerHTML = _nftmState.openTokens.map(tid => _nftmRenderTokenCard(tid, contract)).join('');
     if (wrap) wrap.style.display = (tokens.length < _NFTM_TOKEN_PAGE || _nftmState.openTokens.length >= _NFTM_TOKEN_CAP) ? 'none' : 'block';
+    // fill metadata in the background (progressive, non-blocking) — images/names pop in as they arrive
+    _nftmFillMetadata(tokens, contract);
   } catch (e) {
     if (status) { status.className = 'status-msg error'; status.style.display = 'block'; status.innerHTML = '❌ ' + escapeHtml(e.message || e); }
   }
 }
 
-function _nftmRenderTokenCard(tokenId, contract) {
+function _nftmTokenCardInner(tokenId, contract) {
   const d = _nftmState.openDisplays[tokenId] || {};
   const img = safeNftImgSrc(d.image);
   const name = d.name || tokenId;
   const attrs = d.attrs || [];
   return `
-    <div class="nft-card" data-token-id="${escapeHtml(tokenId)}" data-contract="${escapeHtml(contract)}" style="cursor:pointer;">
       <div class="nft-card-img">
         <div class="nft-card-placeholder" style="display:${img ? 'none' : 'flex'};">🎨</div>
         ${img ? `<img src="${img}" loading="lazy" onerror="this.style.display='none';this.previousElementSibling.style.display='flex';">` : ''}
@@ -390,8 +394,55 @@ function _nftmRenderTokenCard(tokenId, contract) {
         <div class="nft-card-name">${escapeHtml(name)}</div>
         <div class="nft-card-meta">Token #${escapeHtml(tokenId)}</div>
         ${attrs.length ? `<div style="font-size:10px;color:var(--text-muted);margin-top:2px;">${attrs.slice(0, 2).map(a => escapeHtml(a.trait_type || '') + ': ' + escapeHtml(String(a.value ?? ''))).join(' · ')}</div>` : ''}
-      </div>
-    </div>`;
+      </div>`;
+}
+
+function _nftmRenderTokenCard(tokenId, contract) {
+  return `<div class="nft-card" data-token-id="${escapeHtml(tokenId)}" data-contract="${escapeHtml(contract)}" style="cursor:pointer;">${_nftmTokenCardInner(tokenId, contract)}</div>`;
+}
+
+// update a single token card in place (used during the progressive metadata fill)
+function _nftmUpdateTokenCard(tokenId, contract) {
+  const grid = document.getElementById('nftmGrid');
+  if (!grid) return;
+  const card = Array.from(grid.children).find(c => c.dataset && c.dataset.tokenId === tokenId && c.dataset.contract === contract);
+  if (card) card.innerHTML = _nftmTokenCardInner(tokenId, contract);
+}
+
+// progressively fetch nft_info (and token_uri metadata when needed) and refresh cards as they arrive
+let _nftmMetaPending = 0;
+async function _nftmFillMetadata(tokens, contract) {
+  _nftmMetaPending += tokens.length;
+  _nftmSetMetaStatus();
+  await _queryBatch(async (tid) => {
+    try {
+      const info = await _queryNftInfo(contract, tid);
+      _nftmState.openDisplays[tid] = _resolveDisplay(info, null);
+      _nftmUpdateTokenCard(tid, contract);
+      const ext = info.extension || {};
+      if (!ext.image && !ext.name && info.token_uri) {
+        try {
+          const meta = await fetchTokenUriMetadata(info.token_uri, 5000);
+          _nftmState.openDisplays[tid] = _resolveDisplay(info, meta);
+          _nftmUpdateTokenCard(tid, contract);
+        } catch (_) {}
+      }
+    } catch (_) {}
+    _nftmMetaPending = Math.max(0, _nftmMetaPending - 1);
+    _nftmSetMetaStatus();
+  }, tokens, _NFTM_CONCURRENCY);
+}
+
+function _nftmSetMetaStatus() {
+  const status = document.getElementById('nftmStatus');
+  if (!status) return;
+  if (_nftmMetaPending > 0) {
+    status.className = 'status-msg info';
+    status.style.display = 'block';
+    status.textContent = '⏳ ' + t('nftMarket.loadingTokens');
+  } else {
+    status.style.display = 'none';
+  }
 }
 
 function _nftmShowDetail(tokenId, contract) {
@@ -435,6 +486,7 @@ function _nftmGoCollections() {
   const body = document.getElementById('nftmBody');
   if (body) body.innerHTML = _nftmRenderBrowse();
   _nftmBindBody();
+  _nftmLoadCollections(); // re-render the cached collections grid (no re-fetch of the contract list)
 }
 
 function _nftmGotoListWithPrefill(contract, tokenId) {
