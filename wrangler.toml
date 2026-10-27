@@ -1,4 +1,5 @@
 name = "paxi-lens"
+main = "worker.js"
 compatibility_date = "2024-11-01"
-# 纯静态站点：把仓库根目录作为静态资源直接对外服务，无需 Worker 脚本
-assets = { directory = "./" }
+# 静态资源 + worker.js 地域拦截层（CN 返回 403，其余走 ASSETS）
+assets = { directory = "./", binding = "ASSETS" }
