@@ -229,7 +229,9 @@ window.PAXI_LANGS.id = {
     importFail: 'Kartu niat tidak valid',
     exportBtn: '📤 Ekspor niat saya',
     copyCard: '📋 Salin kartu',
-    cardCopied: 'Kartu disalin'
+    cardCopied: 'Kartu disalin',
+      imageLink: 'Gambar',
+      metaLink: 'URI Metadata'
   },
   redelegate: {
     title: '🔄 Ganti Validator', desc: 'Pindah validator instan (tanpa unbond 7 hari). Biaya: 0,15% (1,5‰).', hint: 'Pilih validator saat ini dan tujuan, lalu masukkan jumlah.',
@@ -441,7 +443,7 @@ window.PAXI_LANGS.id = {
     title: '🎨 Peluncur NFT', desc: 'Deploy kontrak NFT PRC-721 ke jaringan Paxi dengan satu klik. Setelah deploy, batch mint.',
     step1: 'Info Koleksi', step2: 'Upload Aset', step3: 'Pratinjau & Deploy', next: 'Lanjut: Upload →', prev: '← Kembali', nextDeploy: 'Lanjut: Pratinjau & Deploy →', deploy: 'Deploy Kontrak NFT',
     collectionName: 'Nama Koleksi', symbol: 'Simbol', description: 'Deskripsi', maxSupply: 'Suplai Maks', royalty: 'Royalti (%)', mintPrice: 'Harga Mint (PAXI)', maxPerWallet: 'Maks Mint per Dompet',
-    deployBtn: '🚀 Deploy Kontrak NFT', uploadCover: 'Gambar Sampul NFT', uploadCoverHint: 'Klik untuk upload sampul', uploadSupport: 'Mendukung JPG/PNG/GIF/SVG', imageUri: 'Image URI (jika IPFS off, atau timpa)', preview: 'Pratinjau', previewPlaceholder: '🖼️',
+    deployBtn: '🚀 Deploy Kontrak NFT', uploadCover: 'Gambar Sampul NFT', uploadCoverHint: 'Klik untuk upload sampul', uploadSupport: 'Mendukung JPG/PNG/GIF/SVG', imageUri: 'Image URI (disarankan: tautan langsung seperti i.ibb.co/...)', preview: 'Pratinjau', previewPlaceholder: '🖼️',
     batchMint: 'Batch Mint NFT', batchMintDesc: 'Batch mint ke kontrak PRC-721 terdeploy. Maks 10 per Tx. Tiap NFT dapat Token ID unik.', contractAddr: 'Alamat Kontrak NFT', contractAddrHint: 'Terisi otomatis setelah deploy', mint: 'Jumlah Mint',
     mintFeeTitle: '💰 Perkiraan Biaya', mintCountLabel: 'Jumlah Mint', estimatedFee: 'Perkiraan Biaya', mintBtn: '🏭 Eksekusi Batch Mint', mintTokenIds: 'Token ID', blockHeight: 'Tinggi Blok',
     metadataTitle: '📝 Metadata Kustom', metadataDesc: 'Tambah nama & gambar kustom ke NFT ter-mint. Generate JSON metadata patuh CW721.', tokenId: 'Token ID', nftName: 'Nama NFT', imageUriLabel: 'Image URI', saveMetadataBtn: '📝 Generate JSON Metadata',
@@ -450,7 +452,7 @@ window.PAXI_LANGS.id = {
     success: '✅ Berhasil', failed: '❌ Gagal', deploySuccess: '✅ Kontrak NFT terdeploy!', nextStep: '👇 Lanjut: salin alamat di atas ke kolom batch mint bawah', mintSuccess: 'Mint berhasil', nftMintCount: 'NFT',
     connected: 'Terhubung', warning: '⚠️ Alat ini hanya layanan teknis minting NFT. Tanpa perantara perdagangan, penentuan harga, atau penukaran. Segala hasil ditanggung pengguna.', warningEn: '⚠️ Alat ini hanya layanan teknis minting NFT. Tanpa perantara perdagangan, penentuan harga, atau penukaran. Segala hasil ditanggung pengguna.',
     max10Hint: 'Maks 10 NFT per transaksi', mintConfirm: 'Konfirmasi batch mint?\n\n· Biaya layanan: 5 PAXI\n· Penerima: ', buildTx: 'Menyusun Tx mint...',
-    ipfsHint: '💡 Gambar upload disimpan di IPFS, jamin akses permanen NFT.', ipfsToggle: 'Gunakan penyimpanan IPFS (disarankan)', ipfsConfig: '⚙️ Pengaturan IPFS (Pinata)', ipfsJwtLabel: 'Pinata JWT', ipfsJwtPlaceholder: 'Tempel Pinata JWT...', ipfsSave: '💾 Simpan', ipfsConfigured: '✓ Teratur', ipfsNotConfigured: '⚠ Belum diatur', ipfsGetKey: '🔗 Dapat Pinata JWT',
+    ipfsHint: '💡 Tautan gambar langsung (mis. i.ibb.co/...) disarankan untuk tampilan stabil. IPFS opsional — hanya untuk penyimpanan terdesentralisasi mandiri (perlu Pinata JWT).', ipfsToggle: 'Gunakan penyimpanan IPFS (opsional · terdesentralisasi)', ipfsConfig: '⚙️ Pengaturan IPFS (Pinata)', ipfsJwtLabel: 'Pinata JWT', ipfsJwtPlaceholder: 'Tempel Pinata JWT...', ipfsSave: '💾 Simpan', ipfsConfigured: '✓ Teratur', ipfsNotConfigured: '⚠ Belum diatur', ipfsGetKey: '🔗 Dapat Pinata JWT',
     ipfsUploading: 'Mengupload', ipfsImageOk: '✅ Gambar diupload ke IPFS', ipfsMetaGen: 'Generate & upload metadata...', ipfsUploadFail: '❌ Gagal upload IPFS', ipfsNoJwt: 'Masukkan Pinata JWT di pengaturan IPFS dulu', ipfsGateway: 'Gateway', ipfsFallback: 'IPFS tidak tersedia, mode dasar', ipfsNeedImage: 'Upload sampul atau input Image URI', ipfsLargeImg: 'Gambar >100KB, aktifkan IPFS untuk kurangi gas',
     updTitle: '🔄 Update Metadata On-Chain', updDescInfo: 'Timpa metadata on-chain NFT ter-mint (nama/gambar/deskripsi/atribut) langsung — tanpa remint. Tanda tangan dompet minter/pemilik, hanya gas tanpa biaya layanan.',
     updDescLabel: 'Deskripsi NFT', updAttrsLabel: 'Atribut JSON (opsional)', updAttrsPlaceholder: '[{"trait_type":"Series","value":"Genesis"}]', updBtn: '🔄 Kirim Update On-Chain', updSuccess: '✅ Metadata diperbarui', updAttrsInvalid: 'Atribut JSON tidak valid — harap array seperti [{"trait_type":"...","value":"..."}]', updAddrInvalid: 'Format alamat kontrak tidak valid (paxi1... akun 43/kontrak 63 karakter). Salin semua dari riwayat deploy.',

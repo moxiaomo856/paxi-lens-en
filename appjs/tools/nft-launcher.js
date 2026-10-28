@@ -27,7 +27,7 @@ const _NFT_LANG = {
     uploadCover: 'NFT Cover Image',
     uploadCoverHint: 'Click to upload cover image',
     uploadSupport: 'JPG/PNG/GIF/SVG supported',
-    imageUri: 'Image URI (used when IPFS off, or override)',
+    imageUri: 'Image URI (recommended: direct link like i.ibb.co/...)',
     preview: 'Preview',
     previewPlaceholder: '🖼️',
     batchMint: 'Batch Mint NFT',
@@ -72,8 +72,8 @@ const _NFT_LANG = {
     mintConfirm: 'Confirm batch mint?\n\n· Service fee: 5 PAXI\n· Receiver: ',
     buildTx: 'Building mint tx...',
     // IPFS
-    ipfsHint: '💡 Uploaded images are stored on IPFS, ensuring permanent NFT access.',
-    ipfsToggle: 'Use IPFS storage (recommended)',
+    ipfsHint: '💡 Direct image links (e.g. i.ibb.co/...) are recommended for stable display. IPFS is optional — only for decentralized, self-hosted storage (requires Pinata JWT).',
+    ipfsToggle: 'Use IPFS storage (optional · decentralized)',
     ipfsConfig: '⚙️ IPFS Config (Pinata)',
     ipfsJwtLabel: 'Pinata JWT',
     ipfsJwtPlaceholder: 'Paste your Pinata JWT...',
@@ -199,7 +199,7 @@ function renderNftLauncher() {
         <div class="info-box">${l('ipfsHint')}</div>
         <div class="form-group">
           <label style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;cursor:pointer;">
-            <input type="checkbox" id="nftUseIpfs" checked style="width:18px;height:18px;accent-color:var(--primary);">
+            <input type="checkbox" id="nftUseIpfs" style="width:18px;height:18px;accent-color:var(--primary);">
             ${l('ipfsToggle')}
           </label>
         </div>

@@ -229,7 +229,9 @@ window.PAXI_LANGS.zh = {
     importFail: '意向卡無效',
     exportBtn: '📤 匯出我的意向',
     copyCard: '📋 複製卡片',
-    cardCopied: '卡片已複製'
+    cardCopied: '卡片已複製',
+      imageLink: '圖片',
+      metaLink: '元資料 URI'
   },
   redelegate: {
     title: '🔄 變更質押節點', desc: '即時切換驗證人（無 7 天解綁）。手續費：0.15%（1.5‰）。', hint: '選擇目前驗證人與目標驗證人，並輸入移動金額。',
@@ -441,7 +443,7 @@ window.PAXI_LANGS.zh = {
     title: '🎨 NFT 發行器', desc: '一鍵將 PRC-721 NFT 合約部署至 Paxi 網路。部署後可批量鑄造。',
     step1: '收藏資訊', step2: '資產上傳', step3: '預覽與部署', next: '下一步：上傳 →', prev: '← 返回', nextDeploy: '下一步：預覽與部署 →', deploy: '部署 NFT 合約',
     collectionName: '收藏名稱', symbol: '符號', description: '描述', maxSupply: '最大供應量', royalty: '版稅（%）', mintPrice: '鑄造價格（PAXI）', maxPerWallet: '每錢包最大鑄造數',
-    deployBtn: '🚀 部署 NFT 合約', uploadCover: 'NFT 封面圖片', uploadCoverHint: '點擊上傳封面', uploadSupport: '支援 JPG/PNG/GIF/SVG', imageUri: 'Image URI（關閉 IPFS 時，或覆寫）', preview: '預覽', previewPlaceholder: '🖼️',
+    deployBtn: '🚀 部署 NFT 合約', uploadCover: 'NFT 封面圖片', uploadCoverHint: '點擊上傳封面', uploadSupport: '支援 JPG/PNG/GIF/SVG', imageUri: 'Image URI（推薦：直鏈如 i.ibb.co/...）', preview: '預覽', previewPlaceholder: '🖼️',
     batchMint: '批量鑄造 NFT', batchMintDesc: '對已部署的 PRC-721 合約批量鑄造。每筆 Tx 最多 10 個。每個 NFT 取得唯一 Token ID。', contractAddr: 'NFT 合約地址', contractAddrHint: '部署後自動填入', mint: '鑄造數量',
     mintFeeTitle: '💰 預估手續費', mintCountLabel: '鑄造數量', estimatedFee: '預估手續費', mintBtn: '🏭 執行批量鑄造', mintTokenIds: '代幣 ID', blockHeight: '區塊高度',
     metadataTitle: '📝 自訂元資料', metadataDesc: '為已鑄造的 NFT 新增自訂名稱與圖片。生成符合 CW721 的元資料 JSON。', tokenId: '代幣 ID', nftName: 'NFT 名稱', imageUriLabel: 'Image URI', saveMetadataBtn: '📝 生成元資料 JSON',
@@ -450,7 +452,7 @@ window.PAXI_LANGS.zh = {
     success: '✅ 成功', failed: '❌ 失敗', deploySuccess: '✅ 已部署 NFT 合約！', nextStep: '👇 下一步：將上方地址複製至下方批量鑄造欄', mintSuccess: '鑄造成功', nftMintCount: 'NFT',
     connected: '已連接', warning: '⚠️ 本工具僅提供 NFT 鑄造的技術服務。無交易仲介·定價·兌換功能。一切後果由使用者自行承擔。', warningEn: '⚠️ 本工具僅提供 NFT 鑄造的技術服務。無交易仲介·定價·兌換功能。一切後果由使用者自行承擔。',
     max10Hint: '每筆交易最多 10 個 NFT', mintConfirm: '確認批量鑄造？\n\n· 服務手續費：5 PAXI\n· 收款人：', buildTx: '建構鑄造 Tx 中...',
-    ipfsHint: '💡 上傳圖片儲存於 IPFS，確保 NFT 永久可存取。', ipfsToggle: '使用 IPFS 儲存（建議）', ipfsConfig: '⚙️ IPFS 設定（Pinata）', ipfsJwtLabel: 'Pinata JWT', ipfsJwtPlaceholder: '貼上 Pinata JWT...', ipfsSave: '💾 儲存', ipfsConfigured: '✓ 已設定', ipfsNotConfigured: '⚠ 未設定', ipfsGetKey: '🔗 取得 Pinata JWT',
+    ipfsHint: '💡 推薦用圖片直鏈（如 i.ibb.co/...）顯示最穩定。IPFS 為可選，僅用於去中心化自託管儲存（需 Pinata JWT）。', ipfsToggle: '使用 IPFS 儲存（可選·去中心化）', ipfsConfig: '⚙️ IPFS 設定（Pinata）', ipfsJwtLabel: 'Pinata JWT', ipfsJwtPlaceholder: '貼上 Pinata JWT...', ipfsSave: '💾 儲存', ipfsConfigured: '✓ 已設定', ipfsNotConfigured: '⚠ 未設定', ipfsGetKey: '🔗 取得 Pinata JWT',
     ipfsUploading: '上傳中', ipfsImageOk: '✅ 圖片已上傳 IPFS', ipfsMetaGen: '生成並上傳元資料中...', ipfsUploadFail: '❌ IPFS 上傳失敗', ipfsNoJwt: '請先在 IPFS 設定中輸入 Pinata JWT', ipfsGateway: '閘道', ipfsFallback: 'IPFS 不可用，切換至基本模式', ipfsNeedImage: '請上傳封面圖或輸入 Image URI', ipfsLargeImg: '圖片超過 100KB，請啟用 IPFS 以降低 Gas',
     updTitle: '🔄 鏈上元資料更新', updDescInfo: '直接覆寫已鑄造 NFT 的鏈上元資料（名稱/圖片/描述/屬性）— 無需重新鑄造。由鑄造者或代幣擁有者錢包簽章，僅 Gas 無服務手續費。',
     updDescLabel: 'NFT 描述', updAttrsLabel: '屬性 JSON（選填）', updAttrsPlaceholder: '[{"trait_type":"Series","value":"Genesis"}]', updBtn: '🔄 發送鏈上更新', updSuccess: '✅ 元資料已更新', updAttrsInvalid: '屬性 JSON 無效 — 預期為 [{"trait_type":"...","value":"..."}] 形式的陣列', updAddrInvalid: '合約地址格式無效（paxi1...，帳戶 43 字/合約 63 字）。請從部署紀錄完整複製。',

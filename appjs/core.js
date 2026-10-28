@@ -141,7 +141,9 @@ const LANG = {
       importFail: 'Invalid intent card',
       exportBtn: '📤 Export my intents',
       copyCard: '📋 Copy card',
-      cardCopied: 'Card copied'
+      cardCopied: 'Card copied',
+      imageLink: 'Image',
+      metaLink: 'Metadata URI'
     },
     redelegate: {
       title: '🔄 Redelegate',

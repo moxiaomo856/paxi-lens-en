@@ -294,7 +294,9 @@ window.PAXI_LANGS.ja = {
     importFail: '意向カードが無効です',
     exportBtn: '📤 私の意向を書き出し',
     copyCard: '📋 カードをコピー',
-    cardCopied: 'カードをコピーしました'
+    cardCopied: 'カードをコピーしました',
+      imageLink: '画像',
+      metaLink: 'メタデータ URI'
   },
   redelegate: {
     title: '🔄 バリデータ変更',
@@ -700,7 +702,7 @@ window.PAXI_LANGS.ja = {
     title: '🎨 NFTランチャー', desc: 'PRC-721 NFTコントラクトをPaxiネットワークへワンクリックデプロイ。デプロイ後にバッチミント。',
     step1: 'コレクション情報', step2: 'アセット Upload', step3: 'プレビュー＆デプロイ', next: '次：Upload →', prev: '← 戻る', nextDeploy: '次：プレビュー＆デプロイ →', deploy: 'NFTコントラクトをデプロイ',
     collectionName: 'コレクション名', symbol: 'シンボル', description: '説明', maxSupply: '最大供給量', royalty: 'ロイヤリティ（%）', mintPrice: 'ミント価格（PAXI）', maxPerWallet: 'ウォレット毎最大ミント',
-    deployBtn: '🚀 NFTコントラクトをデプロイ', uploadCover: 'NFTカバー画像', uploadCoverHint: 'クリックでカバー画像Upload', uploadSupport: 'JPG/PNG/GIF/SVG対応', imageUri: 'Image URI（IPFS off時、または上書き）', preview: 'プレビュー', previewPlaceholder: '🖼️',
+    deployBtn: '🚀 NFTコントラクトをデプロイ', uploadCover: 'NFTカバー画像', uploadCoverHint: 'クリックでカバー画像Upload', uploadSupport: 'JPG/PNG/GIF/SVG対応', imageUri: 'Image URI（推奨：i.ibb.co/... などの直リンク）', preview: 'プレビュー', previewPlaceholder: '🖼️',
     batchMint: 'バッチミントNFT', batchMintDesc: 'デプロイ済PRC-721コントラクトへバッチミント。1Tx最大10件。各NFTはユニークなToken IDを取得。', contractAddr: 'NFTコントラクトアドレス', contractAddrHint: 'デプロイ後に自動入力', mint: 'ミント数',
     mintFeeTitle: '💰 見積手数料', mintCountLabel: 'ミント数', estimatedFee: '見積手数料', mintBtn: '🏭 バッチミント実行', mintTokenIds: 'トークンID', blockHeight: 'ブロック高',
     metadataTitle: '📝 カスタムメタデータ', metadataDesc: 'ミント済NFTにカスタム名＆画像を追加。CW721準拠メタデータJSONを生成。', tokenId: 'トークンID', nftName: 'NFT名', imageUriLabel: 'Image URI', saveMetadataBtn: '📝 メタデータJSON生成',
@@ -709,7 +711,7 @@ window.PAXI_LANGS.ja = {
     success: '✅ 成功', failed: '❌ 失敗', deploySuccess: '✅ NFTコントラクトをデプロイ！', nextStep: '👇 次：上のアドレスを下のバッチミント欄へコピー', mintSuccess: 'ミント成功', nftMintCount: 'NFT',
     connected: '接続済', warning: '⚠️ 本ツールはNFTミントの技術的サービスのみ提供。取引・価格付け・交換機能は一切なし。一切の結果は利用者が負います。', warningEn: '⚠️ 本ツールはNFTミントの技術的サービスのみ提供。取引・価格付け・交換機能は一切なし。一切の結果は利用者が負います。',
     max10Hint: '1トランザクション最大10NFT', mintConfirm: 'バッチミントを確定しますか？\n\n· サービス手数料：5 PAXI\n· 受取人：', buildTx: 'ミントTx構築中...',
-    ipfsHint: '💡 Upload画像はIPFSに保存され、NFTの恒久的アクセスを保証。', ipfsToggle: 'IPFS保存を使用（推奨）', ipfsConfig: '⚙️ IPFS設定（Pinata）', ipfsJwtLabel: 'Pinata JWT', ipfsJwtPlaceholder: 'Pinata JWTを貼り付け...', ipfsSave: '💾 保存', ipfsConfigured: '✓ 設定済', ipfsNotConfigured: '⚠ 未設定', ipfsGetKey: '🔗 Pinata JWT取得',
+    ipfsHint: '💡 画像の直リンク（i.ibb.co/... など）は表示が安定するため推奨。IPFSはオプションで、分散型自己ホスティング保存のみ（Pinata JWT要）。', ipfsToggle: 'IPFS保存を使用（任意・分散型）', ipfsConfig: '⚙️ IPFS設定（Pinata）', ipfsJwtLabel: 'Pinata JWT', ipfsJwtPlaceholder: 'Pinata JWTを貼り付け...', ipfsSave: '💾 保存', ipfsConfigured: '✓ 設定済', ipfsNotConfigured: '⚠ 未設定', ipfsGetKey: '🔗 Pinata JWT取得',
     ipfsUploading: 'Upload中', ipfsImageOk: '✅ 画像をIPFSへUpload', ipfsMetaGen: 'メタデータ生成＆Upload中...', ipfsUploadFail: '❌ IPFS Upload失敗', ipfsNoJwt: '先にIPFS設定でPinata JWTを入力してください', ipfsGateway: 'ゲートウェイ', ipfsFallback: 'IPFS利用不可、基本モードへ', ipfsNeedImage: 'カバー画像をUploadするかImage URIを入力してください', ipfsLargeImg: '画像が100KB超、IPFSを有効にしてガス削減',
     updTitle: '🔄 オンチェーンメタデータ更新', updDescInfo: 'ミント済NFTのオンチェーンメタデータ（名前／画像／説明／属性）を直接書き換え — 再ミント不要。ミンターまたはトークン所有者ウォレットで署名、ガスのみでサービス手数料なし。',
     updDescLabel: 'NFT説明', updAttrsLabel: '属性JSON（任意）', updAttrsPlaceholder: '[{"trait_type":"Series","value":"Genesis"}]', updBtn: '🔄 オンチェーン更新送信', updSuccess: '✅ メタデータ更新', updAttrsInvalid: '属性JSON無効 — [{"trait_type":"...","value":"..."}] のような配列を期待', updAddrInvalid: 'コントラクトアドレス形式無効（paxi1...、アカウント43文字／コントラクト63文字）。デプロイ履歴から全てコピー。',

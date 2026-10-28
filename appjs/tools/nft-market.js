@@ -386,15 +386,96 @@ async function _nftmLoadMoreTokens() {
   }
 }
 
+// Resolve an NFT image/metadata URI into one or more displayable HTTP URLs.
+// IMPORTANT: Paxi NFTs use several DISTINCT schemes — IPFS (ipfs:// or bare CID),
+// Arweave (ar://), plain https, and chain-specific schemes (e.g. ibcc://). They must
+// NOT be conflated. IPFS/Arweave get their own gateway maps; unknown schemes are returned
+// as-is so the raw link can still be shown to the user (never force-fed to <img>).
+function _nftmResolveImgSrcs(uri) {
+  if (!uri || typeof uri !== 'string') return [];
+  const s = uri.trim();
+  if (s.startsWith('ar://')) {
+    const id = s.slice(5).replace(/\/.*$/, '');
+    return id ? ['https://arweave.net/' + id, 'https://arweave.dev/' + id] : [];
+  }
+  let cid = '';
+  if (s.startsWith('ipfs://')) cid = s.slice(7).replace(/\/.*$/, '');
+  else { const m = s.match(/\/ipfs\/(Qm[1-9A-HJ-NP-Za-km-z]{44}|baf[a-z0-9]{44,})/); if (m) cid = m[1]; }
+  if (cid) {
+    return [
+      'https://gateway.pinata.cloud/ipfs/' + cid,
+      'https://ipfs.io/ipfs/' + cid,
+      'https://dweb.link/ipfs/' + cid,
+      'https://cloudflare-ipfs.com/ipfs/' + cid,
+    ];
+  }
+  if (/^(https?:\/\/|data:)/i.test(s)) return [s];
+  // unknown scheme (ibcc:// or any custom) — keep raw so it can be linked/shown
+  return [s];
+}
+
+// onerror for NFT <img>: try the next gateway candidate, else fall back to placeholder
+function _nftmImgErr(img) {
+  var next = img.getAttribute('data-next');
+  if (!next) { _nftmImgFallback(img); return; }
+  try {
+    var arr = JSON.parse(next);
+    if (arr.length) { img.src = arr.shift(); img.setAttribute('data-next', JSON.stringify(arr)); }
+    else _nftmImgFallback(img);
+  } catch (_) { _nftmImgFallback(img); }
+}
+function _nftmImgFallback(img) {
+  var ph = document.createElement('div');
+  ph.className = 'nft-card-placeholder';
+  ph.style.cssText = 'display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:48px;';
+  ph.textContent = '🎨';
+  if (img.parentNode) img.parentNode.replaceChild(ph, img);
+}
+
+// Render a clickable link (http/ipfs/arweave) or raw copyable text (unknown scheme) for a URI
+function _nftmLinkRow(label, uri) {
+  if (!uri) return '';
+  const cands = _nftmResolveImgSrcs(uri);
+  const http = cands.find(c => /^https?:\/\//i.test(c));
+  const display = uri.length > 64 ? uri.slice(0, 42) + '…' + uri.slice(-14) : uri;
+  if (http) {
+    return `<div style="font-size:11px;color:var(--text-muted);line-height:1.8;word-break:break-all;"><strong>${label}:</strong> <a href="${escapeHtml(http)}" target="_blank" rel="noopener" style="color:var(--primary);">${escapeHtml(display)}</a></div>`;
+  }
+  return `<div style="font-size:11px;color:var(--text-muted);line-height:1.8;word-break:break-all;"><strong>${label}:</strong> <code style="word-break:break-all;">${escapeHtml(display)}</code></div>`;
+}
+
+// Fetch external metadata JSON (token_uri) trying each candidate gateway in turn.
+// For ipfs:// token_uri this tries pinata -> ipfs.io -> dweb.link -> cloudflare in order.
+async function _nftmFetchMeta(uri, timeoutMs) {
+  if (!uri) return null;
+  const cands = _nftmResolveImgSrcs(uri);
+  for (const url of cands) {
+    if (!/^https?:\/\//i.test(url)) continue;
+    try {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), timeoutMs || 6000);
+      const res = await fetch(url, { signal: controller.signal });
+      clearTimeout(timer);
+      if (res.ok) {
+        try { return await res.json(); } catch (_) {}
+      }
+    } catch (_) {}
+  }
+  return null;
+}
+
 function _nftmTokenCardInner(tokenId, contract) {
   const d = _nftmState.openDisplays[tokenId] || {};
-  const img = safeNftImgSrc(d.image);
+  const cands = _nftmResolveImgSrcs(d.image || d.tokenUri).filter(c => /^https?:\/\//i.test(c) || c.startsWith('data:'));
   const name = d.name || tokenId;
   const attrs = d.attrs || [];
+  const imgHtml = cands.length
+    ? `<img src="${escapeHtml(cands[0])}" data-next='${escapeHtml(JSON.stringify(cands.slice(1)))}' loading="lazy" onerror="_nftmImgErr(this)">`
+    : '';
   return `
       <div class="nft-card-img">
-        <div class="nft-card-placeholder" style="display:${img ? 'none' : 'flex'};">🎨</div>
-        ${img ? `<img src="${img}" loading="lazy" onerror="this.style.display='none';this.previousElementSibling.style.display='flex';">` : ''}
+        <div class="nft-card-placeholder" style="display:${cands.length ? 'none' : 'flex'};">🎨</div>
+        ${imgHtml}
       </div>
       <div class="nft-card-body">
         <div class="nft-card-name">${escapeHtml(name)}</div>
@@ -426,9 +507,11 @@ async function _nftmFillMetadata(tokens, contract) {
       _nftmState.openDisplays[tid] = _resolveDisplay(info, null);
       _nftmUpdateTokenCard(tid, contract);
       const ext = info.extension || {};
-      if (!ext.image && !ext.name && info.token_uri) {
+      const tokenUri = info.token_uri || '';
+      const isDirectImage = /\.(png|jpe?g|gif|webp|svg|bmp|avif)(\?[^#]*)?$/i.test(tokenUri);
+      if (!ext.image && !ext.name && tokenUri && !isDirectImage) {
         try {
-          const meta = await fetchTokenUriMetadata(info.token_uri, 5000);
+          const meta = await _nftmFetchMeta(info.token_uri, 6000);
           _nftmState.openDisplays[tid] = _resolveDisplay(info, meta);
           _nftmUpdateTokenCard(tid, contract);
         } catch (_) {}
@@ -453,7 +536,7 @@ function _nftmSetMetaStatus() {
 
 function _nftmShowDetail(tokenId, contract) {
   const d = _nftmState.openDisplays[tokenId] || {};
-  const img = safeNftImgSrc(d.image);
+  const imgCands = _nftmResolveImgSrcs(d.image || d.tokenUri).filter(c => /^https?:\/\//i.test(c) || c.startsWith('data:'));
   const attrs = d.attrs || [];
   const existing = document.getElementById('nftmModal');
   if (existing) existing.remove();
@@ -465,7 +548,7 @@ function _nftmShowDetail(tokenId, contract) {
       <button onclick="document.getElementById('nftmModal').remove()" style="position:absolute;top:12px;right:12px;background:var(--bg);border:1px solid var(--border);color:var(--text);width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:16px;line-height:1;">✕</button>
       <div style="text-align:center;margin-bottom:14px;">
         <div style="width:100%;max-width:240px;aspect-ratio:1;margin:0 auto 12px;background:var(--bg);border-radius:12px;overflow:hidden;display:flex;align-items:center;justify-content:center;">
-          ${img ? `<img src="${img}" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentElement.innerHTML='<div style=&quot;font-size:48px;&quot;>🎨</div>'">` : '<div style="font-size:48px;">🎨</div>'}
+          ${imgCands.length ? `<img src="${escapeHtml(imgCands[0])}" data-next='${escapeHtml(JSON.stringify(imgCands.slice(1)))}' style="width:100%;height:100%;object-fit:cover;" onerror="_nftmImgErr(this)">` : '<div style="font-size:48px;">🎨</div>'}
         </div>
         <h3 style="font-size:17px;margin-bottom:4px;">${escapeHtml(d.name || tokenId)}</h3>
         <div style="font-size:12px;color:var(--text-muted);">Token #${escapeHtml(tokenId)}</div>
@@ -478,6 +561,8 @@ function _nftmShowDetail(tokenId, contract) {
       <div style="border-top:1px solid var(--border);padding-top:10px;font-size:11px;color:var(--text-muted);line-height:1.8;word-break:break-all;">
         <div><strong>${t('myNfts.contractAddr')}:</strong><br><code style="word-break:break-all;color:var(--primary)">${escapeHtml(contract)}</code></div>
       </div>
+      ${_nftmLinkRow(t('nftMarket.imageLink'), d.image || d.tokenUri)}
+      ${_nftmLinkRow(t('nftMarket.metaLink'), d.tokenUri)}
       <button class="btn btn-primary btn-block" id="nftmIntentFromDetail" style="margin-top:14px;">📋 ${t('nftMarket.saveIntent')}</button>
     </div>`;
   modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });

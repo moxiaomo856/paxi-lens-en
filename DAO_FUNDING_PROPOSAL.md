@@ -28,6 +28,8 @@ Paxi Lens is a **pure front-end, non-custodial** all-in-one toolkit for the Paxi
 
 > Compliance exclusions (proactively avoided): NFT marketplace (Authz risk), mini-games, wallet itself, prediction-market replica (boundary with official division of labor).
 
+> 说明：线上套件另含一个「NFT 市场」工具，但它只是**只读画廊 + 非托管挂单意向板**（无 Authz 授权、无链上结算、无资金托管，所有结算均在用户钱包内自行完成），与上方排除的「Authz 式 NFT 交易撮合市场」**本质不同**，不构成对排除项的违背。
+
 ## 5. Deliverables
 1. Deployable pure front-end dApp (20 tools + 7 data applications, 6-language i18n: en/ja/ko/id/vi/zh-Traditional, with multilingual legal documents).
 2. `paxi-data` open-source data service: scanner + index + public API + replay tests (reproducibility evidence).

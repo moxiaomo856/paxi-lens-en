@@ -27,6 +27,8 @@ Paxi Lens is a **pure front-end, non-custodial** toolkit for the Paxi ecosystem.
 
 > Compliance exclusions (deliberately not shipped): NFT marketplace (Authz risk), mini-games, wallet itself, prediction-market clones (division of labor with the official team).
 
+> Note: the live suite also ships an "NFT Market" tool, but it is only a **read-only gallery + non-custodial listing board** (no Authz, no on-chain settlement, no escrow — all settlement happens independently in the user's own wallet). This is fundamentally distinct from the excluded Authz-based NFT trading marketplace above and does not violate this exclusion.
+
 ## 5. Deliverables
 1. Deployable pure front-end dApp (20 tools + 7 data applications, 6-language i18n: en/ja/ko/id/vi/zh-Traditional, with multilingual legal documents).
 2. Open-source `paxi-data` service: scanner + indexer + public API + replay tests (reproducibility evidence).

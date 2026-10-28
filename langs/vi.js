@@ -229,7 +229,9 @@ window.PAXI_LANGS.vi = {
     importFail: 'Thẻ ý định không hợp lệ',
     exportBtn: '📤 Xuất ý định của tôi',
     copyCard: '📋 Sao chép thẻ',
-    cardCopied: 'Đã sao chép thẻ'
+    cardCopied: 'Đã sao chép thẻ',
+      imageLink: 'Hình ảnh',
+      metaLink: 'URI Metadata'
   },
   redelegate: {
     title: '🔄 Chuyển Validator', desc: 'Chuyển validator tức thì (không unbond 7 ngày). Phí: 0,15% (1,5‰).', hint: 'Chọn validator hiện tại và đích, rồi nhập số tiền.',
@@ -441,7 +443,7 @@ window.PAXI_LANGS.vi = {
     title: '🎨 Trình phát hành NFT', desc: 'Deploy hợp đồng NFT PRC-721 lên mạng Paxi một cú nhấp. Sau deploy, batch mint.',
     step1: 'Thông tin bộ sưu tập', step2: 'Upload tài sản', step3: 'Xem trước & Deploy', next: 'Tiếp: Upload →', prev: '← Quay lại', nextDeploy: 'Tiếp: Xem trước & Deploy →', deploy: 'Deploy hợp đồng NFT',
     collectionName: 'Tên bộ sưu tập', symbol: 'Ký hiệu', description: 'Mô tả', maxSupply: 'Tổng cung tối đa', royalty: 'Royalty (%)', mintPrice: 'Giá mint (PAXI)', maxPerWallet: 'Mint tối đa mỗi ví',
-    deployBtn: '🚀 Deploy hợp đồng NFT', uploadCover: 'Ảnh bìa NFT', uploadCoverHint: 'Nhấp để upload bìa', uploadSupport: 'Hỗ trợ JPG/PNG/GIF/SVG', imageUri: 'Image URI (nếu tắt IPFS, hoặc ghi đè)', preview: 'Xem trước', previewPlaceholder: '🖼️',
+    deployBtn: '🚀 Deploy hợp đồng NFT', uploadCover: 'Ảnh bìa NFT', uploadCoverHint: 'Nhấp để upload bìa', uploadSupport: 'Hỗ trợ JPG/PNG/GIF/SVG', imageUri: 'Image URI (khuyên: liên kết trực tiếp như i.ibb.co/...)', preview: 'Xem trước', previewPlaceholder: '🖼️',
     batchMint: 'Batch Mint NFT', batchMintDesc: 'Batch mint vào hợp đồng PRC-721 đã deploy. Tối đa 10 mỗi Tx. Mỗi NFT có Token ID riêng.', contractAddr: 'Địa chỉ hợp đồng NFT', contractAddrHint: 'Tự điền sau deploy', mint: 'Số mint',
     mintFeeTitle: '💰 Ước tính phí', mintCountLabel: 'Số mint', estimatedFee: 'Ước tính phí', mintBtn: '🏭 Thực hiện batch mint', mintTokenIds: 'Token ID', blockHeight: 'Cao khối',
     metadataTitle: '📝 Metadata tùy chỉnh', metadataDesc: 'Thêm tên & ảnh tùy chỉnh cho NFT đã mint. Tạo JSON metadata tuân thủ CW721.', tokenId: 'Token ID', nftName: 'Tên NFT', imageUriLabel: 'Image URI', saveMetadataBtn: '📝 Tạo JSON Metadata',
@@ -450,7 +452,7 @@ window.PAXI_LANGS.vi = {
     success: '✅ Thành công', failed: '❌ Thất bại', deploySuccess: '✅ Đã deploy hợp đồng NFT!', nextStep: '👇 Tiếp: sao chép địa chỉ trên vào ô batch mint dưới', mintSuccess: 'Mint thành công', nftMintCount: 'NFT',
     connected: 'Đã kết nối', warning: '⚠️ Công cụ này chỉ cung cấp dịch vụ kỹ thuật mint NFT. Không môi giới giao dịch, định giá hay trao đổi. Mọi hậu quả do người dùng chịu.', warningEn: '⚠️ Công cụ này chỉ cung cấp dịch vụ kỹ thuật mint NFT. Không môi giới giao dịch, định giá hay trao đổi. Mọi hậu quả do người dùng chịu.',
     max10Hint: 'Tối đa 10 NFT mỗi giao dịch', mintConfirm: 'Xác nhận batch mint?\n\n· Phí dịch vụ: 5 PAXI\n· Người nhận: ', buildTx: 'Đang dựng Tx mint...',
-    ipfsHint: '💡 Ảnh upload lưu trên IPFS, đảm bảo truy cập vĩnh viễn NFT.', ipfsToggle: 'Dùng lưu trữ IPFS (khuyên)', ipfsConfig: '⚙️ Cài đặt IPFS (Pinata)', ipfsJwtLabel: 'Pinata JWT', ipfsJwtPlaceholder: 'Dán Pinata JWT...', ipfsSave: '💾 Lưu', ipfsConfigured: '✓ Đã cài', ipfsNotConfigured: '⚠ Chưa cài', ipfsGetKey: '🔗 Lấy Pinata JWT',
+    ipfsHint: '💡 Liên kết ảnh trực tiếp (vd. i.ibb.co/...) được khuyên dùng vì hiển thị ổn định. IPFS là tùy chọn — chỉ dành cho lưu trữ phi tập trung tự chủ (cần Pinata JWT).', ipfsToggle: 'Dùng lưu trữ IPFS (tùy chọn · phi tập trung)', ipfsConfig: '⚙️ Cài đặt IPFS (Pinata)', ipfsJwtLabel: 'Pinata JWT', ipfsJwtPlaceholder: 'Dán Pinata JWT...', ipfsSave: '💾 Lưu', ipfsConfigured: '✓ Đã cài', ipfsNotConfigured: '⚠ Chưa cài', ipfsGetKey: '🔗 Lấy Pinata JWT',
     ipfsUploading: 'Đang upload', ipfsImageOk: '✅ Ảnh đã upload IPFS', ipfsMetaGen: 'Đang tạo & upload metadata...', ipfsUploadFail: '❌ Upload IPFS thất bại', ipfsNoJwt: 'Nhập Pinata JWT trong cài đặt IPFS trước', ipfsGateway: 'Gateway', ipfsFallback: 'IPFS không dùng được, chế độ cơ bản', ipfsNeedImage: 'Upload ảnh bìa hoặc nhập Image URI', ipfsLargeImg: 'Ảnh >100KB, bật IPFS để giảm gas',
     updTitle: '🔄 Cập nhật metadata on-chain', updDescInfo: 'Ghi đè metadata on-chain NFT đã mint (tên/ảnh/mô tả/thuộc tính) trực tiếp — không cần mint lại. Ký ví minter/chủ, chỉ gas không phí dịch vụ.',
     updDescLabel: 'Mô tả NFT', updAttrsLabel: 'Thuộc tính JSON (tùy chọn)', updAttrsPlaceholder: '[{"trait_type":"Series","value":"Genesis"}]', updBtn: '🔄 Gửi cập nhật on-chain', updSuccess: '✅ Đã cập nhật metadata', updAttrsInvalid: 'Thuộc tính JSON không hợp lệ — cần mảng như [{"trait_type":"...","value":"..."}]', updAddrInvalid: 'Sai định dạng địa chỉ hợp đồng (paxi1... tài khoản 43/hợp đồng 63 ký tự). Sao chép toàn bộ từ lịch sử deploy.',

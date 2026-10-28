@@ -444,12 +444,17 @@ async function _queryBatch(fn, items, limit) {
 function _resolveDisplay(info, meta) {
   const ext = (info && info.extension) || {};
   const m = meta || {};
+  const tokenUri = (info && info.token_uri) || '';
+  // Paxi NFTs frequently store the image directly as token_uri (e.g. https://i.ibb.co/...png),
+  // with extension === null and no separate image field. Treat such a direct image URI as the
+  // image so it renders, instead of leaving a placeholder and trying to parse it as JSON metadata.
+  const isDirectImage = /\.(png|jpe?g|gif|webp|svg|bmp|avif)(\?[^#]*)?$/i.test(tokenUri);
   return {
     name: ext.name || m.name || '',
-    image: ext.image || m.image || '',
+    image: ext.image || m.image || (isDirectImage ? tokenUri : ''),
     desc: ext.description || m.description || '',
     attrs: ext.attributes || m.attributes || [],
-    tokenUri: (info && info.token_uri) || '',
+    tokenUri: tokenUri,
   };
 }
 
@@ -602,7 +607,9 @@ async function _queryAllChainNfts() {
     // for tokens missing image/name, fetch metadata from token_uri (which may contain base64 JSON)
     const needMeta = items.filter(it => {
       const ext = it.info?.extension || {};
-      return (!ext.image && !ext.name && it.info?.token_uri);
+      const tokenUri = it.info?.token_uri || '';
+      const isDirectImage = /\.(png|jpe?g|gif|webp|svg|bmp|avif)(\?[^#]*)?$/i.test(tokenUri);
+      return (!ext.image && !ext.name && tokenUri && !isDirectImage);
     });
     if (needMeta.length) {
       if (statusEl) statusEl.innerHTML = `<span class="spinner"></span> ${t('myNfts.loadingMeta')} (${needMeta.length}/${items.length})`;

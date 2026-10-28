@@ -229,7 +229,9 @@ window.PAXI_LANGS.ko = {
     importFail: '의향 카드가 유효하지 않음',
     exportBtn: '📤 내 의향 내보내기',
     copyCard: '📋 카드 복사',
-    cardCopied: '카드 복사됨'
+    cardCopied: '카드 복사됨',
+      imageLink: '이미지',
+      metaLink: '메타데이터 URI'
   },
   redelegate: {
     title: '🔄 밸리데이터 변경', desc: '밸리데이터를 즉시 전환(7일 언본드 없음). 수수료: 0.15%(1.5‰).', hint: '현재 밸리데이터와 이동 대상 밸리데이터를 선택하고 이동 금액을 입력.',
@@ -441,7 +443,7 @@ window.PAXI_LANGS.ko = {
     title: '🎨 NFT 런처', desc: 'PRC-721 NFT 컨트랙트를 Paxi 네트워크에 원클릭 배포. 배포 후 배치 민팅.',
     step1: '컬렉션 정보', step2: '에셋 업로드', step3: '미리보기 & 배포', next: '다음: 업로드 →', prev: '← 뒤로', nextDeploy: '다음: 미리보기 & 배포 →', deploy: 'NFT 컨트랙트 배포',
     collectionName: '컬렉션 이름', symbol: '심볼', description: '설명', maxSupply: '최대 공급량', royalty: '로열티(%)', mintPrice: '민팅 가격(PAXI)', maxPerWallet: '지갑당 최대 민팅',
-    deployBtn: '🚀 NFT 컨트랙트 배포', uploadCover: 'NFT 커버 이미지', uploadCoverHint: '클릭해 커버 이미지 업로드', uploadSupport: 'JPG/PNG/GIF/SVG 지원', imageUri: 'Image URI(IPFS off 시, 또는 덮어쓰기)', preview: '미리보기', previewPlaceholder: '🖼️',
+    deployBtn: '🚀 NFT 컨트랙트 배포', uploadCover: 'NFT 커버 이미지', uploadCoverHint: '클릭해 커버 이미지 업로드', uploadSupport: 'JPG/PNG/GIF/SVG 지원', imageUri: 'Image URI(추천: i.ibb.co/... 직접 링크)', preview: '미리보기', previewPlaceholder: '🖼️',
     batchMint: '배치 민팅 NFT', batchMintDesc: '배포된 PRC-721 컨트랙트에 배치 민팅. 1Tx 최대 10건. 각 NFT는 고유한 Token ID 획득.', contractAddr: 'NFT 컨트랙트 주소', contractAddrHint: '배포 후 자동 입력', mint: '민팅 수',
     mintFeeTitle: '💰 견적 수수료', mintCountLabel: '민팅 수', estimatedFee: '견적 수수료', mintBtn: '🏭 배치 민팅 실행', mintTokenIds: '토큰 ID', blockHeight: '블록 높이',
     metadataTitle: '📝 커스텀 메타데이터', metadataDesc: '민팅된 NFT에 커스텀 이름 & 이미지 추가. CW721 준수 메타데이터 JSON 생성.', tokenId: '토큰 ID', nftName: 'NFT 이름', imageUriLabel: 'Image URI', saveMetadataBtn: '📝 메타데이터 JSON 생성',
@@ -450,7 +452,7 @@ window.PAXI_LANGS.ko = {
     success: '✅ 성공', failed: '❌ 실패', deploySuccess: '✅ NFT 컨트랙트 배포!', nextStep: '👇 다음: 위 주소를 아래 배치 민팅란으로 복사', mintSuccess: '민팅 성공', nftMintCount: 'NFT',
     connected: '연결됨', warning: '⚠️ 본 도구는 NFT 민팅의 기술적 서비스만 제공. 거래·가격 책정·교환 기능은 일절 없음. 일체 결과는 이용자가 부담.', warningEn: '⚠️ 본 도구는 NFT 민팅의 기술적 서비스만 제공. 거래·가격 책정·교환 기능은 일절 없음. 일체 결과는 이용자가 부담.',
     max10Hint: '1트랜잭션 최대 10 NFT', mintConfirm: '배치 민팅을 확정할까요?\n\n· 서비스 수수료: 5 PAXI\n· 수신자: ', buildTx: '민팅 Tx 구성 중...',
-    ipfsHint: '💡 업로드 이미지는 IPFS에 저장되어 NFT의 영구 접근 보장.', ipfsToggle: 'IPFS 저장 사용(권장)', ipfsConfig: '⚙️ IPFS 설정(Pinata)', ipfsJwtLabel: 'Pinata JWT', ipfsJwtPlaceholder: 'Pinata JWT 붙여넣기...', ipfsSave: '💾 저장', ipfsConfigured: '✓ 설정됨', ipfsNotConfigured: '⚠ 미설정', ipfsGetKey: '🔗 Pinata JWT 받기',
+    ipfsHint: '💡 이미지 직접 링크(i.ibb.co/... 등)가 표시가 가장 안정적이라 추천. IPFS는 선택이며 분산형 자체 호스팅 저장용(Pinata JWT 필요).', ipfsToggle: 'IPFS 저장 사용(선택·분산형)', ipfsConfig: '⚙️ IPFS 설정(Pinata)', ipfsJwtLabel: 'Pinata JWT', ipfsJwtPlaceholder: 'Pinata JWT 붙여넣기...', ipfsSave: '💾 저장', ipfsConfigured: '✓ 설정됨', ipfsNotConfigured: '⚠ 미설정', ipfsGetKey: '🔗 Pinata JWT 받기',
     ipfsUploading: '업로드 중', ipfsImageOk: '✅ 이미지를 IPFS에 업로드', ipfsMetaGen: '메타데이터 생성 & 업로드 중...', ipfsUploadFail: '❌ IPFS 업로드 실패', ipfsNoJwt: '먼저 IPFS 설정에서 Pinata JWT를 입력하세요', ipfsGateway: '게이트웨이', ipfsFallback: 'IPFS 사용 불가, 기본 모드로', ipfsNeedImage: '커버 이미지를 업로드하거나 Image URI를 입력하세요', ipfsLargeImg: '이미지가 100KB 초과, IPFS 활성화해 가스 절감',
     updTitle: '🔄 온체인 메타데이터 갱신', updDescInfo: '민팅된 NFT의 온체인 메타데이터(이름/이미지/설명/속성)를 직접 덮어쓰기 — 재민팅 불필요. 민터 또는 토큰 소유자 지갑으로 서명, 가스만 있고 서비스 수수료 없음.',
     updDescLabel: 'NFT 설명', updAttrsLabel: '속성 JSON(선택)', updAttrsPlaceholder: '[{"trait_type":"Series","value":"Genesis"}]', updBtn: '🔄 온체인 갱신 전송', updSuccess: '✅ 메타데이터 갱신', updAttrsInvalid: '속성 JSON 무효 — [{"trait_type":"...","value":"..."}] 형태의 배열 기대', updAddrInvalid: '컨트랙트 주소 형식 무효(paxi1... 계정 43자/컨트랙트 63자). 배포 이력을 모두 복사.',
