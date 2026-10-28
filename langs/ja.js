@@ -347,7 +347,7 @@ window.PAXI_LANGS.ja = {
     daoDesc: 'コミュニティプール（CommunityPoolSpend）から資金を申請。提案が可決するとプールが受取アドレスへ送金します。',
     daoInfo: '💡 タイトルと概要は投票する全トークン保有者に公開されます。目的・予算内訳・マイルストーン・納期を記載し、受取先はプロジェクトの財庫アドレスを使用してください。',
     daoLabelTitle: '提案タイトル',
-    daoTitlePlaceholder: '例：Paxi Lens ローンチ ＋ 6ヶ月保守資金（360,000 PAXI）',
+    daoTitlePlaceholder: '例：公式ウォレットの dApp 検索に Paxi Lens を掲載 ＋ 開発チームへの 360,000 PAXI 资助',
     daoLabelSummary: '提案概要（summary）',
     daoSummaryPlaceholder: '申請内容と金額を一文で...',
     daoLabelDesc: '提案説明（description）',

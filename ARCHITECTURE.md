@@ -150,7 +150,8 @@ paxi-suite/                # existing: front-end (GitHub Pages)
 ## 7. Budget Mapping (360k)
 | Item | Amount | Corresponding |
 |------|--------|---------------|
-| Development · Delivered v1 official integration & maintenance | 120,000 | deep-link / official PR / audit / docs / usability |
+| Development · **Official wallet dApp listing adaptation** (new objective) | 45,000 | deep-link spec & implementation / in-wallet WebView compatibility / 6-language dApp metadata / compatibility regression / post-listing version tracking |
+| Development · Delivered v1 official integration & maintenance | 75,000 | official PR / audit / docs / usability |
 | Development · Multilingual internationalization (delivered) | 60,000 | 6-language UI (en/ja/ko/id/vi/zh-Traditional) + 6-language legal docs, shipped & live |
 | Development · Data service layer | 50,000 | scan + index + API |
 | Development · Data application front-end | 60,000 | 7 data applications |

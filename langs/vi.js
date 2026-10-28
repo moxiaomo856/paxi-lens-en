@@ -251,7 +251,7 @@ window.PAXI_LANGS.vi = {
     confirmSubmitPool: 'Gửi đề xuất chi tiêu community pool (xin quỹ DAO)?\n\nSố tiền: {amount} PAXI\nNhận: {rcv}\n\nNếu thông qua, pool gửi {amount} PAXI đến địa chỉ này.\nPhí dịch vụ {fee} PAXI + deposit {deposit} PAXI.',
     daoTitle: '🏦 Xin quỹ DAO', daoDesc: 'Xin quỹ từ Community Pool (CommunityPoolSpend). Nếu thông qua, pool gửi đến địa chỉ nhận.',
     daoInfo: '💡 Tiêu đề và tóm tắt công khai với mọi holder vote. Ghi rõ mục đích·chi tiết ngân sách·cột mốc·thời hạn, dùng địa chỉ kho bạc dự án làm người nhận.',
-    daoLabelTitle: 'Tiêu đề đề xuất', daoTitlePlaceholder: 'Ví dụ: Ra mắt Paxi Lens + quỹ bảo trì 6 tháng (300.000 PAXI)', daoLabelSummary: 'Tóm tắt đề xuất (summary)', daoSummaryPlaceholder: 'Viết nội dung và số tiền trong một câu...',
+    daoLabelTitle: 'Tiêu đề đề xuất', daoTitlePlaceholder: 'Ví dụ: Đưa Paxi Lens vào tìm kiếm dApp của ví chính thức + tài trợ 360.000 PAXI cho nhóm phát triển', daoLabelSummary: 'Tóm tắt đề xuất (summary)', daoSummaryPlaceholder: 'Viết nội dung và số tiền trong một câu...',
     daoLabelDesc: 'Mô tả đề xuất (description)', daoDescPlaceholder: 'Ghi mục đích·chi tiết ngân sách·cột mốc·thời hạn...', daoSubmitBtn: 'Gửi xin quỹ DAO', daoNotAllowed: 'Ví hiện tại không thể gửi xin quỹ DAO',
     daoNoTitle: 'Nhập tiêu đề đề xuất', daoNoSummary: 'Nhập tóm tắt đề xuất', daoNoDesc: 'Nhập mô tả đề xuất', daoSuccess: '✅ Đã gửi xin quỹ DAO! ID đề xuất: ',
     paramSubspace: 'Subspace (module)', paramKey: 'Key (tên tham số)', paramValue: 'Value (chuỗi JSON)', paramValuePH: 'Ví dụ: "0.050000000000000000"',

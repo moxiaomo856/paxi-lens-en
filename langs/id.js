@@ -251,7 +251,7 @@ window.PAXI_LANGS.id = {
     confirmSubmitPool: 'Ajukan usulan pengeluaran community pool (dana DAO)?\n\nJumlah: {amount} PAXI\nPenerima: {rcv}\n\nJika disetujui, pool mengirim {amount} PAXI ke alamat ini.\nBiaya layanan {fee} PAXI + deposit {deposit} PAXI.',
     daoTitle: '🏦 Ajukan Dana DAO', daoDesc: 'Ajukan dana dari Community Pool (CommunityPoolSpend). Jika disetujui, pool mengirim ke alamat penerima.',
     daoInfo: '💡 Judul dan ringkasan terbuka untuk semua pemegang token yang vote. Jelaskan tujuan·rincian anggaran·milestone·tenggat, gunakan alamat treasury proyek sebagai penerima.',
-    daoLabelTitle: 'Judul Usulan', daoTitlePlaceholder: 'Contoh: Peluncuran Paxi Lens + dana pemeliharaan 6 bulan (300.000 PAXI)', daoLabelSummary: 'Ringkasan usulan (summary)', daoSummaryPlaceholder: 'Tulis isi dan jumlah dalam satu kalimat...',
+    daoLabelTitle: 'Judul Usulan', daoTitlePlaceholder: 'Contoh: Masukkan Paxi Lens ke pencarian dApp dompet resmi + dana 360.000 PAXI untuk tim pengembang', daoLabelSummary: 'Ringkasan usulan (summary)', daoSummaryPlaceholder: 'Tulis isi dan jumlah dalam satu kalimat...',
     daoLabelDesc: 'Deskripsi usulan (description)', daoDescPlaceholder: 'Tulis tujuan·rincian anggaran·milestone·tenggat...', daoSubmitBtn: 'Ajukan Dana DAO', daoNotAllowed: 'Alamat dompet saat ini tidak dapat mengajukan dana DAO',
     daoNoTitle: 'Masukkan judul usulan', daoNoSummary: 'Masukkan ringkasan usulan', daoNoDesc: 'Masukkan deskripsi usulan', daoSuccess: '✅ Dana DAO diajukan! ID usulan: ',
     paramSubspace: 'Subspace (modul)', paramKey: 'Key (nama parameter)', paramValue: 'Value (string JSON)', paramValuePH: 'Contoh: "0.050000000000000000"',

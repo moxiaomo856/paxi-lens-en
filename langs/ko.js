@@ -251,7 +251,7 @@ window.PAXI_LANGS.ko = {
     confirmSubmitPool: '커뮤니티 풀 지출 제안(DAO 자금 신청)을 제출할까요?\n\n금액: {amount} PAXI\n수령처: {rcv}\n\n통과 시 풀은 이 주소로 {amount} PAXI를 전송합니다.\n서비스 수수료 {fee} PAXI + 디파짓 {deposit} PAXI.',
     daoTitle: '🏦 DAO 자금 신청', daoDesc: '커뮤니티 풀(CommunityPoolSpend)에서 자금을 신청. 제안 통과 시 풀이 수령 주소로 전송.',
     daoInfo: '💡 제목과 요약은 투표하는 모든 토큰 보유자에게 공개됩니다. 목적·예산 내역·마일스톤·납기를 기재하고, 수령처는 프로젝트 국고 주소를 사용하세요.',
-    daoLabelTitle: '제안 제목', daoTitlePlaceholder: '예: Paxi Lens 출시 + 6개월 유지보수 자금(360,000 PAXI)', daoLabelSummary: '제안 요약(summary)', daoSummaryPlaceholder: '신청 내용과 금액을 한 문장으로...',
+    daoLabelTitle: '제안 제목', daoTitlePlaceholder: '예: 공식 지갑 dApp 검색에 Paxi Lens 등록 + 개발팀 360,000 PAXI 지원', daoLabelSummary: '제안 요약(summary)', daoSummaryPlaceholder: '신청 내용과 금액을 한 문장으로...',
     daoLabelDesc: '제안 설명(description)', daoDescPlaceholder: '목적·예산 내역·마일스톤·납기 기재...', daoSubmitBtn: 'DAO 자금 신청 제출', daoNotAllowed: '현재 지갑 주소는 DAO 자금 신청을 제출할 수 없습니다',
     daoNoTitle: '제안 제목을 입력하세요', daoNoSummary: '제안 요약을 입력하세요', daoNoDesc: '제안 설명을 입력하세요', daoSuccess: '✅ DAO 자금 신청 제출! 제안 ID: ',
     paramSubspace: 'Subspace(모듈)', paramKey: 'Key(파라미터명)', paramValue: 'Value(JSON 문자열)', paramValuePH: '예: "0.050000000000000000"',

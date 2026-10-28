@@ -194,7 +194,7 @@ const LANG = {
       daoDesc: 'Apply for funding from the community pool (CommunityPoolSpend). If the proposal passes, the pool transfers the amount to the recipient address.',
       daoInfo: '💡 Title and summary are public to all token holders voting. State the purpose, budget breakdown, milestones and delivery timeline; use your project treasury address as recipient.',
       daoLabelTitle: 'Proposal Title',
-      daoTitlePlaceholder: 'e.g. Paxi Lens launch + 6-month maintenance funding (360,000 PAXI)',
+      daoTitlePlaceholder: 'e.g. List Paxi Lens in the official wallet dApp search + 360,000 PAXI grant for the dev team',
       daoLabelSummary: 'Proposal Summary (summary)',
       daoSummaryPlaceholder: 'One sentence describing the request and amount…',
       daoLabelDesc: 'Proposal Description (description)',

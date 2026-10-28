@@ -17,6 +17,7 @@
 
 | Phase | Feature | KPI contribution | Person-days |
 |-------|---------|------------------|-------------|
+| **Phase One · Headline** | **Official wallet dApp listing** (deep-link spec `paxi://hub/explorer?url=` + in-wallet WebView compatibility + 6-language dApp metadata + regression suite) | Wallet listing (25% of monthly visits via the wallet entry; deep-link success ≥98%); MAU ≥500 | 5 |
 | **Phase One wrap-up** | Weighted voting MsgVoteWeighted (70/30 split options) | Governance participation +20% (main); tx volume | 0.5 |
 | **Phase One wrap-up** | Three high-frequency tools mobile polish (batch transfer / balance / decoder) | MAU ≥500 (main, PaxiHub is mobile-only) | 1–2 |
 | **Phase One wrap-up** | SIWP signed-message verifier + phishing-injection detection | MAU (trust conversion) | 1.5 |

@@ -251,7 +251,7 @@ window.PAXI_LANGS.zh = {
     confirmSubmitPool: '提交社群資金池支出提案（DAO 資金申請）嗎？\n\n金額：{amount} PAXI\n收款方：{rcv}\n\n若通過，資金池將發送 {amount} PAXI 至此地址。\n服務手續費 {fee} PAXI ＋ 押金 {deposit} PAXI。',
     daoTitle: '🏦 DAO 資金申請', daoDesc: '從社群資金池（CommunityPoolSpend）申請資金。提案通過後資金池將發送至收款地址。',
     daoInfo: '💡 標題與摘要會公開給所有投票的代幣持有者。請寫明目的·預算細項·里程碑·期限，並使用專案金庫地址作為收款方。',
-    daoLabelTitle: '提案標題', daoTitlePlaceholder: '例：Paxi Lens 上線 ＋ 6 個月維運資金（360,000 PAXI）', daoLabelSummary: '提案摘要（summary）', daoSummaryPlaceholder: '用一句話寫出申請內容與金額...',
+    daoLabelTitle: '提案標題', daoTitlePlaceholder: '例：Paxi Lens 納入官方錢包 dApp 搜尋 ＋ 資助開發團隊 360,000 PAXI', daoLabelSummary: '提案摘要（summary）', daoSummaryPlaceholder: '用一句話寫出申請內容與金額...',
     daoLabelDesc: '提案說明（description）', daoDescPlaceholder: '寫明目的·預算細項·里程碑·期限...', daoSubmitBtn: '提交 DAO 資金申請', daoNotAllowed: '目前錢包地址無法提交 DAO 資金申請',
     daoNoTitle: '請輸入提案標題', daoNoSummary: '請輸入提案摘要', daoNoDesc: '請輸入提案說明', daoSuccess: '✅ 已提交 DAO 資金申請！提案 ID：',
     paramSubspace: 'Subspace（模組）', paramKey: 'Key（參數名）', paramValue: 'Value（JSON 字串）', paramValuePH: '例："0.050000000000000000"',
