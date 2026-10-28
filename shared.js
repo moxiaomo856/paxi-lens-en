@@ -376,6 +376,35 @@ function ipfsToHttp(uri) {
   return '';
 }
 
+// Paxi NFTs store the image / metadata in several different shapes:
+//   1) direct image URI in token_uri  — https://i.ibb.co/xxx.png, https://.../a.jpg, data:image/png;base64,...
+//   2) JSON metadata in token_uri    — data:application/json;base64,... or https://.../metadata.json
+//   3) ipfs:// / ar:// metadata URI  — points at a JSON metadata document
+// Only shape 1 may be used directly as an <img src>. Shapes 2/3 must be parsed as metadata first,
+// otherwise the browser gets JSON where it expects an image and falls back to the 🎨 placeholder.
+function isDirectImageUri(uri) {
+  if (!uri || typeof uri !== 'string') return false;
+  const s = uri.trim();
+  if (/^data:image\//i.test(s)) return true;
+  return /\.(png|jpe?g|gif|webp|svg|bmp|avif)(\?[^#]*)?$/i.test(s);
+}
+
+// Parse a data: URI that carries JSON (base64 or percent-encoded) — decoded locally, no network
+function parseDataUriJson(uri) {
+  if (!uri || typeof uri !== 'string') return null;
+  const m = /^data:([^,]*),([\s\S]*)$/i.exec(uri.trim());
+  if (!m) return null;
+  const mime = m[1] || '';
+  const payload = m[2] || '';
+  try {
+    if (/base64/i.test(mime)) {
+      const bin = atob(payload);
+      return JSON.parse(decodeURIComponent(escape(bin))); // UTF-8 safe
+    }
+    return JSON.parse(decodeURIComponent(payload));
+  } catch (e) { return null; }
+}
+
 // Upload a file to Pinata (XHR to support upload progress), returns { cid, url, size }
 function uploadFileToIpfs(file, onProgress) {
   return new Promise((resolve, reject) => {

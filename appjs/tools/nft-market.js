@@ -391,27 +391,52 @@ async function _nftmLoadMoreTokens() {
 // Arweave (ar://), plain https, and chain-specific schemes (e.g. ibcc://). They must
 // NOT be conflated. IPFS/Arweave get their own gateway maps; unknown schemes are returned
 // as-is so the raw link can still be shown to the user (never force-fed to <img>).
+// NOTE: a CID may be followed by a sub-path (e.g. /ipfs/QmXXX/1.png) — that sub-path MUST be
+// kept, otherwise the URL points at the wrong object and the image silently fails to load.
 function _nftmResolveImgSrcs(uri) {
   if (!uri || typeof uri !== 'string') return [];
   const s = uri.trim();
   if (s.startsWith('ar://')) {
-    const id = s.slice(5).replace(/\/.*$/, '');
-    return id ? ['https://arweave.net/' + id, 'https://arweave.dev/' + id] : [];
+    const p = s.slice(5);
+    const i = p.indexOf('/');
+    const id = i < 0 ? p : p.slice(0, i);
+    const rest = i < 0 ? '' : p.slice(i);
+    return id ? ['https://arweave.net/' + id + rest, 'https://arweave.dev/' + id + rest] : [];
   }
   let cid = '';
-  if (s.startsWith('ipfs://')) cid = s.slice(7).replace(/\/.*$/, '');
-  else { const m = s.match(/\/ipfs\/(Qm[1-9A-HJ-NP-Za-km-z]{44}|baf[a-z0-9]{44,})/); if (m) cid = m[1]; }
+  let rest = '';
+  if (s.startsWith('ipfs://')) {
+    const p = s.slice(7);
+    const i = p.indexOf('/');
+    cid = i < 0 ? p : p.slice(0, i);
+    rest = i < 0 ? '' : p.slice(i);
+  } else {
+    const m = s.match(/\/ipfs\/(Qm[1-9A-HJ-NP-Za-km-z]{44}|baf[a-z0-9]{44,})(\/[^?#]*)?/);
+    if (m) { cid = m[1]; rest = m[2] || ''; }
+  }
   if (cid) {
-    return [
-      'https://gateway.pinata.cloud/ipfs/' + cid,
-      'https://ipfs.io/ipfs/' + cid,
-      'https://dweb.link/ipfs/' + cid,
-      'https://cloudflare-ipfs.com/ipfs/' + cid,
-    ];
+    const list = [];
+    // already an http(s) gateway URL — try it first (it may point at a specific sub-file)
+    if (/^https?:\/\//i.test(s)) list.push(s);
+    list.push(
+      'https://gateway.pinata.cloud/ipfs/' + cid + rest,
+      'https://ipfs.io/ipfs/' + cid + rest,
+      'https://dweb.link/ipfs/' + cid + rest,
+      'https://cloudflare-ipfs.com/ipfs/' + cid + rest
+    );
+    return list;
   }
   if (/^(https?:\/\/|data:)/i.test(s)) return [s];
   // unknown scheme (ibcc:// or any custom) — keep raw so it can be linked/shown
   return [s];
+}
+
+// Candidate <img src> values for a resolved image URI.
+// Only http(s) URLs and data:image/* are real images. A data:application/json URI is METADATA
+// (token_uri holding an inline JSON document) — passing it to <img> yields a broken image and
+// the 🎨 placeholder, so it must be filtered out here.
+function _nftmImgCands(uri) {
+  return _nftmResolveImgSrcs(uri).filter(c => /^https?:\/\//i.test(c) || /^data:image\//i.test(c));
 }
 
 // onerror for NFT <img>: try the next gateway candidate, else fall back to placeholder
@@ -446,8 +471,12 @@ function _nftmLinkRow(label, uri) {
 
 // Fetch external metadata JSON (token_uri) trying each candidate gateway in turn.
 // For ipfs:// token_uri this tries pinata -> ipfs.io -> dweb.link -> cloudflare in order.
+// For data:application/json;base64,... token_uri the JSON is decoded locally (no network).
 async function _nftmFetchMeta(uri, timeoutMs) {
   if (!uri) return null;
+  // data: URI carrying JSON metadata — decode inline, no request needed
+  const dataMeta = parseDataUriJson(uri);
+  if (dataMeta) return dataMeta;
   const cands = _nftmResolveImgSrcs(uri);
   for (const url of cands) {
     if (!/^https?:\/\//i.test(url)) continue;
@@ -466,7 +495,7 @@ async function _nftmFetchMeta(uri, timeoutMs) {
 
 function _nftmTokenCardInner(tokenId, contract) {
   const d = _nftmState.openDisplays[tokenId] || {};
-  const cands = _nftmResolveImgSrcs(d.image || d.tokenUri).filter(c => /^https?:\/\//i.test(c) || c.startsWith('data:'));
+  const cands = _nftmImgCands(d.image || d.tokenUri);
   const name = d.name || tokenId;
   const attrs = d.attrs || [];
   const imgHtml = cands.length
@@ -508,12 +537,13 @@ async function _nftmFillMetadata(tokens, contract) {
       _nftmUpdateTokenCard(tid, contract);
       const ext = info.extension || {};
       const tokenUri = info.token_uri || '';
-      const isDirectImage = /\.(png|jpe?g|gif|webp|svg|bmp|avif)(\?[^#]*)?$/i.test(tokenUri);
+      const isDirectImage = isDirectImageUri(tokenUri);
       if (!ext.image && !ext.name && tokenUri && !isDirectImage) {
         try {
           const meta = await _nftmFetchMeta(info.token_uri, 6000);
           _nftmState.openDisplays[tid] = _resolveDisplay(info, meta);
           _nftmUpdateTokenCard(tid, contract);
+          _nftmRefreshOpenDetail(tid, contract);
         } catch (_) {}
       }
     } catch (_) {}
@@ -536,12 +566,14 @@ function _nftmSetMetaStatus() {
 
 function _nftmShowDetail(tokenId, contract) {
   const d = _nftmState.openDisplays[tokenId] || {};
-  const imgCands = _nftmResolveImgSrcs(d.image || d.tokenUri).filter(c => /^https?:\/\//i.test(c) || c.startsWith('data:'));
+  const imgCands = _nftmImgCands(d.image || d.tokenUri);
   const attrs = d.attrs || [];
   const existing = document.getElementById('nftmModal');
   if (existing) existing.remove();
   const modal = document.createElement('div');
   modal.id = 'nftmModal';
+  modal.dataset.tokenId = tokenId;
+  modal.dataset.contract = contract;
   modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:300;display:flex;align-items:center;justify-content:center;padding:16px;overflow-y:auto;';
   modal.innerHTML = `
     <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:14px;max-width:420px;width:100%;max-height:90vh;overflow-y:auto;padding:20px;position:relative;">
@@ -569,6 +601,15 @@ function _nftmShowDetail(tokenId, contract) {
   document.body.appendChild(modal);
   const btn = modal.querySelector('#nftmIntentFromDetail');
   if (btn) btn.onclick = () => { modal.remove(); _nftmGotoListWithPrefill(contract, tokenId); };
+}
+
+// The detail modal may be opened before the token's metadata has finished loading
+// (progressive fill). Re-render it once the metadata arrives so the image/name appear.
+function _nftmRefreshOpenDetail(tokenId, contract) {
+  const modal = document.getElementById('nftmModal');
+  if (!modal) return;
+  if (modal.dataset.tokenId !== tokenId || modal.dataset.contract !== contract) return;
+  _nftmShowDetail(tokenId, contract);
 }
 
 function _nftmGoCollections() {
