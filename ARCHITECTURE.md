@@ -1,6 +1,6 @@
 # Paxi Lens · 360k Grant Edition — Full Architecture & Development Recommendations
 
-> Request amount: **360,000 PAXI** (development 342,000 + operations 18,000 / 6 months)
+> Request amount: **360,000 PAXI** (tool development 320,000 + 3-month maintenance 20,000 + new large-address transaction tracking 20,000)
 > Positioning upgrade: from "toolkit" → **"Paxi on-chain data layer + non-custodial toolkit"**
 > This document: full architecture / data flow / new-feature specs / repo structure / security & compliance boundaries / cost model / step-by-step development plan
 
@@ -150,12 +150,7 @@ paxi-suite/                # existing: front-end (GitHub Pages)
 ## 7. Budget Mapping (360k)
 | Item | Amount | Corresponding |
 |------|--------|---------------|
-| Development · **Official wallet dApp listing adaptation** (new objective) | 45,000 | deep-link spec & implementation / in-wallet WebView compatibility / 6-language dApp metadata / compatibility regression / post-listing version tracking |
-| Development · Delivered v1 official integration & maintenance | 75,000 | official PR / audit / docs / usability |
-| Development · Multilingual internationalization (delivered) | 60,000 | 6-language UI (en/ja/ko/id/vi/zh-Traditional) + 6-language legal docs, shipped & live |
-| Development · Data service layer | 50,000 | scan + index + API |
-| Development · Data application front-end | 60,000 | 7 data applications |
-| Development · Testing & security hardening | 30,000 | SDK localization / SRI / guards / replay |
-| Development · Community & content operations | 22,000 | ko/ru/es + weekly & monthly reports |
-| Operations service (6 months) | 18,000 | VPS 6 months + monthly report + community + contingency |
-| **Total** | **360,000** | Development 342,000 + Operations 18,000 |
+| **Tool development funding** | 320,000 | Continuous dev & iteration of the full suite: v1 official integration & maintenance / 6-language i18n / data-layer foundation / testing & security / community & content / wallet listing adaptation |
+| **Post-launch maintenance (3 months)** | 20,000 | VPS 3 months + monthly reports + community + contingency |
+| **New: large-address transaction tracking** | 20,000 | Whale leaderboard + large-tx feed + on-chain data dashboard (ring-fenced to guarantee delivery) |
+| **Total** | **360,000** | Development 320,000 + Maintenance 20,000 + Large-address tracking 20,000 |
