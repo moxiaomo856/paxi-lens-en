@@ -200,7 +200,11 @@ function _nftmSwitchTab(key) {
   const body = document.getElementById('nftmBody');
   if (!body) return;
   let html = '';
-  if (key === 'browse') html = _nftmRenderBrowse();
+  if (key === 'browse') {
+    _nftmState.view = 'collections';     // 从其他 tab 切回浏览时总是回到合集列表（而非残留的 token 视图）
+    _nftmState.openContract = '';
+    html = _nftmRenderBrowse();
+  }
   else if (key === 'list') html = _nftmRenderList();
   else if (key === 'myOrders') html = _nftmRenderMyOrders();
   else if (key === 'import') html = _nftmRenderImport();
@@ -225,7 +229,7 @@ function _nftmBindBody() {
     };
     const more = document.getElementById('nftmLoadMore');
     if (more) more.onclick = _nftmLoadMoreTokens;
-    if (_nftmState.view === 'collections' && !_nftmState.collections.length) _nftmLoadCollections();
+    if (_nftmState.view === 'collections') _nftmLoadCollections(); // always re-render; cached list is reused (no re-fetch), fixes blank after tab switch / back
   } else if (tab === 'list') {
     const save = document.getElementById('nftmSaveIntent');
     if (save) save.onclick = _nftmSaveIntent;
@@ -257,6 +261,8 @@ async function _nftmLoadCollections() {
   const status = document.getElementById('nftmStatus');
   const box = document.getElementById('nftmCollections');
   if (!box) return;
+  _nftmState.collShown = 0; // reset pagination; otherwise returning from a collection starts past the end and renders nothing
+  box.innerHTML = ''; // clear stale grid so re-render starts clean (no duplicate appends across switch/back)
   try {
     if (!_nftmState.collections.length) {
       _nftmState.collections = await _getAllCw721Contracts(); // global from my-nfts.js
@@ -485,8 +491,7 @@ function _nftmGoCollections() {
   _nftmState.openContract = '';
   const body = document.getElementById('nftmBody');
   if (body) body.innerHTML = _nftmRenderBrowse();
-  _nftmBindBody();
-  _nftmLoadCollections(); // re-render the cached collections grid (no re-fetch of the contract list)
+  _nftmBindBody(); // view==='collections' triggers _nftmLoadCollections inside, re-rendering the cached grid without re-fetching
 }
 
 function _nftmGotoListWithPrefill(contract, tokenId) {
