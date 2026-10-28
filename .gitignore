@@ -1,0 +1,7 @@
+# 防止 wrangler 把内部目录/临时文件当作公开静态资源上传
+.git
+.wrangler
+*.map
+node_modules
+# deploy.sh 生成的静态资源目录（构建产物，不进 git）
+public/

@@ -2,4 +2,6 @@ name = "paxi-lens"
 main = "worker.js"
 compatibility_date = "2024-11-01"
 # 静态资源 + worker.js 地域拦截层（CN 返回 403，其余走 ASSETS）
-assets = { directory = "./", binding = "ASSETS" }
+# 静态资源目录指向 public/（由 deploy.sh 生成，已排除 .git/.wrangler 等内部文件）
+# worker.js 为 Worker 入口（main），不参与静态资源
+assets = { directory = "./public", binding = "ASSETS" }
