@@ -61,7 +61,7 @@
 Wallet core / prediction-market replica (clashes with official); limit order / DCA / push notifications (need backend custody); front-end self-built multisig (wallet API only returns single-sig, wait for official); K-line history (no price index on-chain); token-incentive user acquisition (compliance); fees overlapping with official free features.
 
 ## 6. Proposal Roadmap Section Wording (ready to use)
-> **Delivered baseline (v1, not in scope of this grant)**: All 20 tools live, MIT public repository with full commit history, having passed security audit. This proposal does not duplicate-pay for already-built parts, but provides official integration, operations guarantee, and next-phase evolution for them.
+> **Delivered baseline (v1, not in scope of this grant)**: All 20 tools live. This proposal does not duplicate-pay for already-built parts, but provides official integration, operations guarantee, and next-phase evolution for them.
 > **Phase One (0–2 months)**: Deep-link launch & official PR collaboration, Swap assistant, Allowance management, SIWP signature verification, weighted voting, mobile polish; instrument in parallel to establish acceptance metric baseline.
 > **Phase Two (3–5 months, acceptance-metric-gated)**: LP liquidity management, portfolio dashboard, Feegrant/Authz panel, yield analyzer, tax CSV; monthly report ×3 on-chain verifiable.
 > **Future sections (not in this proposal)**: Governance data dashboard, validator transparency tool, public read-only API, each with trigger conditions, separately reviewed after verification. We deliberately do not cram the future into this application.
