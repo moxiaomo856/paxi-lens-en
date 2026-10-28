@@ -103,10 +103,20 @@ function daoWhitelist() {
   return Array.isArray(cfg.daoProposerWhitelist) ? cfg.daoProposerWhitelist : [];
 }
 
+// Normalize a bech32 address for comparison.
+// bech32 allows an all-uppercase form, and some wallets return it that way —
+// a plain string compare against the lowercase whitelist would then always fail
+// and the whitelisted account would be wrongly rejected.
+function _daoNormAddr(a) {
+  return (a || '').trim().toLowerCase();
+}
+
 // Whether the currently connected wallet is on the DAO whitelist
 function isDaoProposerAllowed() {
   if (typeof state === 'undefined' || !state.connected || !state.wallet || !state.wallet.address) return false;
-  return daoWhitelist().includes(state.wallet.address);
+  const addr = _daoNormAddr(state.wallet.address);
+  if (!addr) return false;
+  return daoWhitelist().some(x => _daoNormAddr(x) === addr);
 }
 
 function renderProposal() {
@@ -1283,9 +1293,12 @@ async function loadProposalList() {
 
     // Async-fill the proposers (only query those missing from the list data).
     // Concurrency is capped at 3: firing one request per proposal at once trips the LCD rate limiter.
+    // NOTE: the filter must stay on the proposal objects — `p` is not in scope inside
+    // a separate .filter() callback (that was the source of "p is not defined").
     const needProposer = proposals
+      .filter(p => !(p.proposer || p._raw?.proposer))
       .map(p => p.proposal_id || p.id)
-      .filter(pid => pid && !p.proposer);
+      .filter(pid => pid !== undefined && pid !== null && pid !== '');
     let ppIdx = 0;
     const ppWorker = async () => {
       while (ppIdx < needProposer.length) {

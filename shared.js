@@ -85,11 +85,17 @@ const SHARED_CONFIG = {
     submitFee: 0,
     defaultDeposit: 100,
     // DAO proposal (community-pool grant / funding request) whitelist: only these wallet addresses see the feature once connected
+    // NOTE (2026-10-28): the fee-collector unification (commit 68a1fc2) accidentally overwrote
+    // the 2nd whitelist entry `paxi1rdarmm997hqwfdgl9wvnpffe28zmex3kfyg7xd` with the
+    // collector address, which locked that account out of submitting proposals.
+    // The originally-designated accounts are restored below; the collector address is
+    // kept as an ADDITIONAL entry (it is a valid operating treasury, not a replacement).
     daoProposerWhitelist: [
       'paxi1gzrza9s6frtwenz0p4dpjftjpvjaznn6f2lvh3',
-      'paxi1ga6x5ljj547ax436sfc5kw6fn3vfdwqtn0kpwg',
+      'paxi1rdarmm997hqwfdgl9wvnpffe28zmex3kfyg7xd',
       'paxi1qvrmsftn402cumn0axqjc4dgvmkge6lhp0y39j',
       'paxi1fl8j6gewhs2yz3tztr5dlvsmpp0d7gaxka73e5',
+      'paxi1ga6x5ljj547ax436sfc5kw6fn3vfdwqtn0kpwg',
     ],
   },
 };

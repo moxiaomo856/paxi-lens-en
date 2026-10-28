@@ -95,7 +95,17 @@ window.TOOL_REGISTRY ||= {};
     const my = ++gvLoadSeq;
     listEl.innerHTML = `<div style="font-size:13px;color:var(--text-muted);padding:8px 0;">⏳ ${esc(pt('loading'))}</div>`;
     try {
-      const data = await fetchAPI('/cosmos/gov/v1beta1/proposals');
+      // gov v1 carries title/summary/proposer (v1beta1 has no title at all).
+      // Fall back to v1beta1 only if v1 is unavailable.
+      let data = null;
+      try {
+        data = await fetchAPI('/cosmos/gov/v1/proposals?pagination.limit=100&pagination.reverse=true');
+      } catch (_) {
+        data = null;
+      }
+      if (!data || !(data.proposals || []).length) {
+        data = await fetchAPI('/cosmos/gov/v1beta1/proposals?pagination.limit=100');
+      }
       if (my !== gvLoadSeq) return; // Prevent language switch/reload race condition
       const proposals = (data && data.proposals) || [];
       if (proposals.length === 0) {
@@ -104,8 +114,14 @@ window.TOOL_REGISTRY ||= {};
       }
       listEl.innerHTML = '';
       for (const p of proposals) {
-        const id = p.id;
-        const title = p.title || (p.content && p.content.title) || ('# ' + id);
+        // The chain exposes two shapes: gov v1 uses `id`/`title`/`summary`,
+        // gov v1beta1 uses `proposal_id` with no title at all. Read both so the
+        // card never renders "#undefined · #undefined".
+        const id = p.id ?? p.proposal_id;
+        const title = p.title
+          || (p.content && (p.content.title || (p.content.value && typeof p.content.value === 'object' && p.content.value.title)))
+          || (p.summary ? String(p.summary).slice(0, 80) : '')
+          || ('# ' + id);
         const status = p.status || '';
         const card = document.createElement('div');
         card.style.cssText = 'border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:12px;background:rgba(255,255,255,0.02);';
