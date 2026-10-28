@@ -67,26 +67,28 @@ function _isValidPaxiAddress(a) {
 // Build gov v1 MsgSubmitProposal{messages:[MsgCommunityPoolSpend]} (isomorphic to on-chain proposal #13)
 // Returns an Any (can be placed in tx messages)
 function _buildPoolSpendProposalAny({ title, summary, recipient, amountMicro, depositMicro, proposer, denom }) {
-  const spendMsg = PaxiCosmJS.Any.fromPartial({
-    typeUrl: GOV_V1_TYPE_URL.poolMsg,
-    value: PaxiCosmJS.MsgCommunityPoolSpend.encode({
-      authority: GOV_MODULE_ACCOUNT,
-      recipient,
-      amount: [{ denom, amount: amountMicro }],
-    }).finish(),
-  });
-  const submitValueBytes = PaxiCosmJS.MsgSubmitProposalV1.encode({
-    messages: [spendMsg],
-    initial_deposit: [{ denom, amount: depositMicro }],
+  if (typeof PaxiMsgCodec === 'undefined' || !PaxiMsgCodec.encodeMsgSubmitProposal) {
+    throw new Error('Message codec not loaded (appjs/msg-codec.js)');
+  }
+  // The chain's CosmJS bundle exports neither MsgCommunityPoolSpend nor MsgSubmitProposal,
+  // so both are encoded by hand (appjs/msg-codec.js — verified against the chain's decoder).
+  const spendValue = PaxiMsgCodec.encodeMsgCommunityPoolSpend(
+    GOV_MODULE_ACCOUNT,
+    recipient,
+    [{ denom, amount: amountMicro }]
+  );
+  const submitValue = PaxiMsgCodec.encodeMsgSubmitProposal(
+    [{ typeUrl: GOV_V1_TYPE_URL.poolMsg, value: spendValue }],
+    [{ denom, amount: depositMicro }],
     proposer,
-    metadata: '',
+    '',
     title,
-    summary: (summary || '').length > 2000 ? summary.slice(0, 2000) : (summary || ''),
-    expedited: false,
-  }).finish();
+    (summary || '').length > 2000 ? summary.slice(0, 2000) : (summary || ''),
+    false
+  );
   return PaxiCosmJS.Any.fromPartial({
     typeUrl: GOV_V1_TYPE_URL.submitV1,
-    value: submitValueBytes,
+    value: submitValue,
   });
 }
 
@@ -657,35 +659,39 @@ async function submitProposal() {
     const denom = CONFIG.denom;
     const proposer = state.wallet.address;
 
-    // Build the content Any (text / param use legacy content)
-    let contentAny = null;
-    const submitTypeUrl = '/cosmos.gov.v1beta1.MsgSubmitProposal';
-
-    if (type === 'text') {
-      contentAny = PaxiCosmJS.Any.fromPartial({
-        typeUrl: GOV_TYPE_URL.text,
-        value: PaxiCosmJS.TextProposal.encode({ title, description: desc }).finish(),
-      });
-    } else {
-      contentAny = PaxiCosmJS.Any.fromPartial({
-        typeUrl: GOV_TYPE_URL.param,
-        value: PaxiCosmJS.ParameterChangeProposal.encode({ title, description: desc, changes }).finish(),
-      });
+    // This chain's gov module only supports gov v1: the legacy content types
+    // (TextProposal / ParameterChangeProposal) are NOT registered on chain, and the CosmJS bundle
+    // does not export the corresponding classes either. A text proposal is therefore submitted as a
+    // gov v1 MsgSubmitProposal with no messages and the body in metadata/summary — the chain
+    // requires "metadata or messages" to be non-empty.
+    if (type === 'param') {
+      showStatus('proposalStatus',
+        _t('proposal.paramUnsupported',
+          'This chain does not register the legacy ParameterChangeProposal type. Only text proposals and community-pool-spend proposals can be submitted here.'),
+        'error');
+      return;
+    }
+    if (typeof PaxiMsgCodec === 'undefined' || !PaxiMsgCodec.encodeMsgSubmitProposal) {
+      showStatus('proposalStatus', 'Message codec not loaded (appjs/msg-codec.js)', 'error');
+      return;
     }
 
-    // MsgSubmitProposal
+    // MsgSubmitProposal (gov v1)
     const depositMicro = paxiToUpaxi(depositNum.toFixed(6));
     const depositCoins = [{ denom, amount: depositMicro }];
-    const submitMsg = PaxiCosmJS.MsgSubmitProposal.fromPartial({
-      content: contentAny,
-      initialDeposit: depositCoins,
+    const submitValueBytes = PaxiMsgCodec.encodeMsgSubmitProposal(
+      [],                                   // no messages -> body goes into metadata/summary
+      depositCoins,
       proposer,
-    });
-    const submitValueBytes = PaxiCosmJS.MsgSubmitProposal.encode(submitMsg).finish();
+      desc.slice(0, 255),                  // metadata: max 255 chars
+      title,
+      desc.slice(0, 65535),                // summary: full body
+      false
+    );
 
     const messages = [
       PaxiCosmJS.Any.fromPartial({
-        typeUrl: submitTypeUrl,
+        typeUrl: '/cosmos.gov.v1.MsgSubmitProposal',
         value: submitValueBytes,
       }),
     ];

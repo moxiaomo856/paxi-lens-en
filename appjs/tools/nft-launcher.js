@@ -556,17 +556,16 @@ async function _deployNft() {
   try {
     const addr = state.wallet.address;
     const initMsg = JSON.stringify({ name, symbol, minter: addr });
-    const instantiateMsg = PaxiCosmJS.MsgInstantiateContract.fromPartial({
-      sender: addr,
-      admin: '',
-      codeId: 2,
-      label: `Paxi NFT - ${name} (${Date.now()})`,
-      msg: new TextEncoder().encode(initMsg),
-      funds: [],
-    });
+    // The chain's CosmJS bundle does not export MsgInstantiateContract, so it is encoded by hand
+    // (appjs/msg-codec.js — verified against the chain's decoder).
+    if (typeof PaxiMsgCodec === 'undefined' || !PaxiMsgCodec.encodeMsgInstantiateContract) {
+      throw new Error('Message codec not loaded (appjs/msg-codec.js)');
+    }
     const messages = [PaxiCosmJS.Any.fromPartial({
       typeUrl: '/cosmwasm.wasm.v1.MsgInstantiateContract',
-      value: PaxiCosmJS.MsgInstantiateContract.encode(instantiateMsg).finish(),
+      value: PaxiMsgCodec.encodeMsgInstantiateContract(
+        addr, '', 2, `Paxi NFT - ${name} (${Date.now()})`, new TextEncoder().encode(initMsg), []
+      ),
     })];
 
     btn.innerHTML = '<span class="spinner"></span> ' + _nftL('waiting');

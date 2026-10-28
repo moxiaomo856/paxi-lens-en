@@ -343,15 +343,17 @@ async function executeRedelegate() {
     const amountMicro = (amount * 1e6).toFixed(0);
     const feeMicro = (fee * 1e6).toFixed(0);
 
-    const redelegateMsg = {
-      delegator_address: state.wallet.address,
-      validator_src_address: from,
-      validator_dst_address: to,
-      amount: { denom, amount: amountMicro }
-    };
+    // The chain's CosmJS bundle does NOT export MsgBeginRedelegate, so we encode it ourselves
+    // (appjs/msg-codec.js — bytes verified against the chain's own decoder).
+    if (typeof PaxiMsgCodec === 'undefined' || !PaxiMsgCodec.encodeMsgBeginRedelegate) {
+      showStatus('rdStatus', '❌ Message codec not loaded (appjs/msg-codec.js)', 'error');
+      return;
+    }
     const msgAny = PaxiCosmJS.Any.fromPartial({
       typeUrl: '/cosmos.staking.v1beta1.MsgBeginRedelegate',
-      value: PaxiCosmJS.MsgBeginRedelegate.encode(redelegateMsg).finish(),
+      value: PaxiMsgCodec.encodeMsgBeginRedelegate(
+        state.wallet.address, from, to, denom, amountMicro
+      ),
     });
 
     const feeMsg = PaxiCosmJS.MsgSend.fromPartial({

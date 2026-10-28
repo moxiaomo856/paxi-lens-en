@@ -196,11 +196,15 @@ window.TOOL_REGISTRY ||= {};
       const optNum = (typeof option === 'number') ? option : (VOTE_OPT[option] || 1);
       const m = PaxiCosmJS.MsgVote.fromPartial({
         voter: address,
-        proposal_id: BigInt(id),
+        // NOTE: the SDK's MsgVote uses camelCase field names — fromPartial() silently ignores
+        // unknown keys, so `proposal_id` produced an empty proposal id and the chain rejected it.
+        proposalId: BigInt(id),
         option: optNum,
       });
       const any = PaxiCosmJS.Any.fromPartial({
-        typeUrl: '/cosmos.gov.v1beta1.MsgVote',
+        // NOTE: this chain only accepts the v1 gov module — "/cosmos.gov.v1beta1.MsgVote" is
+        // rejected with "errUnknownField *v1beta1.MsgVote".
+        typeUrl: '/cosmos.gov.v1.MsgVote',
         value: PaxiCosmJS.MsgVote.encode(m).finish(),
       });
 

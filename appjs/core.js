@@ -694,8 +694,9 @@ function renderHome() {
   // Tool list (organized by category; register a new tool here to make it appear on the home page)
   const HOME_TOOLS = [
     // Staking & governance
-    { id: 'claim-rewards', icon: '🎁', label: 'tools.claimRewards', cat: 'catStake' },
-    { id: 'stake-manage', icon: '🥩', label: 'tools.stakeManage', cat: 'catStake' },
+    // NOTE (2026-10-28): 委托质押 / 解除质押 / 领取奖励 已从工具箱下线 —— 官方 App 已提供这些功能，
+    // 且链上 CosmJS SDK 未打包 MsgUndelegate / MsgWithdrawDelegatorReward 这些类，网页端构造不出
+    // 交易。相关代码仍保留在 appjs/tools/{stake-manage,claim-rewards}.js，需要时可在此重新登记。
     { id: 'gov-vote', icon: '🗳️', label: 'tools.govVote', cat: 'catStake' },
     { id: 'redelegate', icon: '🔄', label: 'tools.redelegate', cat: 'catStake' },
     { id: 'validator-compare', icon: '🏦', label: 'tools.validatorCompare', cat: 'catStake' },

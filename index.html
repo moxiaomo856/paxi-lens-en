@@ -569,6 +569,8 @@
 <!-- ===== SCRIPTS ===== -->
 <script src="https://mainnet-api.paxinet.io/resources/js/paxi-cosmjs.umd.js"></script>
 <script src="shared.js"></script>
+<!-- 手写 protobuf 编码器：补齐链上 CosmJS SDK 未打包的消息类型（MsgBeginRedelegate 等） -->
+<script src="appjs/msg-codec.js"></script>
 <script src="compat.js"></script>
 <!-- Multi-language packs (must load before core.js merges them) -->
 <script src="langs/ja.js"></script>
@@ -587,10 +589,8 @@
 <script src="appjs/tools/redelegate.js"></script>
 <script src="appjs/tools/nft-market.js"></script>
 <script src="appjs/tools/proposal.js"></script>
-<!-- New tool modules (staking/governance/delegation/address book/IBC/tx simulation) -->
-<script src="appjs/tools/claim-rewards.js"></script>
+<!-- New tool modules (governance/address book/IBC/tx simulation) -->
 <script src="appjs/tools/gov-vote.js"></script>
-<script src="appjs/tools/stake-manage.js"></script>
 <script src="appjs/tools/address-book.js"></script>
 <script src="appjs/tools/ibc-query.js"></script>
 <script src="appjs/tools/tx-dryrun.js"></script>
