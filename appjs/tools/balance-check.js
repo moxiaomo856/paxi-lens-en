@@ -101,15 +101,18 @@ async function showAddressTxHistory(address) {
   card.scrollIntoView({ behavior: 'smooth', block: 'start' });
   try {
     let txs = [], found = false;
+    // This LCD only understands the NEW `query=` parameter — the legacy `events=` parameter
+    // answers "query cannot be empty", and it rejects every `order_by` value
+    // ("DESC is not a valid tx.OrderBy"), so the old query form never worked here.
     const queryMethods = [
-      `events=transfer.recipient='${address}'`,
-      `events=message.recipient='${address}'`,
-      `events=coin_received.receiver='${address}'`
+      `transfer.recipient='${address}'`,
+      `message.recipient='${address}'`,
+      `coin_received.receiver='${address}'`
     ];
     // The 3 event queries are independent -> run them in parallel, take the first with results.
     // (serial cost ~3s, parallel ~1s; and a burst of 3 is well within the LCD's tolerance)
     const settled = await Promise.allSettled(
-      queryMethods.map(q => fetchAPI(`/cosmos/tx/v1beta1/txs?${q}&pagination.limit=30&order_by=DESC`))
+      queryMethods.map(q => fetchAPI(`/cosmos/tx/v1beta1/txs?query=${encodeURIComponent(q)}&pagination.limit=30`))
     );
     for (const r of settled) {
       if (r.status === 'fulfilled' && r.value && r.value.tx_responses && r.value.tx_responses.length > 0) {
@@ -120,7 +123,7 @@ async function showAddressTxHistory(address) {
     }
     if (!found || txs.length === 0) {
       try {
-        const data = await fetchAPI(`/cosmos/tx/v1beta1/txs?events=message.sender='${address}'&pagination.limit=10&order_by=DESC`);
+        const data = await fetchAPI(`/cosmos/tx/v1beta1/txs?query=${encodeURIComponent(`message.sender='${address}'`)}&pagination.limit=10`);
         if (data.tx_responses && data.tx_responses.length > 0) {
           const sentTxs = data.tx_responses || [];
           const allTxMap = {};
@@ -130,6 +133,8 @@ async function showAddressTxHistory(address) {
         }
       } catch (e) {}
     }
+    // The LCD cannot sort (no order_by), so order newest-first here
+    txs.sort((a, b) => (Number(b.height || 0) - Number(a.height || 0)));
     if (!found || txs.length === 0) {
       container.innerHTML = `
         <div style="text-align:center;padding:20px 0;">

@@ -49,6 +49,35 @@ const crPt = (k, ...a) => {
 
 const crEsc = (s) => (typeof escapeHtml === 'function') ? escapeHtml(s) : String(s == null ? '' : s);
 
+/* Hand-encode cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward.
+ * The Paxi CosmJS bundle ships the staking module but NOT the distribution module, so
+ * PaxiCosmJS.MsgWithdrawDelegatorReward is undefined and the claim tx could not be built.
+ * Proto definition (protobuf wire format):
+ *   message MsgWithdrawDelegatorReward {
+ *     string delegator_address = 1;   // tag 0x0A
+ *     string validator_address = 2;   // tag 0x12
+ *   }
+ * Verified byte-for-byte against the chain's own decoder — see test/verify-msg-encoding.js. */
+function _crEncodeWithdrawDelegatorReward(delegator, validator) {
+  const enc = new TextEncoder();
+  const chunks = [];
+  const pushString = (field, s) => {
+    const b = enc.encode(s || '');
+    const len = [];
+    let v = b.length;
+    do { let x = v & 0x7f; v >>>= 7; if (v > 0) x |= 0x80; len.push(x); } while (v > 0);
+    chunks.push(new Uint8Array([(field << 3) | 2]), new Uint8Array(len), b);
+  };
+  pushString(1, delegator);
+  pushString(2, validator);
+  let total = 0;
+  for (const c of chunks) total += c.length;
+  const out = new Uint8Array(total);
+  let o = 0;
+  for (const c of chunks) { out.set(c, o); o += c.length; }
+  return out;
+}
+
 /* Build operator_address -> moniker map from localStorage 'paxi_validators_cache' */
 function crLoadValidatorMap() {
   const map = {};
@@ -179,20 +208,23 @@ async function claimRewards() {
 
   if (!confirm(crPt('confirmMsg', totalPaxi, compound))) return;
 
-  if (!PaxiCosmJS || !PaxiCosmJS.MsgWithdrawDelegatorReward || !PaxiCosmJS.MsgWithdrawDelegatorReward.encode) {
-    showStatus('crStatus', crPt('sdkErr'), 'error');
-    return;
-  }
+  // The Paxi CosmJS bundle ships the staking module but NOT cosmos.distribution, so
+  // PaxiCosmJS.MsgWithdrawDelegatorReward does not exist. We therefore encode that one message
+  // by hand (it is just two string fields) and use the SDK class whenever it IS available.
+  const sdkWithdraw = (PaxiCosmJS && PaxiCosmJS.MsgWithdrawDelegatorReward && PaxiCosmJS.MsgWithdrawDelegatorReward.encode)
+    ? PaxiCosmJS.MsgWithdrawDelegatorReward : null;
 
   const msgs = [];
   for (const t of targets) {
-    const wMsg = PaxiCosmJS.MsgWithdrawDelegatorReward.fromPartial({
-      delegator_address: state.wallet.address,
-      validator_address: t.val,
-    });
+    const value = sdkWithdraw
+      ? sdkWithdraw.encode(sdkWithdraw.fromPartial({
+          delegator_address: state.wallet.address,
+          validator_address: t.val,
+        })).finish()
+      : _crEncodeWithdrawDelegatorReward(state.wallet.address, t.val);
     msgs.push(PaxiCosmJS.Any.fromPartial({
       typeUrl: '/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward',
-      value: PaxiCosmJS.MsgWithdrawDelegatorReward.encode(wMsg).finish(),
+      value: value,
     }));
 
     if (compound) {

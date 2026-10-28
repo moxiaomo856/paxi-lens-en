@@ -283,20 +283,24 @@ const ERROR_KEYWORD_MAP = [
 ];
 
 function mapError(code, rawLog) {
-  // 1. First map by error code
-  if (code !== undefined && code !== 0 && ERROR_CODE_MAP[code]) {
-    return `${ERROR_CODE_MAP[code]} (code ${code})`;
-  }
-  // 2. Then map by keyword
-  if (rawLog && typeof rawLog === 'string') {
+  const log = (rawLog && typeof rawLog === 'string') ? rawLog.replace(/\s+/g, ' ').trim() : '';
+  // 1) keyword map FIRST — it holds the most actionable messages (sequence mismatch, insufficient
+  //    funds, ...). The old order mapped by error code first and THREW THE RAW LOG AWAY, so a
+  //    generic "code 1" hid the real reason.
+  if (log) {
     for (const { pattern, msg } of ERROR_KEYWORD_MAP) {
-      if (pattern.test(rawLog)) {
-        return `${msg} (original message: ${rawLog.slice(0, 100)})`;
+      if (pattern.test(log)) {
+        return `${msg} (code ${code}, original message: ${log.slice(0, 140)})`;
       }
     }
   }
-  // 3. Return the raw message (truncated)
-  return rawLog ? (typeof rawLog === 'string' ? rawLog.slice(0, 200) : String(rawLog)) : 'Unknown error';
+  // 2) error code map — always append the raw log so the chain's own wording is never lost
+  if (code !== undefined && code !== 0 && ERROR_CODE_MAP[code]) {
+    const base = `${ERROR_CODE_MAP[code]} (code ${code})`;
+    return log ? `${base} | original message: ${log.slice(0, 180)}` : base;
+  }
+  // 3) raw message (truncated)
+  return log ? log.slice(0, 200) : 'Unknown error';
 }
 
 // ============================================================

@@ -260,6 +260,22 @@ function smRenderValidatorOptions(all) {
 }
 
 /* ------------------------------------------------ Delegate */
+// Pre-flight check: catch the usual causes of a vague "code 1" on-chain error BEFORE signing,
+// so the user gets an exact reason instead of "Generic on-chain error".
+async function smPreflight(amountPaxi, extraMicro) {
+  const addr = state.wallet && state.wallet.address;
+  if (!addr) return null;
+  try {
+    const b = await fetchAPI(`/cosmos/bank/v1beta1/balances/${addr}/by_denom?denom=${CONFIG.denom}`);
+    const freeMicro = Number(b && b.balance && b.balance.amount || 0);
+    const needMicro = Math.ceil((amountPaxi || 0) * 1e6) + (extraMicro || 0);
+    if (freeMicro < needMicro) {
+      return `❌ Insufficient balance: you have ${(freeMicro / 1e6).toFixed(6)} PAXI, but this needs at least ${(needMicro / 1e6).toFixed(6)} PAXI (amount + gas fee).`;
+    }
+  } catch (_) { /* balance query failed -> let the chain decide */ }
+  return null;
+}
+
 async function doDelegate() {
   if (!state.connected) { showToast(smPt('connectFirst'), 'error'); return; }
   const sel = document.getElementById('smDelVal').value;
@@ -267,6 +283,13 @@ async function doDelegate() {
   const statusEl = document.getElementById('smStatus');
   if (!sel) { showStatus('smStatus', smPt('selectValidator'), 'warning'); return; }
   if (!amt || amt <= 0) { showStatus('smStatus', smPt('invalidAmt'), 'warning'); return; }
+  // validator address sanity (an empty/malformed one is the usual "code 1" cause)
+  if (!/^paxivaloper1/i.test(sel) || sel.length < 30) {
+    showStatus('smStatus', `❌ Invalid validator address: ${sel || '(empty)'}`, 'error'); return;
+  }
+  // balance pre-flight (delegation + gas fee). gas fee ≈ 300k gas × 0.25 upaxi ≈ 75000; use 200000 as buffer
+  const preErr = await smPreflight(amt, 200000);
+  if (preErr) { showStatus('smStatus', preErr, 'error'); return; }
 
   if (!confirm(smPt('confirmDelegate', sel, amt.toFixed(6)))) return;
 
@@ -307,6 +330,12 @@ async function doUndelegate() {
   const statusEl = document.getElementById('smStatus');
   if (!sel) { showStatus('smStatus', smPt('selectSource'), 'warning'); return; }
   if (!amt || amt <= 0) { showStatus('smStatus', smPt('invalidAmt'), 'warning'); return; }
+  if (!/^paxivaloper1/i.test(sel) || sel.length < 30) {
+    showStatus('smStatus', `❌ Invalid validator address: ${sel || '(empty)'}`, 'error'); return;
+  }
+  // balance pre-flight (unbonding still costs gas; the principal stays locked, not spent)
+  const preErrU = await smPreflight(0, 200000);
+  if (preErrU) { showStatus('smStatus', preErrU, 'error'); return; }
 
   if (!confirm(smPt('confirmUndelegate', sel, amt.toFixed(6)))) return;
 
