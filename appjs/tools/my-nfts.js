@@ -441,24 +441,54 @@ async function _queryBatch(fn, items, limit) {
   return results;
 }
 
+// ---- local, dependency-free helpers ------------------------------------------------
+// These mirror shared.js isDirectImageUri / parseDataUriJson, duplicated ON PURPOSE:
+// the browser can still hold a STALE cached shared.js (deployed before those helpers
+// existed) while loading a newer tool file. A hard dependency would then throw a
+// ReferenceError and blank out every NFT card, so we degrade gracefully to an inline
+// implementation with identical behaviour.
+function _nftvDirectImageUri(uri) {
+  if (typeof isDirectImageUri === 'function') return isDirectImageUri(uri);
+  if (!uri || typeof uri !== 'string') return false;
+  const s = uri.trim();
+  if (/^data:image\//i.test(s)) return true;
+  return /\.(png|jpe?g|gif|webp|svg|bmp|avif)(\?[^#]*)?$/i.test(s);
+}
+
+function _nftvParseDataUriJson(uri) {
+  if (typeof parseDataUriJson === 'function') return parseDataUriJson(uri);
+  if (!uri || typeof uri !== 'string') return null;
+  const m = /^data:([^,]*),([\s\S]*)$/i.exec(uri.trim());
+  if (!m) return null;
+  try {
+    if (/base64/i.test(m[1] || '')) return JSON.parse(decodeURIComponent(escape(atob(m[2] || ''))));
+    return JSON.parse(decodeURIComponent(m[2] || ''));
+  } catch (e) { return null; }
+}
+
 // merge extension with external metadata to produce display info
 function _resolveDisplay(info, meta) {
-  const ext = (info && info.extension) || {};
-  const m = meta || {};
   const tokenUri = (info && info.token_uri) || '';
-  // Paxi NFTs frequently store the image directly as token_uri (e.g. https://i.ibb.co/...png),
-  // with extension === null and no separate image field. Treat such a direct image URI as the
-  // image so it renders, instead of leaving a placeholder and trying to parse it as JSON metadata.
-  // NOTE: token_uri may ALSO be JSON metadata (data:application/json;base64,... / ipfs:// / *.json) —
-  // those must be parsed as metadata first, never used as an <img src>.
-  const isDirectImage = isDirectImageUri(tokenUri);
-  return {
-    name: ext.name || m.name || '',
-    image: ext.image || m.image || (isDirectImage ? tokenUri : ''),
-    desc: ext.description || m.description || '',
-    attrs: ext.attributes || m.attributes || [],
-    tokenUri: tokenUri,
-  };
+  try {
+    const ext = (info && info.extension) || {};
+    const m = meta || {};
+    // Paxi NFTs frequently store the image directly as token_uri (e.g. https://i.ibb.co/...png),
+    // with extension === null and no separate image field. Treat such a direct image URI as the
+    // image so it renders, instead of leaving a placeholder and trying to parse it as JSON metadata.
+    // NOTE: token_uri may ALSO be JSON metadata (data:application/json;base64,... / ipfs:// / *.json) —
+    // those must be parsed as metadata first, never used as an <img src>.
+    const isDirectImage = _nftvDirectImageUri(tokenUri);
+    return {
+      name: ext.name || m.name || '',
+      image: ext.image || m.image || (isDirectImage ? tokenUri : ''),
+      desc: ext.description || m.description || '',
+      attrs: ext.attributes || m.attributes || [],
+      tokenUri: tokenUri,
+    };
+  } catch (e) {
+    // one broken token must never break the whole grid
+    return { name: '', image: '', desc: '', attrs: [], tokenUri: tokenUri };
+  }
 }
 
 // ============ TRANSFER NFT ============
@@ -611,7 +641,7 @@ async function _queryAllChainNfts() {
     const needMeta = items.filter(it => {
       const ext = it.info?.extension || {};
       const tokenUri = it.info?.token_uri || '';
-      const isDirectImage = isDirectImageUri(tokenUri);
+      const isDirectImage = _nftvDirectImageUri(tokenUri);
       return (!ext.image && !ext.name && tokenUri && !isDirectImage);
     });
     if (needMeta.length) {

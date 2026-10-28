@@ -4,6 +4,23 @@
  * Cloudflare 边缘对每个请求自带访问者国家信息（request.cf.country），
  * 中国大陆 IP（CN）直接返回 403，其余请求原样转发到静态资源。
  */
+// 静态资源缓存策略：HTML/JS/CSS/JSON 一律 no-cache（每次回源，靠 ETag/304 走，代价极小）。
+// 原因：浏览器若缓存了旧版 shared.js，却加载到新版工具文件，两者的全局函数不一致，
+// 运行时直接抛 ReferenceError，会让整个 NFT 列表变空白。禁止缓存即可根除这类错配。
+const ALWAYS_REVALIDATE = ["html", "js", "css", "json", "webmanifest", "map"];
+
+function _withRevalidateHeaders(res, request) {
+  let pathname = "/";
+  try { pathname = new URL(request.url).pathname; } catch (_) {}
+  const m = pathname.match(/\.([a-z0-9]+)$/i);
+  const ext = m ? m[1].toLowerCase() : "";
+  if (ext !== "" && !ALWAYS_REVALIDATE.includes(ext)) return res;
+  const headers = new Headers(res.headers);
+  headers.set("Cache-Control", "no-cache, must-revalidate");
+  if (res.status === 304) return new Response(null, { status: 304, statusText: res.statusText, headers });
+  return new Response(res.body, { status: res.status, statusText: res.statusText, headers });
+}
+
 export default {
   async fetch(request, env) {
     const country = request.cf && request.cf.country;
@@ -18,6 +35,7 @@ export default {
         { status: 403, headers: { "Content-Type": "text/html; charset=utf-8" } }
       );
     }
-    return env.ASSETS.fetch(request);
+    const res = await env.ASSETS.fetch(request);
+    return _withRevalidateHeaders(res, request);
   }
 };

@@ -471,15 +471,8 @@ function buildCw721Metadata(name, description, imageUri, attributes) {
 async function fetchTokenUriMetadata(tokenUri, timeoutMs) {
   const http = ipfsToHttp(tokenUri);
   if (!http) return null;
-  // data:application/json;base64,... decode directly
-  if (http.startsWith('data:application/json')) {
-    const b64 = http.split(',')[1] || '';
-    try {
-      const json = atob(b64);
-      // handle UTF-8
-      return JSON.parse(decodeURIComponent(escape(json)));
-    } catch (e) { return null; }
-  }
+  // data: URI holding JSON metadata (base64 or percent-encoded) — decode locally, no network
+  if (http.startsWith('data:')) return parseDataUriJson(http);
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs || 5000);
   try {

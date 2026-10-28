@@ -386,6 +386,31 @@ async function _nftmLoadMoreTokens() {
   }
 }
 
+// ---- local, dependency-free helpers ------------------------------------------------
+// These mirror shared.js isDirectImageUri / parseDataUriJson, duplicated ON PURPOSE:
+// the browser can still hold a STALE cached shared.js (deployed before those helpers
+// existed) while loading a newer tool file. A hard dependency would then throw a
+// ReferenceError, the metadata fetch would silently fail and EVERY card would show
+// the 🎨 placeholder — so we degrade gracefully to an identical inline implementation.
+function _nftmDirectImageUri(uri) {
+  if (typeof isDirectImageUri === 'function') return isDirectImageUri(uri);
+  if (!uri || typeof uri !== 'string') return false;
+  const s = uri.trim();
+  if (/^data:image\//i.test(s)) return true;
+  return /\.(png|jpe?g|gif|webp|svg|bmp|avif)(\?[^#]*)?$/i.test(s);
+}
+
+function _nftmParseDataUriJson(uri) {
+  if (typeof parseDataUriJson === 'function') return parseDataUriJson(uri);
+  if (!uri || typeof uri !== 'string') return null;
+  const m = /^data:([^,]*),([\s\S]*)$/i.exec(uri.trim());
+  if (!m) return null;
+  try {
+    if (/base64/i.test(m[1] || '')) return JSON.parse(decodeURIComponent(escape(atob(m[2] || ''))));
+    return JSON.parse(decodeURIComponent(m[2] || ''));
+  } catch (e) { return null; }
+}
+
 // Resolve an NFT image/metadata URI into one or more displayable HTTP URLs.
 // IMPORTANT: Paxi NFTs use several DISTINCT schemes — IPFS (ipfs:// or bare CID),
 // Arweave (ar://), plain https, and chain-specific schemes (e.g. ibcc://). They must
@@ -475,7 +500,7 @@ function _nftmLinkRow(label, uri) {
 async function _nftmFetchMeta(uri, timeoutMs) {
   if (!uri) return null;
   // data: URI carrying JSON metadata — decode inline, no request needed
-  const dataMeta = parseDataUriJson(uri);
+  const dataMeta = _nftmParseDataUriJson(uri);
   if (dataMeta) return dataMeta;
   const cands = _nftmResolveImgSrcs(uri);
   for (const url of cands) {
@@ -537,7 +562,7 @@ async function _nftmFillMetadata(tokens, contract) {
       _nftmUpdateTokenCard(tid, contract);
       const ext = info.extension || {};
       const tokenUri = info.token_uri || '';
-      const isDirectImage = isDirectImageUri(tokenUri);
+      const isDirectImage = _nftmDirectImageUri(tokenUri);
       if (!ext.image && !ext.name && tokenUri && !isDirectImage) {
         try {
           const meta = await _nftmFetchMeta(info.token_uri, 6000);

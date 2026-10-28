@@ -9,7 +9,7 @@ const scripts = [
   'appjs/tools/batch-transfer.js', 'appjs/tools/balance-check.js', 'appjs/tools/tx-gas.js',
   'appjs/tools/address-convert.js', 'appjs/tools/validator-compare.js', 'appjs/tools/redelegate.js',
   'appjs/tools/proposal.js', 'appjs/tools/decoder.js', 'appjs/tools/pump.js', 'appjs/tools/burn.js',
-  'appjs/tools/nft-launcher.js', 'appjs/tools/my-nfts.js', 'app.js',
+  'appjs/tools/nft-launcher.js', 'appjs/tools/my-nfts.js', 'appjs/tools/nft-market.js', 'app.js',
   'appjs/tools/claim-rewards.js', 'appjs/tools/gov-vote.js', 'appjs/tools/stake-manage.js',
   'appjs/tools/address-book.js', 'appjs/tools/ibc-query.js', 'appjs/tools/tx-dryrun.js',
   'appjs/tools/allowance.js', 'appjs/tools/swap.js',
