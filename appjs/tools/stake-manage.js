@@ -202,44 +202,61 @@ function smStartCountdown() {
   smUnbondTimer = setInterval(tick, 1000);
 }
 
+// The cached loader lives in shared.js; if a STALE cached shared.js is loaded (without it) we
+// fall back to fetching the pages directly, so the tool never breaks.
+async function _smValidators(opts) {
+  if (typeof loadValidatorsCached === 'function') return loadValidatorsCached(opts);
+  const all = []; let nextKey = null;
+  for (let page = 0; page < 6; page++) {
+    const q = nextKey
+      ? `/cosmos/staking/v1beta1/validators?pagination.limit=100&pagination.key=${encodeURIComponent(nextKey)}`
+      : '/cosmos/staking/v1beta1/validators?pagination.limit=100';
+    const data = await fetchAPI(q);
+    const list = data.validators || [];
+    all.push(...list);
+    if (opts && opts.onPage) { try { opts.onPage(all.slice()); } catch (_) {} }
+    nextKey = data.pagination?.next_key || null;
+    if (!nextKey || !list.length) break;
+  }
+  return all;
+}
+
 async function smLoadValidators() {
   const sel = document.getElementById('smDelVal');
   if (!sel) return;
   sel.innerHTML = `<option value="">⏳ ${smPt('loading')}</option>`;
   try {
-    let all = [];
-    let nextKey = null;
-    for (let page = 0; page < 6; page++) {
-      const q = nextKey
-        ? `/cosmos/staking/v1beta1/validators?pagination.limit=100&pagination.key=${encodeURIComponent(nextKey)}`
-        : '/cosmos/staking/v1beta1/validators?pagination.limit=100';
-      const data = await fetchAPI(q);
-      const list = data.validators || [];
-      all = all.concat(list);
-      nextKey = data.pagination?.next_key || null;
-      if (!nextKey || list.length === 0) break;
-    }
-    if (all.length === 0) throw new Error('No validator data retrieved');
-    try { localStorage.setItem('paxi_validators_cache', JSON.stringify({ data: { validators: all }, ts: Date.now() })); } catch (_) {}
-
-    const rank = v => (v.status === 'BOND_STATUS_BONDED' && !v.jailed) ? 0 : 1;
-    const sorted = [...all].sort((a, b) => {
-      const ra = rank(a), rb = rank(b);
-      if (ra !== rb) return ra - rb;
-      return parseInt(b.tokens || 0) - parseInt(a.tokens || 0);
+    // shared loader: memory + localStorage cache (second tool opens instantly),
+    // and the first page renders right away while the remaining pages fill in behind it
+    const all = await _smValidators({
+      onPage: (partial) => { if (partial && partial.length) smRenderValidatorOptions(partial); }
     });
-    sel.innerHTML = `<option value="">${smPt('selectValidator')}</option>`;
-    for (const v of sorted) {
-      const commission = (parseFloat(v.commission?.commission_rates?.rate || 0) * 100).toFixed(1);
-      const moniker = v.description?.moniker || v.operator_address.slice(0, 12);
-      const active = (v.status === 'BOND_STATUS_BONDED' && !v.jailed);
-      const suffix = active ? '' : ' ⚠️Inactive';
-      sel.innerHTML += `<option value="${v.operator_address}">${moniker} · ${commission}%${suffix}</option>`;
-    }
+    smRenderValidatorOptions(all);
   } catch (e) {
     console.error('[StakeManage] validator load failed:', e);
     sel.innerHTML = `<option value="">❌ ${escapeHtml(e.message)}</option>`;
   }
+}
+
+function smRenderValidatorOptions(all) {
+  const sel = document.getElementById('smDelVal');
+  if (!sel || !all || !all.length) return;
+  const cur = sel.value;
+  const rank = v => (v.status === 'BOND_STATUS_BONDED' && !v.jailed) ? 0 : 1;
+  const sorted = [...all].sort((a, b) => {
+    const ra = rank(a), rb = rank(b);
+    if (ra !== rb) return ra - rb;
+    return parseInt(b.tokens || 0) - parseInt(a.tokens || 0);
+  });
+  sel.innerHTML = `<option value="">${smPt('selectValidator')}</option>`;
+  for (const v of sorted) {
+    const commission = (parseFloat(v.commission?.commission_rates?.rate || 0) * 100).toFixed(1);
+    const moniker = v.description?.moniker || v.operator_address.slice(0, 12);
+    const active = (v.status === 'BOND_STATUS_BONDED' && !v.jailed);
+    const suffix = active ? '' : ' ⚠️Inactive';
+    sel.innerHTML += `<option value="${v.operator_address}">${moniker} · ${commission}%${suffix}</option>`;
+  }
+  if (cur) sel.value = cur;
 }
 
 /* ------------------------------------------------ Delegate */

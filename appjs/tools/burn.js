@@ -96,10 +96,10 @@ window.TOOL_REGISTRY ||= {};
   /* Query token info (symbol/decimals) */
   async function fetchTokenInfo(contractAddr) {
     const queryObj = JSON.stringify({ token_info: {} });
-    const url = `${LCD()}/cosmwasm/wasm/v1/contract/${contractAddr}/smart/` + btoa(queryObj);
-    const res = await fetch(url);
-    if (!res.ok) throw new Error(bPt('queryFailHttp', res.status));
-    const data = await res.json();
+    const data = await fetchAPI(`/cosmwasm/wasm/v1/contract/${contractAddr}/smart/` + btoa(queryObj)).catch(err => {
+      const m = /HTTP (\d+)/.exec((err && err.message) || '');
+      throw new Error(bPt('queryFailHttp', m ? m[1] : '?'));
+    });
     if (data.data && data.data.decimals !== undefined) {
       return { symbol: data.data.symbol || '', decimals: Number(data.data.decimals) || 6, name: data.data.name || '' };
     }
@@ -125,8 +125,8 @@ window.TOOL_REGISTRY ||= {};
   async function buildAndSendTx(messages, memo) {
     const chainId = await fetch(`${RPC()}/status`).then(r => r.json()).then(d => d.result.node_info.network);
     const sender = await window.paxihub.paxi.getAddress();
-    const acctRes = await fetch(`${LCD()}/cosmos/auth/v1beta1/accounts/${sender.address}`);
-    const { account } = await acctRes.json();
+    const acctData = await fetchAPI(`/cosmos/auth/v1beta1/accounts/${sender.address}`);
+    const { account } = acctData;
     const ba = account.base_account || account;
     const accountNumber = Number(ba.account_number);
     const sequence = Number(ba.sequence);

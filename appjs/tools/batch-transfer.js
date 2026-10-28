@@ -364,7 +364,7 @@ async function executeBatchTransfer() {
       if (!contractAddr) throw new Error('Missing PRC-20 contract address');
       try {
         const queryMsg = btoa(JSON.stringify({ token_info: {} }));
-        const queryRes = await fetch(`${CONFIG.lcd}/cosmwasm/wasm/v1/contract/${contractAddr}/smart/${queryMsg}`).then(r => r.json());
+        const queryRes = await fetchAPI(`/cosmwasm/wasm/v1/contract/${contractAddr}/smart/${queryMsg}`);
         if (queryRes?.data?.decimals !== undefined) prc20Decimals = queryRes.data.decimals;
       } catch (e) {}
     }
@@ -405,8 +405,7 @@ async function executeBatchTransfer() {
       }
 
       // fetch account info (sequence must be refreshed each batch)
-      const accountRes = await fetch(`${CONFIG.lcd}/cosmos/auth/v1beta1/accounts/${sender.address}`);
-      const accountData = await accountRes.json();
+      const accountData = await fetchAPI(`/cosmos/auth/v1beta1/accounts/${sender.address}`);
       const account = accountData.account?.base_account || accountData.account;
       const accountNumber = Number(account.account_number);
       const sequence = Number(account.sequence);

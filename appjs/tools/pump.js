@@ -245,9 +245,12 @@ window.TOOL_REGISTRY ||= {};
     return data.result.node_info.network;
   }
   async function fetchAccountInfo(address) {
-    const res = await fetch(`${LCD()}/cosmos/auth/v1beta1/accounts/${address}`);
-    if (!res.ok) throw new Error(pt('errAccount'));
-    const data = await res.json();
+    let data;
+    try {
+      data = await fetchAPI(`/cosmos/auth/v1beta1/accounts/${address}`);
+    } catch (e) {
+      throw new Error(pt('errAccount'));
+    }
     const account = data.account || {};
     const base = account.base_account || account;
     return { accountNumber: Number(base.account_number || 0), sequence: Number(base.sequence || 0) };
@@ -322,9 +325,9 @@ window.TOOL_REGISTRY ||= {};
   async function waitContractAddress(txHash) {
     for (let i = 0; i < 10; i++) {
       await sleep(2000);
-      const txRes = await fetch(`${LCD()}/cosmos/tx/v1beta1/txs/${txHash}`);
-      if (!txRes.ok) continue;
-      const txData = await txRes.json();
+      let txData = null;
+      try { txData = await fetchAPI(`/cosmos/tx/v1beta1/txs/${txHash}`); }
+      catch (_) { continue; }
       if (txData.tx_response && txData.tx_response.code !== 0) {
         throw new Error(pt('errTxOnchain') + (txData.tx_response.raw_log || ''));
       }

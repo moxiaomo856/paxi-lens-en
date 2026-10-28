@@ -106,33 +106,27 @@ async function showAddressTxHistory(address) {
       `events=message.recipient='${address}'`,
       `events=coin_received.receiver='${address}'`
     ];
-    for (const query of queryMethods) {
-      try {
-        const url = `${CONFIG.lcd}/cosmos/tx/v1beta1/txs?${query}&pagination.limit=30&order_by=DESC`;
-        const res = await fetch(url);
-        if (res.ok) {
-          const data = await res.json();
-          if (data.tx_responses && data.tx_responses.length > 0) {
-            txs = data.tx_responses;
-            found = true;
-            break;
-          }
-        }
-      } catch (e) {}
+    // The 3 event queries are independent -> run them in parallel, take the first with results.
+    // (serial cost ~3s, parallel ~1s; and a burst of 3 is well within the LCD's tolerance)
+    const settled = await Promise.allSettled(
+      queryMethods.map(q => fetchAPI(`/cosmos/tx/v1beta1/txs?${q}&pagination.limit=30&order_by=DESC`))
+    );
+    for (const r of settled) {
+      if (r.status === 'fulfilled' && r.value && r.value.tx_responses && r.value.tx_responses.length > 0) {
+        txs = r.value.tx_responses;
+        found = true;
+        break;
+      }
     }
     if (!found || txs.length === 0) {
       try {
-        const url = `${CONFIG.lcd}/cosmos/tx/v1beta1/txs?events=message.sender='${address}'&pagination.limit=10&order_by=DESC`;
-        const res = await fetch(url);
-        if (res.ok) {
-          const data = await res.json();
-          if (data.tx_responses && data.tx_responses.length > 0) {
-            const sentTxs = data.tx_responses || [];
-            const allTxMap = {};
-            for (const tx of [...txs, ...sentTxs]) if (tx.txhash) allTxMap[tx.txhash] = tx;
-            txs = Object.values(allTxMap);
-            found = true;
-          }
+        const data = await fetchAPI(`/cosmos/tx/v1beta1/txs?events=message.sender='${address}'&pagination.limit=10&order_by=DESC`);
+        if (data.tx_responses && data.tx_responses.length > 0) {
+          const sentTxs = data.tx_responses || [];
+          const allTxMap = {};
+          for (const tx of [...txs, ...sentTxs]) if (tx.txhash) allTxMap[tx.txhash] = tx;
+          txs = Object.values(allTxMap);
+          found = true;
         }
       } catch (e) {}
     }

@@ -73,10 +73,24 @@ window.TOOL_REGISTRY ||= {};
 
   const b64q = (obj) => btoa(JSON.stringify(obj));
 
+  // LCD 会限流：超限时返回 HTML 错误页（状态码还可能是 200），res.json() 会直接抛。
+  // 防御解析 + 退避重试，行为与 shared.js 的 fetchAPI 一致。
   async function fetchJSON(url) {
-    const r = await fetch(url);
-    if (!r.ok) throw new Error('HTTP ' + r.status);
-    return r.json();
+    let lastErr = null;
+    for (let attempt = 0; attempt < 3; attempt++) {
+      if (attempt) await new Promise(r => setTimeout(r, 300 * attempt * attempt));
+      let r;
+      try { r = await fetch(url); }
+      catch (e) { lastErr = e; continue; }
+      if (!r.ok) {
+        lastErr = new Error('HTTP ' + r.status);
+        if (r.status === 429 || r.status >= 500) continue;
+        throw lastErr;
+      }
+      try { return JSON.parse(await r.text()); }
+      catch (e) { lastErr = e; continue; }
+    }
+    throw lastErr || new Error('Request failed');
   }
 
   async function loadTokenInfo(contract) {

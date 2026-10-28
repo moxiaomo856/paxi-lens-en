@@ -324,10 +324,111 @@ async function fetchAPIWithCache(path, cacheKey, cacheTtl = 60000) {
   return data;
 }
 
-async function fetchAPI(path) {
-  const res = await fetch(`${getLCD()}${path}`);
-  if (!res.ok) throw new Error(`API request failed: HTTP ${res.status}`);
-  return res.json();
+// LCD 会限流：超限时返回的是 HTML 错误页（状态码还可能是 200），直接 res.json() 会抛，
+// 一个限流响应就能把整个工具打挂。统一在这里做防御解析 + 退避重试，所有工具共用。
+// opts: { retries: 重试次数（默认 3） }
+async function fetchAPI(path, opts) {
+  const retries = (opts && typeof opts.retries === 'number') ? opts.retries : 3;
+  const url = `${getLCD()}${path}`;
+  let lastErr = null;
+  for (let attempt = 0; attempt < retries; attempt++) {
+    if (attempt) await new Promise(r => setTimeout(r, 300 * attempt * attempt)); // 300ms / 1200ms
+    let res;
+    try { res = await fetch(url); }
+    catch (e) { lastErr = e; continue; }                                   // 网络抖动 -> 重试
+    if (!res.ok) {
+      lastErr = new Error(`API request failed: HTTP ${res.status}`);
+      if (res.status === 429 || res.status >= 500) continue;               // 限流 / 服务端错误 -> 重试
+      throw lastErr;                                                      // 其它 4xx -> 直接报错
+    }
+    let text;
+    try { text = await res.text(); }
+    catch (e) { lastErr = e; continue; }
+    const ct = (res.headers.get('content-type') || '').toLowerCase();
+    const trimmed = (text || '').trim();
+    if (!ct.includes('json') && !trimmed.startsWith('{') && !trimmed.startsWith('[')) {
+      lastErr = new Error('API returned a non-JSON response (the node may be rate limiting)');
+      continue;                                                            // 限流 HTML -> 重试
+    }
+    try { return JSON.parse(text); }
+    catch (e) { lastErr = e; continue; }
+  }
+  throw lastErr || new Error('API request failed');
+}
+
+// ============ validator list (shared by redelegate / stake-manage / validator-compare) ============
+// 三个工具拉的是同一份数据（主网 138 个，2 页），实测每页约 1.6s。
+// 统一走这里：内存 + localStorage 双层缓存 -> 第二个工具秒开；第一页先回调让用户立刻能选，
+// 第二页在后台补齐。
+const _VALIDATORS_CACHE_KEY = 'paxi_validators_cache';
+const _VALIDATORS_TTL_MS = 30 * 60 * 1000;   // 30 分钟内直接用缓存
+let _validatorsMem = null;      // { validators, ts }
+let _validatorsInflight = null; // Promise<validators>
+
+function _readValidatorsCache() {
+  try {
+    const raw = localStorage.getItem(_VALIDATORS_CACHE_KEY);
+    if (!raw) return null;
+    const c = JSON.parse(raw);
+    const list = (c && c.data && c.data.validators) || [];
+    return list.length ? { validators: list, ts: c.ts || 0 } : null;
+  } catch (_) { return null; }
+}
+
+function _writeValidatorsCache(list) {
+  _validatorsMem = { validators: list, ts: Date.now() };
+  try { localStorage.setItem(_VALIDATORS_CACHE_KEY, JSON.stringify({ data: { validators: list }, ts: Date.now() })); } catch (_) {}
+}
+
+async function _fetchValidatorPages(onPage) {
+  const all = [];
+  let nextKey = null;
+  for (let page = 0; page < 6; page++) {
+    const q = nextKey
+      ? `/cosmos/staking/v1beta1/validators?pagination.limit=100&pagination.key=${encodeURIComponent(nextKey)}`
+      : '/cosmos/staking/v1beta1/validators?pagination.limit=100';
+    const data = await fetchAPI(q);
+    const list = data.validators || [];
+    all.push(...list);
+    if (typeof onPage === 'function') { try { onPage(all.slice()); } catch (_) {} }
+    nextKey = (data.pagination && data.pagination.next_key) ? data.pagination.next_key : null;
+    if (!nextKey || list.length === 0) break;
+  }
+  return all;
+}
+
+function _loadValidatorsFresh(o) {
+  return _fetchValidatorPages(o && o.onPage).then(list => { _writeValidatorsCache(list); return list; });
+}
+
+function _refreshValidators(o) {
+  if (_validatorsInflight) return _validatorsInflight;
+  const p = _loadValidatorsFresh(o).catch(() => null);
+  _validatorsInflight = p;
+  p.finally(() => { if (_validatorsInflight === p) _validatorsInflight = null; });
+  return p;
+}
+
+// opts: { force: 跳过缓存强制刷新, onPage: 每页到达时的回调（先用第一页渲染） }
+async function loadValidatorsCached(opts) {
+  const o = opts || {};
+  const now = Date.now();
+  if (!o.force) {
+    if (_validatorsMem && now - _validatorsMem.ts < _VALIDATORS_TTL_MS) return _validatorsMem.validators;
+    const cached = _readValidatorsCache();
+    if (cached && cached.validators.length) {
+      _validatorsMem = { validators: cached.validators, ts: cached.ts };
+      if (now - cached.ts < _VALIDATORS_TTL_MS) return cached.validators;  // 命中新鲜缓存：立即返回
+      _refreshValidators(o);                                             // 缓存过期：先用旧的顶上，后台刷新
+      return cached.validators;
+    }
+  }
+  if (!_validatorsInflight) {
+    const p = _loadValidatorsFresh(o);
+    _validatorsInflight = p;
+    p.finally(() => { if (_validatorsInflight === p) _validatorsInflight = null; });
+  }
+  return _validatorsInflight;
 }
 
 // ============================================================

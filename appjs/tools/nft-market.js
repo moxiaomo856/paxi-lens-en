@@ -326,10 +326,7 @@ async function _queryNftContractInfo(contract) {
   try {
     const query = { contract_info: {} };
     const encoded = btoa(JSON.stringify(query));
-    const url = `${CONFIG.lcd}/cosmwasm/wasm/v1/contract/${contract}/smart/${encoded}`;
-    const res = await fetch(url);
-    if (!res.ok) return null;
-    const data = await res.json();
+    const data = await fetchAPI(`/cosmwasm/wasm/v1/contract/${contract}/smart/${encoded}`);
     return _decodeSmartQuery(data) || null;
   } catch (_) { return null; }
 }
@@ -355,10 +352,7 @@ async function _nftmLoadMoreTokens() {
   try {
     const query = { all_tokens: { limit: _NFTM_TOKEN_PAGE, ...(_nftmState.tokenCursor ? { start_after: _nftmState.tokenCursor } : {}) } };
     const encoded = btoa(JSON.stringify(query));
-    const url = `${CONFIG.lcd}/cosmwasm/wasm/v1/contract/${contract}/smart/${encoded}`;
-    const res = await fetch(url);
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const data = await res.json();
+    const data = await fetchAPI(`/cosmwasm/wasm/v1/contract/${contract}/smart/${encoded}`);
     const parsed = _decodeSmartQuery(data);
     const tokens = parsed && parsed.tokens ? parsed.tokens : [];
     if (!tokens.length) {

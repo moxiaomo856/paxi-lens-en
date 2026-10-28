@@ -14,42 +14,50 @@ function renderValidatorCompare() {
     </div>
   `;
 }
+// The cached loader lives in shared.js; if a STALE cached shared.js is loaded (without it) we
+// fall back to fetching the pages directly, so the tool never breaks.
+async function _vcValidators() {
+  if (typeof loadValidatorsCached === 'function') return loadValidatorsCached();
+  const all = []; let nextKey = null;
+  do {
+    const q = '/cosmos/staking/v1beta1/validators?pagination.limit=100' + (nextKey ? `&pagination.key=${encodeURIComponent(nextKey)}` : '');
+    const data = await fetchAPI(q);
+    all.push(...(data.validators || []));
+    nextKey = (data.pagination && data.pagination.next_key) ? data.pagination.next_key : null;
+  } while (nextKey);
+  return all;
+}
+
 async function loadValidatorData() {
   showStatus('vcStatus', t('validatorCompare.loading'), 'info');
   try {
-    let validators = [];
-    let nextKey = null;
-    do {
-      const url = '/cosmos/staking/v1beta1/validators?pagination.limit=100' + (nextKey ? `&pagination.key=${encodeURIComponent(nextKey)}` : '');
-      const data = await fetchAPI(url);
-      validators = validators.concat(data.validators || []);
-      nextKey = (data.pagination && data.pagination.next_key) ? data.pagination.next_key : null;
-    } while (nextKey);
-    const poolData = await fetchAPI('/cosmos/staking/v1beta1/pool');
-    const bondedTokens = parseInt(poolData.pool?.bonded_tokens || '0') / 1e6;
+    // shared loader: memory + localStorage cache (2nd tool opens instantly), first page renders first
+    const validators = await _vcValidators();
+    // these four are independent -> fetch them in parallel (serial cost ~3.3s, parallel ~1.2s)
+    const [poolRes, infRes, supRes, distRes] = await Promise.allSettled([
+      fetchAPI('/cosmos/staking/v1beta1/pool'),
+      fetchAPI('/cosmos/mint/v1beta1/inflation'),
+      fetchAPI('/cosmos/bank/v1beta1/supply/by_denom?denom=upaxi'),
+      fetchAPI('/cosmos/distribution/v1beta1/params'),
+    ]);
+    const poolData = poolRes.status === 'fulfilled' ? poolRes.value : null;
+    const bondedTokens = poolData ? parseInt(poolData.pool?.bonded_tokens || '0') / 1e6 : 0;
 
     /* ---- APR calculation: all read live from chain, not hardcoded ----
      * Paxi inflation halves yearly (Year 1 8% → Year 2 4% → …),
      * must read the mint module's current inflation rate, otherwise from Year 2 APR would be overestimated by 2x.
      * APR = Total Supply × Inflation Rate × (1 − Community Pool Tax) ÷ Total Staked            */
     let inflation = null, totalSupply = 0, communityTax = 0.05, aprSource = '';
-    try {
-      const infData = await fetchAPI('/cosmos/mint/v1beta1/inflation');
-      inflation = parseFloat(infData.inflation);
+    if (infRes.status === 'fulfilled') {
+      inflation = parseFloat(infRes.value.inflation);
       aprSource = 'On-chain live';
-    } catch (_) {}
+    }
     if (inflation === null || !isFinite(inflation)) {
       inflation = 0.04;   // Fallback: estimate at Year 2 4%
       aprSource = 'Fallback value (Year 2 4%)';
     }
-    try {
-      const supData = await fetchAPI('/cosmos/bank/v1beta1/supply/by_denom?denom=upaxi');
-      totalSupply = parseInt(supData.amount?.amount || '0') / 1e6;
-    } catch (_) {}
-    try {
-      const distData = await fetchAPI('/cosmos/distribution/v1beta1/params');
-      communityTax = parseFloat(distData.params?.community_tax ?? '0.05');
-    } catch (_) {}
+    if (supRes.status === 'fulfilled') totalSupply = parseInt(supRes.value.amount?.amount || '0') / 1e6;
+    if (distRes.status === 'fulfilled') communityTax = parseFloat(distRes.value.params?.community_tax ?? '0.05');
 
     const annualReward = totalSupply > 0 ? totalSupply * inflation * (1 - communityTax) : 0;
     const bondedRatio = totalSupply > 0 ? (bondedTokens / totalSupply) * 100 : 0;

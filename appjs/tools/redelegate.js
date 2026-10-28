@@ -14,12 +14,12 @@ function renderRedelegate() {
         <span style="font-size:11px;color:var(--text-muted);">📊 Service fee: flat 0.15% (1.5 per mille)</span>
       </div>
       <div class="form-group">
-        <label class="form-label">Validator data <span style="font-size:11px;color:var(--text-muted);">(must be loaded before you can pick a target validator)</span></label>
+        <label class="form-label">Validator data <span style="font-size:11px;color:var(--text-muted);">(auto-loaded; use the button to refresh)</span></label>
         <div style="display:flex;gap:8px;align-items:center;">
-          <button class="btn btn-primary" id="rdLoadValidatorsBtn" onclick="loadValidatorsManually()" style="min-height:42px;flex:1;">📋 Load validator data</button>
+          <button class="btn btn-outline" id="rdLoadValidatorsBtn" onclick="loadValidatorsManually()" style="min-height:42px;flex:1;">🔄 Refresh validator data</button>
         </div>
         <div style="margin-top:6px;">
-          <span id="rdToStatus" style="font-size:11px;color:var(--text-muted);">Cannot select a target validator until validator data is loaded</span>
+          <span id="rdToStatus" style="font-size:11px;color:var(--text-muted);">⏳ Loading validators…</span>
         </div>
       </div>
       <div class="form-group">
@@ -31,7 +31,7 @@ function renderRedelegate() {
       <div class="form-group">
         <label class="form-label">${t('redelegate.to')} <span id="rdToLoading" style="font-size:11px;color:var(--primary);"></span></label>
         <select id="rdTo" onchange="updateRdPreview()" disabled>
-          <option value="">⏳ Please click the "📋 Load validator data" button above first</option>
+          <option value="">⏳ Loading validator data…</option>
         </select>
         <div id="rdTargetWarn" style="display:none;margin-top:6px;font-size:11px;color:#ffd700;line-height:1.5;"></div>
       </div>
@@ -76,8 +76,9 @@ async function withTimeout(promise, ms, name) {
 }
 
 async function loadRedelegateData() {
-  // validator list is triggered by the user's "Load validator data" button (doesn't depend on wallet, avoids being stuck on "Loading" when disconnected)
-  // the current staking validator (from) needs wallet authorization, only auto-loaded when connected
+  // The validator list does not depend on the wallet -> auto-load it (cache hit = instant, no waiting).
+  // The "from" (current staking validator) needs a connected wallet, so it only loads when connected.
+  loadValidatorsAuto();
   if (!state.connected) return;
   const address = state.wallet.address;
   loadDelegationsOnly(address);
@@ -120,57 +121,91 @@ async function loadDelegationsOnly(address) {
   }
 }
 
+// Load the validator list. The cached loader lives in shared.js; if a STALE cached shared.js is
+// loaded (without it) we fall back to fetching the pages directly, so the tool never breaks.
+async function _rdValidators(opts) {
+  if (typeof loadValidatorsCached === 'function') return loadValidatorsCached(opts);
+  const all = []; let nextKey = null;
+  for (let page = 0; page < 6; page++) {
+    const q = nextKey
+      ? `/cosmos/staking/v1beta1/validators?pagination.limit=100&pagination.key=${encodeURIComponent(nextKey)}`
+      : '/cosmos/staking/v1beta1/validators?pagination.limit=100';
+    const data = await fetchAPI(q);
+    const list = data.validators || [];
+    all.push(...list);
+    if (opts && opts.onPage) { try { opts.onPage(all.slice()); } catch (_) {} }
+    nextKey = data.pagination?.next_key || null;
+    if (!nextKey || !list.length) break;
+  }
+  return all;
+}
+
+// Manual refresh — also the retry entry when auto-loading failed
 async function loadValidatorsManually() {
+  return loadValidatorsAuto(true);
+}
+
+// Auto-load the validator list (wallet-independent).
+// Cache hit -> instant; otherwise the first page renders right away and the rest fills in behind it.
+async function loadValidatorsAuto(force) {
   const btn = document.getElementById('rdLoadValidatorsBtn');
   const status = document.getElementById('rdToStatus');
   if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Loading...'; }
   if (status) { status.textContent = '⏳ Loading validators...'; status.style.color = 'var(--text-muted)'; }
   try {
-    // full paginated load: the mainnet has 138 validators total (16 active / 4 unbonding / 118 candidate),
-    // a single page with limit=100 misses the second page, so we must follow pagination.next_key to fetch all,
-    // keeping the count consistent with the "Validator Compare" page (which historically also only got 100, the same kind of defect).
-    let all = [];
-    let nextKey = null;
-    for (let page = 0; page < 6; page++) {
-      const q = nextKey
-        ? `/cosmos/staking/v1beta1/validators?pagination.limit=100&pagination.key=${encodeURIComponent(nextKey)}`
-        : '/cosmos/staking/v1beta1/validators?pagination.limit=100';
-      const data = await withTimeout(fetchAPI(q), 15000, 'Loading validators');
-      const list = data.validators || [];
-      all = all.concat(list);
-      nextKey = data.pagination?.next_key || null;
-      if (!nextKey || list.length === 0) break;
+    const all = await _rdValidators({
+      force: !!force,
+      onPage: (partial) => { if (partial && partial.length) applyRdValidators(partial, false); }
+    });
+    applyRdValidators(all, true);
+    if (force) {
+      const bonded = all.filter(v => v.status === 'BOND_STATUS_BONDED' && !v.jailed).length;
+      showToast(`✅ Loaded ${all.length} validators (active ${bonded})`, 'success');
     }
-    if (all.length === 0) throw new Error('No validator data retrieved');
-    // write cache for "current staking validator" dropdown moniker backfill (format consistent with the reader side)
-    try { localStorage.setItem('paxi_validators_cache', JSON.stringify({ data: { validators: all }, ts: Date.now() })); } catch (_) {}
-    populateToSelect(all);
-    // unlock target validator selection only after a successful load
-    const toSel = document.getElementById('rdTo');
-    if (toSel) toSel.disabled = false;
-    // backfill the "from" moniker (if a local delegation cache exists)
-    try {
-      const cachedDel = localStorage.getItem('paxi_my_delegations_cache');
-      if (cachedDel) {
-        const delegations = (JSON.parse(cachedDel).data?.delegation_responses || []);
-        if (delegations.length > 0) {
-          const valMap = {};
-          all.forEach(v => { valMap[v.operator_address] = v; });
-          const currentFrom = document.getElementById('rdFrom')?.value;
-          populateFromSelect(delegations, valMap, '');
-          if (currentFrom) document.getElementById('rdFrom').value = currentFrom;
-        }
-      }
-    } catch (_) {}
-    const bonded = all.filter(v => v.status === 'BOND_STATUS_BONDED' && !v.jailed).length;
-    if (status) { status.innerHTML = `✅ Loaded ${all.length} validators (active ${bonded} / inactive ${all.length - bonded})`; status.style.color = 'var(--success)'; }
-    showToast(`✅ Loaded ${all.length} validators (active ${bonded})`, 'success');
   } catch (e) {
     console.error('[Redelegate] validator load failed:', e);
     if (status) { status.textContent = '❌ Load failed, please retry'; status.style.color = 'var(--danger)'; }
     showToast('❌ Failed to load validators: ' + e.message, 'error');
   } finally {
-    if (btn) { btn.disabled = false; btn.innerHTML = '🔍 Load validators'; }
+    if (btn) { btn.disabled = false; btn.innerHTML = '🔄 Refresh validator data'; }
+  }
+}
+
+// Populate the target-validator dropdown. complete=false means "more pages are still loading".
+function applyRdValidators(all, complete) {
+  if (!all || !all.length) return;
+  const toSel = document.getElementById('rdTo');
+  const status = document.getElementById('rdToStatus');
+  const cur = toSel ? toSel.value : '';
+  populateToSelect(all);
+  if (toSel) {
+    // unlock target validator selection as soon as we have any data
+    toSel.disabled = false;
+    if (cur) toSel.value = cur;
+  }
+  // backfill the "from" moniker (if a local delegation cache exists)
+  try {
+    const cachedDel = localStorage.getItem('paxi_my_delegations_cache');
+    if (cachedDel) {
+      const delegations = (JSON.parse(cachedDel).data?.delegation_responses || []);
+      if (delegations.length > 0) {
+        const valMap = {};
+        all.forEach(v => { valMap[v.operator_address] = v; });
+        const currentFrom = document.getElementById('rdFrom')?.value;
+        populateFromSelect(delegations, valMap, '');
+        if (currentFrom) document.getElementById('rdFrom').value = currentFrom;
+      }
+    }
+  } catch (_) {}
+  const bonded = all.filter(v => v.status === 'BOND_STATUS_BONDED' && !v.jailed).length;
+  if (status) {
+    if (complete) {
+      status.innerHTML = `✅ Loaded ${all.length} validators (active ${bonded} / inactive ${all.length - bonded})`;
+      status.style.color = 'var(--success)';
+    } else {
+      status.textContent = `⏳ Loaded ${all.length} validators, loading more…`;
+      status.style.color = 'var(--text-muted)';
+    }
   }
 }
 

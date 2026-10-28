@@ -753,9 +753,7 @@ async function _getAllCw721Contracts() {
   let key = null;
   while (true) {
     const qs = key ? `?pagination.key=${encodeURIComponent(key)}&pagination.limit=100` : '?pagination.limit=100';
-    const res = await fetch(`${CONFIG.lcd}/cosmwasm/wasm/v1/code/${_NFTV_CW721_CODE_ID}/contracts${qs}`);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json();
+    const data = await fetchAPI(`/cosmwasm/wasm/v1/code/${_NFTV_CW721_CODE_ID}/contracts${qs}`);
     if (data.contracts) list.push(...data.contracts);
     const nk = data.pagination?.next_key;
     if (!nk) break;
