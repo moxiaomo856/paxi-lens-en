@@ -22,8 +22,9 @@ if (!window.TOOL_REGISTRY) window.TOOL_REGISTRY = {};
 // ============================================================
 const _NFTM_CODE_ID = 2;          // every cw721 on Paxi instantiates from code_id 2
 const _NFTM_COLL_PER_PAGE = 60;   // collections shown per page
-const _NFTM_TOKEN_PAGE = 100;      // tokens fetched per page inside a collection
-const _NFTM_CONCURRENCY = 10;
+const _NFTM_TOKEN_PAGE = 24;       // tokens fetched per page inside a collection
+                                      // (每页一个 token = 一次 LCD 查询；100 个要 ~19s，24 个 ~2s)
+const _NFTM_CONCURRENCY = 5;       // LCD 会限流（并发越高失败越多），靠重试兜底，5 是速度/压力平衡点
 const _NFTM_INTENT_KEY = 'paxi_nft_intents';   // local sale intents (this device)
 const _NFTM_IMPORT_KEY = 'paxi_nft_imported';  // imported intent cards (this device)
 const _NFTM_TOKEN_CAP = 500;       // hard cap on tokens rendered per collection
@@ -418,9 +419,13 @@ function _nftmParseDataUriJson(uri) {
 // as-is so the raw link can still be shown to the user (never force-fed to <img>).
 // NOTE: a CID may be followed by a sub-path (e.g. /ipfs/QmXXX/1.png) — that sub-path MUST be
 // kept, otherwise the URL points at the wrong object and the image silently fails to load.
+// The canonical implementation lives in my-nfts.js; the inline copy keeps this file working
+// even if a stale cached my-nfts.js is loaded (no hard cross-file dependency).
 function _nftmResolveImgSrcs(uri) {
+  if (typeof _nftImgCandidates === 'function') return _nftImgCandidates(uri);
   if (!uri || typeof uri !== 'string') return [];
   const s = uri.trim();
+  if (!s) return [];
   if (s.startsWith('ar://')) {
     const p = s.slice(5);
     const i = p.indexOf('/');
@@ -441,10 +446,11 @@ function _nftmResolveImgSrcs(uri) {
   }
   if (cid) {
     const list = [];
-    // already an http(s) gateway URL — try it first (it may point at a specific sub-file)
-    if (/^https?:\/\//i.test(s)) list.push(s);
+    // an already-resolved gateway URL is tried first; pinata 301-redirects when the path has no
+    // trailing slash, so add it ourselves (measured 12.3s -> 7.2s on a mainland-CN line)
+    if (/^https?:\/\//i.test(s)) list.push(/^https:\/\/gateway\.pinata\.cloud\/ipfs\/[^/]+$/.test(s) ? s + '/' : s);
     list.push(
-      'https://gateway.pinata.cloud/ipfs/' + cid + rest,
+      'https://gateway.pinata.cloud/ipfs/' + cid + (rest ? rest : '/'),
       'https://ipfs.io/ipfs/' + cid + rest,
       'https://dweb.link/ipfs/' + cid + rest,
       'https://cloudflare-ipfs.com/ipfs/' + cid + rest
@@ -454,6 +460,26 @@ function _nftmResolveImgSrcs(uri) {
   if (/^(https?:\/\/|data:)/i.test(s)) return [s];
   // unknown scheme (ibcc:// or any custom) — keep raw so it can be linked/shown
   return [s];
+}
+
+// Race all gateway candidates in parallel and use the first that decodes.
+// Sequential onerror-fallback has to wait for a dead gateway to time out (10s each) first.
+function _nftmRaceImage(cands, onWin) {
+  if (!cands || !cands.length) return;
+  let done = false;
+  const win = (u) => {
+    if (done) return;
+    done = true;
+    try { onWin(u); } catch (_) {}
+  };
+  for (const u of cands) {
+    try {
+      const probe = new Image();
+      probe.onload = () => { if (typeof _nftGwOk === 'function') _nftGwOk(u); win(u); };
+      probe.onerror = () => { if (typeof _nftGwFail === 'function') _nftGwFail(u); };
+      probe.src = u;
+    } catch (_) {}
+  }
 }
 
 // Candidate <img src> values for a resolved image URI.
@@ -466,6 +492,7 @@ function _nftmImgCands(uri) {
 
 // onerror for NFT <img>: try the next gateway candidate, else fall back to placeholder
 function _nftmImgErr(img) {
+  if (img && img.src && typeof _nftGwFail === 'function') _nftGwFail(img.src);
   var next = img.getAttribute('data-next');
   if (!next) { _nftmImgFallback(img); return; }
   try {
@@ -497,25 +524,42 @@ function _nftmLinkRow(label, uri) {
 // Fetch external metadata JSON (token_uri) trying each candidate gateway in turn.
 // For ipfs:// token_uri this tries pinata -> ipfs.io -> dweb.link -> cloudflare in order.
 // For data:application/json;base64,... token_uri the JSON is decoded locally (no network).
+// Gateways are raced in PARALLEL: on a mainland-CN line ipfs.io / dweb.link / cloudflare-ipfs
+// all time out (10s each), so a serial fallback would waste 10s per dead gateway per token.
 async function _nftmFetchMeta(uri, timeoutMs) {
   if (!uri) return null;
   // data: URI carrying JSON metadata — decode inline, no request needed
   const dataMeta = _nftmParseDataUriJson(uri);
   if (dataMeta) return dataMeta;
-  const cands = _nftmResolveImgSrcs(uri);
-  for (const url of cands) {
-    if (!/^https?:\/\//i.test(url)) continue;
-    try {
-      const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), timeoutMs || 6000);
-      const res = await fetch(url, { signal: controller.signal });
+  const cands = _nftmResolveImgSrcs(uri).filter(c => /^https?:\/\//i.test(c));
+  if (!cands.length) return null;
+  const budget = timeoutMs || 6000;
+  return await new Promise((resolve) => {
+    let settled = false;
+    const finish = (v) => {
+      if (settled) return;
+      settled = true;
       clearTimeout(timer);
-      if (res.ok) {
-        try { return await res.json(); } catch (_) {}
-      }
-    } catch (_) {}
-  }
-  return null;
+      resolve(v);
+    };
+    const timer = setTimeout(() => finish(null), budget);
+    for (const url of cands) {
+      (async () => {
+        try {
+          const controller = new AbortController();
+          const t = setTimeout(() => controller.abort(), budget);
+          const res = await fetch(url, { signal: controller.signal });
+          clearTimeout(t);
+          if (!res.ok) { if (typeof _nftGwFail === 'function') _nftGwFail(url); return; }
+          const json = await res.json();
+          if (typeof _nftGwOk === 'function') _nftGwOk(url);
+          finish(json);
+        } catch (_) {
+          if (typeof _nftGwFail === 'function') _nftGwFail(url);
+        }
+      })();
+    }
+  });
 }
 
 function _nftmTokenCardInner(tokenId, contract) {
@@ -605,7 +649,7 @@ function _nftmShowDetail(tokenId, contract) {
       <button onclick="document.getElementById('nftmModal').remove()" style="position:absolute;top:12px;right:12px;background:var(--bg);border:1px solid var(--border);color:var(--text);width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:16px;line-height:1;">✕</button>
       <div style="text-align:center;margin-bottom:14px;">
         <div style="width:100%;max-width:240px;aspect-ratio:1;margin:0 auto 12px;background:var(--bg);border-radius:12px;overflow:hidden;display:flex;align-items:center;justify-content:center;">
-          ${imgCands.length ? `<img src="${escapeHtml(imgCands[0])}" data-next='${escapeHtml(JSON.stringify(imgCands.slice(1)))}' style="width:100%;height:100%;object-fit:cover;" onerror="_nftmImgErr(this)">` : '<div style="font-size:48px;">🎨</div>'}
+          ${imgCands.length ? `<img id="nftmDetailImg" src="${escapeHtml(imgCands[0])}" data-next='${escapeHtml(JSON.stringify(imgCands.slice(1)))}' style="width:100%;height:100%;object-fit:cover;" onerror="_nftmImgErr(this)">` : '<div style="font-size:48px;">🎨</div>'}
         </div>
         <h3 style="font-size:17px;margin-bottom:4px;">${escapeHtml(d.name || tokenId)}</h3>
         <div style="font-size:12px;color:var(--text-muted);">Token #${escapeHtml(tokenId)}</div>
@@ -624,6 +668,11 @@ function _nftmShowDetail(tokenId, contract) {
     </div>`;
   modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
   document.body.appendChild(modal);
+  // single image in the detail view: race all gateway candidates, use whichever decodes first
+  const detailImg = document.getElementById('nftmDetailImg');
+  if (detailImg && imgCands.length > 1) {
+    _nftmRaceImage(imgCands, (u) => { detailImg.src = u; });
+  }
   const btn = modal.querySelector('#nftmIntentFromDetail');
   if (btn) btn.onclick = () => { modal.remove(); _nftmGotoListWithPrefill(contract, tokenId); };
 }

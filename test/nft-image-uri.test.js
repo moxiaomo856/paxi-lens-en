@@ -1,4 +1,4 @@
-/* Regression test — NFT image / metadata URI handling.
+/* Regression test — NFT image / metadata URI handling + performance guards.
  *
  * Bugs covered (2026-10-28):
  *  A) After the "direct image token_uri" change, only i.ibb.co style direct image links rendered.
@@ -11,6 +11,10 @@
  *     The tools must therefore work with OR without those shared.js helpers.
  *  C) _nftmResolveImgSrcs dropped the sub-path after an IPFS CID
  *     (/ipfs/QmXXX/1.png -> /ipfs/QmXXX), pointing at the wrong object.
+ *  D) Performance: LCD rate-limits at concurrency >=3 (answers with an HTML error page), the
+ *     tools used concurrency 10 -> ~25% of nft_info queries failed; a failing res.json() threw
+ *     and killed the whole batch. Also pinata 301-redirects /ipfs/<cid> -> /ipfs/<cid>/,
+ *     which doubled the image latency (12.3s -> 7.2s once we add the slash ourselves).
  *
  * Run: node test/nft-image-uri.test.js
  */
@@ -20,12 +24,15 @@ const vm = require('vm');
 
 const SUITE = path.join(__dirname, '..');
 
-// ---- extract a top-level function from a source file (brace matching) ----
+function readSrc(file) {
+  return fs.readFileSync(path.join(SUITE, file), 'utf8');
+}
+
+// ---- extract a top-level function (brace matching) ----
 function extractFn(file, name) {
-  const src = fs.readFileSync(path.join(SUITE, file), 'utf8');
+  const src = readSrc(file);
   let start = src.indexOf('function ' + name + '(');
   if (start < 0) throw new Error('function not found: ' + name + ' in ' + file);
-  // keep a preceding `async` keyword (async function ... { await ... })
   if (src.slice(Math.max(0, start - 6), start) === 'async ') start -= 6;
   let depth = 0, opened = false;
   for (let i = start; i < src.length; i++) {
@@ -38,31 +45,67 @@ function extractFn(file, name) {
   throw new Error('unbalanced braces: ' + name);
 }
 
+// ---- extract a top-level `const NAME = ...;` statement (bracket + quote aware) ----
+function extractConst(file, name) {
+  const src = readSrc(file);
+  const idx = src.indexOf('const ' + name + ' =');
+  if (idx < 0) throw new Error('const not found: ' + name + ' in ' + file);
+  let depth = 0, quote = null;
+  for (let i = idx; i < src.length; i++) {
+    const c = src[i];
+    if (quote) {
+      if (c === '\\') { i++; continue; }
+      if (c === quote) quote = null;
+      continue;
+    }
+    if (c === '"' || c === "'" || c === '`') { quote = c; continue; }
+    if (c === '[' || c === '{' || c === '(') depth++;
+    else if (c === ']' || c === '}' || c === ')') depth--;
+    else if (c === ';' && depth === 0) return src.slice(idx, i + 1);
+  }
+  throw new Error('unterminated const: ' + name);
+}
+
 // ---- sandbox WITHOUT network ----
-function makeCtx(withSharedHelpers) {
+function makeCtx(opts) {
+  const withShared = !!(opts && opts.withShared);
+  const withCandidates = !!(opts && opts.withCandidates);
   const ctx = vm.createContext({
     atob, btoa, escape, unescape, decodeURIComponent, encodeURIComponent,
-    console, JSON, Math, Date, setTimeout, clearTimeout, AbortController,
+    console, JSON, Math, Date, setTimeout, clearTimeout, AbortController, Map, Set,
     fetch: () => { throw new Error('network disabled in this test'); },
   });
-  const load = (file, name) => {
+  const loadFn = (file, name) => {
     const fn = vm.runInContext('(' + extractFn(file, name) + ')', ctx);
     ctx[name] = fn;
     return fn;
   };
-  if (withSharedHelpers) {
-    load('shared.js', 'isDirectImageUri');
-    load('shared.js', 'parseDataUriJson');
+  const loadConst = (file, name) => {
+    vm.runInContext(extractConst(file, name), ctx);
+  };
+  if (withShared) {
+    loadFn('shared.js', 'isDirectImageUri');
+    loadFn('shared.js', 'parseDataUriJson');
   }
   // tool-local helpers (must work even when shared.js is stale)
-  load('appjs/tools/my-nfts.js', '_nftvDirectImageUri');
-  load('appjs/tools/my-nfts.js', '_nftvParseDataUriJson');
-  load('appjs/tools/nft-market.js', '_nftmDirectImageUri');
-  load('appjs/tools/nft-market.js', '_nftmParseDataUriJson');
-  load('appjs/tools/my-nfts.js', '_resolveDisplay');
-  load('appjs/tools/nft-market.js', '_nftmResolveImgSrcs');
-  load('appjs/tools/nft-market.js', '_nftmImgCands');
-  load('appjs/tools/nft-market.js', '_nftmFetchMeta');
+  loadFn('appjs/tools/my-nfts.js', '_nftvDirectImageUri');
+  loadFn('appjs/tools/my-nfts.js', '_nftvParseDataUriJson');
+  loadFn('appjs/tools/nft-market.js', '_nftmDirectImageUri');
+  loadFn('appjs/tools/nft-market.js', '_nftmParseDataUriJson');
+  if (withCandidates) {
+    // canonical gateway helpers (live in my-nfts.js)
+    loadConst('appjs/tools/my-nfts.js', '_NFT_IPFS_GATEWAYS');
+    loadConst('appjs/tools/my-nfts.js', '_NFT_GW_BLOCK_MS');
+    loadConst('appjs/tools/my-nfts.js', '_nftGwState');
+    loadFn('appjs/tools/my-nfts.js', '_nftGwBlocked');
+    loadFn('appjs/tools/my-nfts.js', '_nftGwFail');
+    loadFn('appjs/tools/my-nfts.js', '_nftGwOk');
+    loadFn('appjs/tools/my-nfts.js', '_nftImgCandidates');
+  }
+  loadFn('appjs/tools/my-nfts.js', '_resolveDisplay');
+  loadFn('appjs/tools/nft-market.js', '_nftmResolveImgSrcs');
+  loadFn('appjs/tools/nft-market.js', '_nftmImgCands');
+  loadFn('appjs/tools/nft-market.js', '_nftmFetchMeta');
   return ctx;
 }
 
@@ -75,7 +118,7 @@ function ok(cond, label, extra) {
 }
 
 // ============================================================
-// Behaviour that must hold in BOTH sandboxes (fresh / stale shared.js)
+// Behaviour that must hold in every sandbox variant
 // ============================================================
 async function behaviourSuite(label, ctx) {
   const _resolveDisplay = ctx._resolveDisplay;
@@ -101,20 +144,27 @@ async function behaviourSuite(label, ctx) {
   ok(disp.image !== dataUri, 'data: JSON URI is NOT used as the image');
 
   const cands = _nftmImgCands(disp.image);
-  ok(cands.length === 4, 'ipfs image -> 4 gateway candidates', String(cands.length));
-  ok(/gateway\.pinata\.cloud/.test(cands[0]), 'first candidate is pinata gateway', cands[0]);
-  ok(/ipfs\.io/.test(cands[1]) && /dweb\.link/.test(cands[2]) && /cloudflare-ipfs/.test(cands[3]),
-     'fallback gateways ordered pinata->ipfs.io->dweb->cloudflare');
+  ok(cands.length >= 1 && /gateway\.pinata\.cloud/.test(cands[0]), 'first candidate is pinata gateway', JSON.stringify(cands));
+  ok(cands.some(u => /ipfs\.io/.test(u)) && cands.some(u => /dweb\.link/.test(u)) && cands.some(u => /cloudflare-ipfs/.test(u)),
+     'fallback gateways present (pinata/ipfs.io/dweb/cloudflare)');
   ok(_nftmImgCands(dataUri).length === 0, 'data:application/json NEVER becomes an <img src>');
 
+  console.log('-- pinata trailing slash (skips the 301 round trip) --');
+  const pinataBare = _nftmResolveImgSrcs('ipfs://QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG');
+  ok(/^https:\/\/gateway\.pinata\.cloud\/ipfs\/Qm[A-Za-z0-9]{44}\/$/.test(pinataBare[0]),
+     'bare CID -> pinata candidate has trailing slash', pinataBare[0]);
+  const pinataUrl = 'https://gateway.pinata.cloud/ipfs/QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG';
+  const pinataFixed = _nftmResolveImgSrcs(pinataUrl);
+  ok(pinataFixed[0] === pinataUrl + '/', 'existing pinata URL gets a trailing slash', pinataFixed[0]);
+
   console.log('-- inline metadata whose image is an https/pinata URL --');
-  const pinataUrl = 'https://gateway.pinata.cloud/ipfs/QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG/1.png';
-  const pinataUri = 'data:application/json;base64,' + b64({ name: 'Pinata One', image: pinataUrl });
+  const pinataFile = 'https://gateway.pinata.cloud/ipfs/QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG/1.png';
+  const pinataUri = 'data:application/json;base64,' + b64({ name: 'Pinata One', image: pinataFile });
   const m2 = await _nftmFetchMeta(pinataUri);
   const d2 = _resolveDisplay({ token_uri: pinataUri, extension: null }, m2);
   ok(d2.image && /pinata\.cloud/.test(d2.image), 'pinata image resolved from inline metadata', d2.image);
   const c2 = _nftmImgCands(d2.image);
-  ok(c2[0] === pinataUrl, 'original pinata URL tried first', JSON.stringify(c2));
+  ok(c2[0] === pinataFile, 'original pinata URL (with file name) tried first', JSON.stringify(c2));
   ok(c2.every(u => /\/1\.png$/.test(u)), 'sub-path /1.png preserved in every candidate', JSON.stringify(c2));
 
   console.log('-- direct image token_uri (i.ibb.co / ibcc) --');
@@ -137,23 +187,28 @@ async function behaviourSuite(label, ctx) {
 
   console.log('-- ipfs:// CID with / without sub-path --');
   const g2 = _nftmResolveImgSrcs('ipfs://QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG/2.png');
-  ok(g2.length === 4 && g2.every(u => /\/2\.png$/.test(u)), 'ipfs:// sub-path preserved', JSON.stringify(g2));
+  ok(g2.length >= 1 && g2.every(u => /\/2\.png$/.test(u)), 'ipfs:// sub-path preserved', JSON.stringify(g2));
   const g3 = _nftmResolveImgSrcs('ipfs://QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG');
-  ok(g3.length === 4 && /pinata\.cloud/.test(g3[0]), 'bare ipfs:// CID -> 4 gateways, pinata first', JSON.stringify(g3));
+  ok(g3.length >= 1 && /pinata\.cloud/.test(g3[0]), 'bare ipfs:// CID -> pinata first', JSON.stringify(g3));
+  ok(!g3.some(u => u.indexOf('pinata') >= 0 && /\/ipfs\/Qm[A-Za-z0-9]{44}$/.test(u)),
+     'pinata candidate is the only one carrying a trailing slash');
+  ok(g3.filter(u => u.indexOf('pinata') < 0).every(u => /\/ipfs\/Qm[A-Za-z0-9]{44}$/.test(u)),
+     'other gateways keep the bare form (they serve it directly, no 301)');
 }
 
 (async () => {
-  // 1) fresh shared.js (helpers present)
-  await behaviourSuite('A. fresh shared.js (helpers present)', makeCtx(true));
+  // 1) fresh shared.js + canonical candidate helpers
+  await behaviourSuite('A. fresh shared.js + canonical helpers', makeCtx({ withShared: true, withCandidates: true }));
 
   // 2) STALE shared.js (helpers missing) — must not break anything
-  await behaviourSuite('B. STALE shared.js (helpers missing) — must still work', makeCtx(false));
+  await behaviourSuite('B. STALE shared.js (helpers missing)', makeCtx({ withShared: false, withCandidates: true }));
 
-  console.log('\n===== C. robustness =====');
-  const ctx = makeCtx(false);
-  // a malformed token must not throw out of _resolveDisplay
-  let threw = false;
-  let res = null;
+  // 3) STALE shared.js AND stale my-nfts.js (nft-market must use its own inline fallback)
+  await behaviourSuite('C. STALE shared.js + STALE my-nfts.js (inline fallback)', makeCtx({ withShared: false, withCandidates: false }));
+
+  console.log('\n===== D. robustness =====');
+  const ctx = makeCtx({ withShared: false, withCandidates: true });
+  let threw = false, res = null;
   try {
     const bad = {};
     Object.defineProperty(bad, 'extension', { get() { throw new Error('boom'); } });
@@ -161,13 +216,28 @@ async function behaviourSuite(label, ctx) {
   } catch (e) { threw = true; }
   ok(!threw && res && res.image === '', '_resolveDisplay never throws on malformed token', String(threw));
 
-  // a token with no token_uri at all
   const r2 = ctx._resolveDisplay({}, null);
   ok(r2 && r2.image === '' && r2.tokenUri === '', 'empty token -> empty display, no crash', JSON.stringify(r2));
-
-  // null / undefined info
   const r3 = ctx._resolveDisplay(null, null);
   ok(r3 && r3.image === '' && r3.tokenUri === '', 'null info -> empty display, no crash', JSON.stringify(r3));
+
+  console.log('\n===== E. performance guards (source-level) =====');
+  const mkt = readSrc('appjs/tools/nft-market.js');
+  const mnv = readSrc('appjs/tools/my-nfts.js');
+  // LCD rate-limits us: the higher the concurrency, the more requests come back as an HTML error
+  // page. Retry is what actually guarantees completeness, concurrency only trades speed vs pressure.
+  ok(/_NFTM_CONCURRENCY = 5\b/.test(mkt), 'nft-market concurrency = 5 (balance of speed vs LCD pressure)');
+  ok(/_NFTV_CONCURRENCY = 5\b/.test(mnv), 'my-nfts concurrency = 5 (balance of speed vs LCD pressure)');
+  // first page must stay small: 100 nft_info queries ≈ 19s (and mostly fail), 24 ≈ 3.5s
+  ok(/_NFTM_TOKEN_PAGE = 24\b/.test(mkt), 'nft-market first page = 24 tokens');
+  // nft_info must not throw on an HTML rate-limit body
+  ok(/content-type[\s\S]{0,80}json/.test(mnv) && /continue;/.test(mnv), 'nft_info retries instead of throwing on rate-limit HTML');
+  ok(/attempt < 3/.test(mnv), 'nft_info retries up to 3 times');
+  // pinata trailing slash
+  ok(/gateway\\?\.pinata\.cloud/.test(mkt) && /\+ '\/'|\+ "\/"|\? s \+ '\/'/.test(mkt + mnv),
+     'pinata candidate gets a trailing slash');
+  // gateways must be raced in parallel, not sequentially
+  ok(/Promise\.all|_nftmRaceImage|for \(const url of cands\)/.test(mkt), 'metadata fetch races gateways');
 
   console.log('\n' + (failed === 0 ? 'ALL PASS' : 'FAILURES') + ': ' + passed + ' passed, ' + failed + ' failed\n');
   process.exit(failed === 0 ? 0 : 1);

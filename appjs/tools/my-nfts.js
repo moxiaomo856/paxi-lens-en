@@ -9,7 +9,7 @@ if (!window.TOOL_REGISTRY) window.TOOL_REGISTRY = {};
 // state
 // ============================================================
 const _NFTV_PAGE_SIZE = 20;
-const _NFTV_CONCURRENCY = 10;
+const _NFTV_CONCURRENCY = 5;   // LCD 会限流（并发越高失败越多），靠重试兜底，5 是速度/压力平衡点
 const _NFTV_META_TIMEOUT = 5000;
 const _NFTV_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
@@ -257,14 +257,15 @@ function renderNextPage() {
 
 function _renderNftCard(tokenId, display) {
   const d = display || {};
-  const imgSrc = safeNftImgSrc(d.image);
+  const imgCands = _nftImgCandidates(d.image).filter(c => /^https?:\/\//i.test(c) || /^data:image\//i.test(c));
+  const imgSrc = imgCands[0] || '';
   const attrs = d.attrs || [];
   const name = d.name || tokenId;
   return `
     <div class="nft-card" data-token-id="${escapeHtml(tokenId)}" style="cursor:pointer;">
       <div class="nft-card-img">
         <div class="nft-card-placeholder" style="display:${imgSrc ? 'none' : 'flex'};">🎨</div>
-        ${imgSrc ? `<img src="${imgSrc}" loading="lazy" onerror="this.style.display='none';this.previousElementSibling.style.display='flex';">` : ''}
+        ${imgSrc ? `<img src="${escapeHtml(imgSrc)}" data-nft-cands='${escapeHtml(JSON.stringify(imgCands.slice(1)))}' loading="lazy" onerror="_nftvImgErr(this)">` : ''}
       </div>
       <div class="nft-card-body">
         <div class="nft-card-name">${escapeHtml(name)}</div>
@@ -285,7 +286,8 @@ function showNftDetail(tokenId, contract) {
     const it = _nftvAllChain.find(x => x.tokenId === tokenId && x.contract === contract);
     if (it) { d = it.display || {}; c = it.contract; }
   }
-  const imgSrc = safeNftImgSrc(d.image);
+  const imgCands = _nftImgCandidates(d.image).filter(c => /^https?:\/\//i.test(c) || /^data:image\//i.test(c));
+  const imgSrc = imgCands[0] || '';
   const attrs = d.attrs || [];
   const existing = document.getElementById('nftvModal');
   if (existing) existing.remove();
@@ -297,8 +299,9 @@ function showNftDetail(tokenId, contract) {
     <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:14px;max-width:420px;width:100%;max-height:90vh;overflow-y:auto;padding:20px;position:relative;">
       <button onclick="document.getElementById('nftvModal').remove()" style="position:absolute;top:12px;right:12px;background:var(--bg);border:1px solid var(--border);color:var(--text);width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:16px;line-height:1;">✕</button>
       <div style="text-align:center;margin-bottom:14px;">
-        <div style="width:100%;max-width:240px;aspect-ratio:1;margin:0 auto 12px;background:var(--bg);border-radius:12px;overflow:hidden;display:flex;align-items:center;justify-content:center;">
-          ${imgSrc ? `<img src="${imgSrc}" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentElement.innerHTML='<div style=&quot;font-size:48px;&quot;>🎨</div>'">` : '<div style="font-size:48px;">🎨</div>'}
+        <div style="position:relative;width:100%;max-width:240px;aspect-ratio:1;margin:0 auto 12px;background:var(--bg);border-radius:12px;overflow:hidden;display:flex;align-items:center;justify-content:center;">
+          <div class="nft-card-placeholder" style="position:absolute;inset:0;display:${imgSrc ? 'none' : 'flex'};align-items:center;justify-content:center;font-size:48px;">🎨</div>
+          ${imgSrc ? `<img id="nftvModalImg" src="${escapeHtml(imgSrc)}" data-nft-cands='${escapeHtml(JSON.stringify(imgCands.slice(1)))}' style="width:100%;height:100%;object-fit:cover;" onerror="_nftvImgErr(this)">` : ''}
         </div>
         <h3 style="font-size:17px;margin-bottom:4px;">${escapeHtml(d.name || tokenId)}</h3>
         <div style="font-size:12px;color:var(--text-muted);">Token #${escapeHtml(tokenId)}</div>
@@ -327,6 +330,12 @@ function showNftDetail(tokenId, contract) {
   `;
   modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
   document.body.appendChild(modal);
+
+  // single image in the detail view: race all gateway candidates, use whichever decodes first
+  const modalImg = document.getElementById('nftvModalImg');
+  if (modalImg && imgCands.length > 1) {
+    _nftRaceImage(imgCands, (u) => { modalImg.src = u; });
+  }
 
   // bind the send/transfer button inside the modal
   const btnModal = document.getElementById('btnNftvModalTransfer');
@@ -407,27 +416,57 @@ async function _queryAllTokens(contract, owner) {
     const query = { tokens: { owner, limit: 100, ...(startAfter ? { start_after: startAfter } : {}) } };
     const encoded = btoa(JSON.stringify(query));
     const url = `${CONFIG.lcd}/cosmwasm/wasm/v1/contract/${contract}/smart/${encoded}`;
-    const res = await fetch(url);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json();
-    const parsed = _decodeSmartQuery(data);
+    let parsed = null;
+    for (let attempt = 0; attempt < 3 && !parsed; attempt++) {
+      if (attempt) await new Promise(r => setTimeout(r, 300 * attempt * attempt));
+      try {
+        const res = await fetch(url);
+        if (!res.ok) {
+          if (res.status === 429 || res.status >= 500) continue;
+          throw new Error(`HTTP ${res.status}`);
+        }
+        const text = await res.text();
+        const ct = res.headers.get('content-type') || '';
+        if (!ct.includes('json') && !text.trim().startsWith('{')) continue; // rate-limit HTML -> retry
+        parsed = _decodeSmartQuery(JSON.parse(text));
+      } catch (e) {
+        if (attempt === 2) throw e; // real error -> surface it
+      }
+    }
     const tokens = parsed?.tokens || parsed?.ids || [];
     all.push(...tokens);
     if (tokens.length < 100) break;
     startAfter = tokens[tokens.length - 1];
-    if (all.length >= 500) break; // safety cap
+    if (all.length >= 120) break; // safety cap (each token costs one LCD query)
   }
   return all;
 }
 
+// Query one token's nft_info. The LCD rate-limits us: once concurrency is too high it answers
+// with an HTML error page instead of JSON, and res.json() would THROW — which used to blow up the
+// whole Promise.all batch and blank the entire page. So: parse defensively, retry with backoff on
+// rate-limit/5xx, and never throw (worst case we return {} and the card stays a placeholder).
 async function _queryNftInfo(contract, tokenId) {
   const query = { nft_info: { token_id: tokenId } };
   const encoded = btoa(JSON.stringify(query));
   const url = `${CONFIG.lcd}/cosmwasm/wasm/v1/contract/${contract}/smart/${encoded}`;
-  const res = await fetch(url);
-  if (!res.ok) return {};
-  const data = await res.json();
-  return _decodeSmartQuery(data) || {};
+  for (let attempt = 0; attempt < 3; attempt++) {
+    if (attempt) await new Promise(r => setTimeout(r, 300 * attempt * attempt)); // 300ms, 1200ms
+    try {
+      const res = await fetch(url);
+      if (!res.ok) {
+        if (res.status === 429 || res.status >= 500) continue; // rate limited / server error -> retry
+        return {};
+      }
+      const text = await res.text();
+      const ct = res.headers.get('content-type') || '';
+      if (!ct.includes('json') && !text.trim().startsWith('{')) continue; // HTML rate-limit page -> retry
+      return _decodeSmartQuery(JSON.parse(text)) || {};
+    } catch (_) {
+      // network hiccup / non-JSON body -> retry, and on the last attempt give up quietly
+    }
+  }
+  return {};
 }
 
 // concurrent batch processing (limits concurrency)
@@ -439,6 +478,125 @@ async function _queryBatch(fn, items, limit) {
     res.forEach((r, j) => { results[i + j] = r; });
   }
   return results;
+}
+
+// ============ IPFS gateway / image candidate helpers ============
+// Measured from a mainland-CN line (2026-10-28):
+//   gateway.pinata.cloud  reachable, but 301-redirects /ipfs/<cid> -> /ipfs/<cid>/  (extra round trip:
+//                            12.3s -> 7.2s once we add the trailing slash ourselves)
+//   ipfs.io / dweb.link / cloudflare-ipfs.com  all time out (10s)
+//   nftstorage.link  only redirects to ipfs.io -> useless
+// So: build several candidates, skip gateways that recently failed (circuit breaker), and race
+// them in parallel instead of waiting for one dead gateway to time out before trying the next.
+const _NFT_IPFS_GATEWAYS = [
+  'https://gateway.pinata.cloud/ipfs/',
+  'https://ipfs.io/ipfs/',
+  'https://dweb.link/ipfs/',
+  'https://cloudflare-ipfs.com/ipfs/',
+];
+const _NFT_GW_BLOCK_MS = 60000;
+const _nftGwState = new Map(); // host -> { fails, until }
+
+// a gateway that keeps failing is skipped for the rest of the session (avoid hammering it)
+function _nftGwBlocked(url) {
+  try {
+    const host = new URL(url).host;
+    const st = _nftGwState.get(host);
+    if (!st) return false;
+    if (Date.now() > st.until) { _nftGwState.delete(host); return false; }
+    return st.fails >= 2;
+  } catch (_) { return false; }
+}
+function _nftGwFail(url) {
+  try {
+    const host = new URL(url).host;
+    const st = _nftGwState.get(host) || { fails: 0, until: 0 };
+    st.fails += 1;
+    st.until = Date.now() + _NFT_GW_BLOCK_MS;
+    _nftGwState.set(host, st);
+  } catch (_) {}
+}
+function _nftGwOk(url) {
+  try { _nftGwState.delete(new URL(url).host); } catch (_) {}
+}
+
+// Build the list of URLs that may serve the image behind `uri`.
+// IPFS/Arweave get gateway maps; unknown schemes are kept raw so the link can still be shown.
+function _nftImgCandidates(uri) {
+  if (!uri || typeof uri !== 'string') return [];
+  const s = uri.trim();
+  if (!s) return [];
+  if (s.startsWith('ar://')) {
+    const p = s.slice(5);
+    const i = p.indexOf('/');
+    const id = i < 0 ? p : p.slice(0, i);
+    const rest = i < 0 ? '' : p.slice(i);
+    return id ? ['https://arweave.net/' + id + rest, 'https://arweave.dev/' + id + rest] : [];
+  }
+  let cid = '', rest = '';
+  if (s.startsWith('ipfs://')) {
+    const p = s.slice(7);
+    const i = p.indexOf('/');
+    cid = i < 0 ? p : p.slice(0, i);
+    rest = i < 0 ? '' : p.slice(i);
+  } else {
+    // http(s) URL that embeds /ipfs/<cid>[/sub/path] — keep the sub-path (e.g. /1.png)
+    const m = s.match(/\/ipfs\/(Qm[1-9A-HJ-NP-Za-km-z]{44}|baf[a-z0-9]{44,})(\/[^?#]*)?/);
+    if (m) { cid = m[1]; rest = m[2] || ''; }
+  }
+  if (cid) {
+    const list = [];
+    const seen = new Set();
+    const push = (u) => { if (u && !seen.has(u)) { seen.add(u); list.push(u); } };
+    // an already-resolved gateway URL is tried first (it is a working host)
+    if (/^https?:\/\//i.test(s)) {
+      // pinata 301-redirects when the path has no trailing slash — add it ourselves
+      push(/^https:\/\/gateway\.pinata\.cloud\/ipfs\/[^/]+$/.test(s) ? s + '/' : s);
+    }
+    for (const g of _NFT_IPFS_GATEWAYS) {
+      if (_nftGwBlocked(g)) continue;
+      const isPinata = g.indexOf('gateway.pinata.cloud') >= 0;
+      // no sub-path -> pinata wants a trailing slash (skips the 301 round trip)
+      push(isPinata && !rest ? g + cid + '/' : g + cid + rest);
+    }
+    return list;
+  }
+  if (/^(https?:\/\/|data:)/i.test(s)) return [s];
+  return [s];
+}
+
+// Preload candidates in parallel and hand back the FIRST one that actually decodes.
+// Serial onerror-fallback waits for a dead gateway to time out before trying the next one.
+function _nftRaceImage(cands, onWin) {
+  if (!cands || !cands.length) return;
+  let done = false;
+  const win = (u) => {
+    if (done) return;
+    done = true;
+    try { onWin(u); } catch (_) {}
+  };
+  for (const u of cands) {
+    try {
+      const probe = new Image();
+      probe.onload = () => { _nftGwOk(u); win(u); };
+      probe.onerror = () => { _nftGwFail(u); };
+      probe.src = u;
+    } catch (_) {}
+  }
+}
+
+// <img> fallback chain: try the next candidate, else show the 🎨 placeholder
+function _nftvImgErr(img) {
+  const ph = img && img.previousElementSibling;
+  let next = [];
+  try { next = JSON.parse(img.getAttribute('data-nft-cands') || '[]'); } catch (_) { next = []; }
+  if (next.length) {
+    img.setAttribute('data-nft-cands', JSON.stringify(next.slice(1)));
+    img.src = next[0];
+    return;
+  }
+  if (img) img.style.display = 'none';
+  if (ph) ph.style.display = 'flex';
 }
 
 // ---- local, dependency-free helpers ------------------------------------------------
@@ -674,7 +832,8 @@ function _renderAllChainResults(items, contractCount) {
 
 function _renderAllChainCard(item) {
   const d = item.display || {};
-  const imgSrc = safeNftImgSrc(d.image);
+  const imgCands = _nftImgCandidates(d.image).filter(c => /^https?:\/\//i.test(c) || /^data:image\//i.test(c));
+  const imgSrc = imgCands[0] || '';
   const attrs = d.attrs || [];
   const name = d.name || item.tokenId;
   const shortC = item.contract.slice(0, 8) + '...' + item.contract.slice(-4);
@@ -682,7 +841,7 @@ function _renderAllChainCard(item) {
     <div class="nft-card" data-token-id="${escapeHtml(item.tokenId)}" data-contract="${escapeHtml(item.contract)}" style="cursor:pointer;">
       <div class="nft-card-img">
         <div class="nft-card-placeholder" style="display:${imgSrc ? 'none' : 'flex'};">🎨</div>
-        ${imgSrc ? `<img src="${imgSrc}" loading="lazy" onerror="this.style.display='none';this.previousElementSibling.style.display='flex';">` : ''}
+        ${imgSrc ? `<img src="${escapeHtml(imgSrc)}" data-nft-cands='${escapeHtml(JSON.stringify(imgCands.slice(1)))}' loading="lazy" onerror="_nftvImgErr(this)">` : ''}
       </div>
       <div class="nft-card-body">
         <div class="nft-card-name">${escapeHtml(name)}</div>
